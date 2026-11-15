@@ -1,0 +1,38 @@
+"""Pytest fixtures for backend test suite."""
+
+import sys
+from pathlib import Path
+import pytest
+
+# Ensure project root is discoverable
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from backend.app import create_app
+
+
+@pytest.fixture(scope="session")
+def app():
+    """Create Flask application in testing mode."""
+    application = create_app()
+    application.config.update({"TESTING": True})
+    return application
+
+
+@pytest.fixture(scope="session")
+def client(app):
+    """Test client for HTTP assertions."""
+    return app.test_client()
+
+
+@pytest.fixture
+def sample_features():
+    """Standard realistic meteorological sample."""
+    return {
+        "RH": 55.0,
+        "WD": 180.0,
+        "SR": 350.0,
+        "BP": 745.0,
+        "AT": 28.0,
+    }
