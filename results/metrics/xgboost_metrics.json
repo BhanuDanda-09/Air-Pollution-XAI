@@ -1,0 +1,45 @@
+{
+    "model_type": "XGBRegressor",
+    "best_hyperparameters": {
+        "subsample": 0.9,
+        "reg_lambda": 5.0,
+        "reg_alpha": 0,
+        "n_estimators": 250,
+        "min_child_weight": 2,
+        "max_depth": 7,
+        "learning_rate": 0.1,
+        "gamma": 0,
+        "colsample_bytree": 0.8,
+        "cv_best_rmse": 39.2468978881836,
+        "cv_folds": 5,
+        "n_iter": 30
+    },
+    "train_samples": 1621,
+    "test_samples": 406,
+    "features": [
+        "RH",
+        "WD",
+        "SR",
+        "BP",
+        "AT"
+    ],
+    "test_metrics": {
+        "MAE": 25.282991409301758,
+        "MSE": 1349.5732421875,
+        "RMSE": 36.73653824447127,
+        "R2_Score": 0.7454586029052734
+    },
+    "train_metrics": {
+        "MAE": 8.849754333496094,
+        "MSE": 155.9350128173828,
+        "RMSE": 12.487394156403601,
+        "R2_Score": 0.9703536629676819
+    },
+    "feature_importances": {
+        "RH": 0.2735788822174072,
+        "AT": 0.21807348728179932,
+        "BP": 0.19986024498939514,
+        "SR": 0.16154992580413818,
+        "WD": 0.1469375044107437
+    }
+}
