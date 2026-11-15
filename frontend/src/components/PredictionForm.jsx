@@ -54,23 +54,29 @@ export default function PredictionForm({
           </p>
         </div>
 
-        {/* Model dropdown */}
-        <div className="flex items-center gap-2">
-          <label htmlFor="model-select" className="text-xs font-semibold text-slate-600 whitespace-nowrap">
-            Model:
-          </label>
-          <select
-            id="model-select"
-            value={selectedModel}
-            onChange={(e) => onModelChange(e.target.value)}
-            disabled={loading}
-            className="text-xs font-semibold bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            <option value="xgboost">XGBoost Regressor (Top Performer: R²=0.7455)</option>
-            <option value="random_forest">Random Forest Regressor (R²=0.7269)</option>
-            <option value="mlp">Multilayer Perceptron (MLP) (R²=0.5408)</option>
-          </select>
-        </div>
+        {/* Model dropdown or Multi-model mode badge */}
+        {selectedModel === 'all' ? (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold">
+            <span>Evaluating All 3 Models</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <label htmlFor="model-select" className="text-xs font-semibold text-slate-600 whitespace-nowrap">
+              Model:
+            </label>
+            <select
+              id="model-select"
+              value={selectedModel}
+              onChange={(e) => onModelChange(e.target.value)}
+              disabled={loading}
+              className="text-xs font-semibold bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            >
+              <option value="xgboost">XGBoost Regressor (Top Performer: R²=0.7455)</option>
+              <option value="random_forest">Random Forest Regressor (R²=0.7269)</option>
+              <option value="mlp">Multilayer Perceptron (MLP) (R²=0.5408)</option>
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Quick Scenario Presets */}
@@ -187,12 +193,12 @@ export default function PredictionForm({
           {loading ? (
             <>
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>Running Inference...</span>
+              <span>{selectedModel === 'all' ? 'Comparing Models...' : 'Running Inference...'}</span>
             </>
           ) : (
             <>
               <Play className="w-4 h-4 fill-current" />
-              <span>Predict PM2.5</span>
+              <span>{selectedModel === 'all' ? 'Compare All Models' : 'Predict PM2.5'}</span>
             </>
           )}
         </button>

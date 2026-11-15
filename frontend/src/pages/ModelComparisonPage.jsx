@@ -3,7 +3,7 @@ import usePrediction from '../hooks/usePrediction';
 import PredictionForm from '../components/PredictionForm';
 import ModelComparison from '../components/ModelComparison';
 import ErrorMessage from '../components/ErrorMessage';
-import { GitCompare, Trophy, BarChart2, ShieldAlert } from 'lucide-react';
+import { GitCompare, Trophy, BarChart2, ShieldAlert, AlertTriangle } from 'lucide-react';
 
 export default function ModelComparisonPage() {
   const {
@@ -33,13 +33,27 @@ export default function ModelComparisonPage() {
         </p>
       </div>
 
-      {/* Error Alert */}
-      {error && (
+      {/* Error Alert (only if no results could be retrieved) */}
+      {error && !comparisonResult && (
         <ErrorMessage
           title="Comparison Notice"
           message={error}
           onRetry={() => compare()}
         />
+      )}
+
+      {/* Partial Failure Warning Banner */}
+      {comparisonResult?.has_partial_failures && (
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-3">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold">Partial Multi-Model Evaluation: </span>
+            <span>
+              Live inference is online for {comparisonResult.successful_models} of {comparisonResult.total_models} models. 
+              Models with offline inference display their verified held-out test benchmarks without fabricated predictions.
+            </span>
+          </div>
+        </div>
       )}
 
       {/* Input Parameters Form (reuses PredictionForm without model dropdown) */}

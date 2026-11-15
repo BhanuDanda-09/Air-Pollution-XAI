@@ -17,11 +17,14 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 export default function ModelComparison({ comparisonData }) {
   if (!comparisonData || !comparisonData.predictions) return null;
 
-  const { predictions, best_model, comparison_summary } = comparisonData;
+  const { predictions, best_model, comparison_summary, has_partial_failures } = comparisonData;
 
   const modelKeys = Object.keys(predictions);
-  const labels = modelKeys.map((k) => predictions[k].display_name || k);
-  const pm25Values = modelKeys.map((k) => predictions[k].pm25);
+  const availableKeys = modelKeys.filter(
+    (k) => predictions[k].pm25 !== null && predictions[k].pm25 !== undefined
+  );
+  const labels = availableKeys.map((k) => predictions[k].display_name || k);
+  const pm25Values = availableKeys.map((k) => predictions[k].pm25);
 
   const chartData = {
     labels,
@@ -29,10 +32,10 @@ export default function ModelComparison({ comparisonData }) {
       {
         label: 'Predicted PM2.5 (µg/m³)',
         data: pm25Values,
-        backgroundColor: modelKeys.map((k) =>
+        backgroundColor: availableKeys.map((k) =>
           k === best_model ? 'rgba(37, 99, 235, 0.85)' : 'rgba(100, 116, 139, 0.65)'
         ),
-        borderColor: modelKeys.map((k) =>
+        borderColor: availableKeys.map((k) =>
           k === best_model ? '#1D4ED8' : '#475569'
         ),
         borderWidth: 1.5,
@@ -107,15 +110,29 @@ export default function ModelComparison({ comparisonData }) {
               {/* Prediction */}
               <div className="my-3 py-2 px-3 rounded-xl bg-white border border-slate-200/80">
                 <div className="text-[10px] font-semibold text-slate-400 uppercase">Input Prediction</div>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-2xl font-black text-navy-800">{item.pm25}</span>
-                  <span className="text-xs text-slate-500">µg/m³</span>
-                </div>
-                <div className="mt-1 flex items-center gap-1.5">
-                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${cpcbStyle.badge}`}>
-                    {item.cpcb_category}
-                  </span>
-                </div>
+                {item.pm25 !== null && item.pm25 !== undefined ? (
+                  <>
+                    <div className="flex items-baseline gap-1.5 mt-0.5">
+                      <span className="text-2xl font-black text-navy-800">{item.pm25}</span>
+                      <span className="text-xs text-slate-500">µg/m³</span>
+                    </div>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-md ${cpcbStyle.badge}`}>
+                        {item.cpcb_category}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-1">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                      <span>{item.status === 'unavailable' ? 'Live Inference Offline' : 'Inference Blocked'}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">
+                      {item.error || 'Live inference temporarily unavailable. Showing verified generalization benchmark below.'}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Held-out test metrics */}
@@ -146,7 +163,13 @@ export default function ModelComparison({ comparisonData }) {
           <span>Comparative Predicted Concentration for Current Input</span>
         </h4>
         <div className="h-64">
-          <Bar data={chartData} options={chartOptions} />
+          {availableKeys.length > 0 ? (
+            <Bar data={chartData} options={chartOptions} />
+          ) : (
+            <div className="h-full flex items-center justify-center text-xs text-slate-400">
+              No live model predictions available for the chart. Precomputed held-out benchmarks are shown above.
+            </div>
+          )}
         </div>
       </div>
 

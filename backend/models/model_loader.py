@@ -115,12 +115,16 @@ class ModelLoader:
                 self.load_status["mlp"] = True
                 logger.info("Loaded MLP model and scaler from %s and %s", mlp_path, scaler_path)
                 # KernelExplainer with zero-centered normalized background (5 features)
-                background = np.zeros((1, 5))
-                self.mlp_explainer = shap.KernelExplainer(
-                    lambda x: self.mlp_model.predict(x, verbose=0).flatten(),
-                    background,
-                )
+                try:
+                    background = np.zeros((1, 5))
+                    self.mlp_explainer = shap.KernelExplainer(
+                        lambda x: self.mlp_model.predict(x, verbose=0).flatten(),
+                        background,
+                    )
+                except Exception as explainer_exc:
+                    logger.warning("Could not initialize SHAP KernelExplainer for MLP: %s", explainer_exc)
             except Exception as exc:
+                self.load_status["mlp"] = False
                 self.load_errors["mlp"] = str(exc)
                 logger.error("Failed loading MLP: %s", exc)
         else:

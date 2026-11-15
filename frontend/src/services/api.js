@@ -7,7 +7,7 @@ const API_BASE_URL =
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 45000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -33,9 +33,13 @@ api.interceptors.response.use(
       } else {
         customMessage = `Server returned status ${error.response.status}`;
       }
+    } else if (error.code === 'ECONNABORTED' || error.message?.toLowerCase().includes('timeout')) {
+      // Request exceeded timeout threshold
+      customMessage = `Request timed out after 45 seconds while waiting for ${API_BASE_URL}. The server may be processing complex multi-model inference or waking from idle. Please try again.`;
+      errorCode = 'REQUEST_TIMEOUT';
     } else if (error.request) {
       // Request made but no response received (Backend down or CORS issue)
-      customMessage = `Unable to connect to backend server at ${API_BASE_URL}. Ensure the Flask server is running.`;
+      customMessage = `Unable to connect to backend server at ${API_BASE_URL}. Ensure the Flask server is running and accessible.`;
       errorCode = 'SERVER_UNREACHABLE';
     } else {
       customMessage = error.message;
