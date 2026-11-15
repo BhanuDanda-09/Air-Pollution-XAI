@@ -1,4 +1,4 @@
 Model,Paradigm,MAE,MSE,RMSE,R2
 Random Forest,Traditional ML (Bagging),25.6211,1447.9012,38.0513,0.7269
 XGBoost,Gradient Boosting,25.283,1349.5732,36.7365,0.7455
-Multilayer Perceptron (MLP),Deep Learning (Neural Net),38.3404,2524.012,50.2395,0.5239
+Multilayer Perceptron (MLP),Deep Learning (Neural Net),37.8782,2434.7852,49.3435,0.5408

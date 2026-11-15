@@ -35,7 +35,7 @@ VALIDATION_BOUNDS = {
     "RH": (0.0, 100.0, "%", "Relative Humidity"),
     "WD": (0.0, 360.0, "degrees", "Wind Direction"),
     "SR": (0.0, 1500.0, "W/m2", "Solar Radiation"),
-    "BP": (500.0, 1100.0, "hPa", "Barometric Pressure"),
+    "BP": (700.0, 780.0, "mmHg", "Barometric Pressure"),
     "AT": (-20.0, 60.0, "°C", "Air Temperature"),
 }
 
@@ -120,7 +120,7 @@ def print_prediction_card(features_dict, predicted_pm25):
     print("-" * 65)
     print(f"PREDICTED PM2.5 CONCENTRATION:  {predicted_pm25:.2f} µg/m³")
 
-    # Air Quality Index (AQI) Category Context (CPCB Standard)
+    # Indicative CPCB PM2.5 Health Severity Category (Concentration Breakpoints)
     if predicted_pm25 <= 30:
         category = "Good (0 - 30 µg/m³)"
     elif predicted_pm25 <= 60:
@@ -134,12 +134,16 @@ def print_prediction_card(features_dict, predicted_pm25):
     else:
         category = "Severe (> 250 µg/m³)"
 
-    print(f"INDIAN CPCB PM2.5 CATEGORY:     {category}")
+    print(f"INDICATIVE CPCB PM2.5 HEALTH BAND:  {category}")
     print("-" * 65)
-    print("SCIENTIFIC NOTICE:")
-    print("  * This value is an AI model ESTIMATION derived strictly from 5")
-    print("    meteorological features using a trained Multilayer Perceptron.")
-    print("  * It is NOT an in-situ certified regulatory sensor measurement.")
+    print("SCIENTIFIC NOTICES & REGULATORY DISCLAIMERS:")
+    print("  * Model Prediction: This value is an AI regression estimation")
+    print("    derived from 5 instantaneous meteorological indicators, NOT an")
+    print("    in-situ certified regulatory particulate monitor measurement.")
+    print("  * AQI Distinction: This output reflects an indicative single-pollutant")
+    print("    health severity band based on CPCB PM2.5 concentration breakpoints.")
+    print("    It is NOT an official CPCB AQI calculation, which requires a 24-hour")
+    print("    time-weighted running average and multi-pollutant sub-index aggregation.")
     print("=" * 65 + "\n")
 
 
@@ -180,7 +184,7 @@ def main():
     parser.add_argument("--rh", type=float, help="Relative Humidity (0-100 percent)")
     parser.add_argument("--wd", type=float, help="Wind Direction (0-360 degrees)")
     parser.add_argument("--sr", type=float, help="Solar Radiation (W/m2)")
-    parser.add_argument("--bp", type=float, help="Barometric Pressure (hPa/mmHg)")
+    parser.add_argument("--bp", type=float, help="Barometric Pressure in mmHg (typical Delhi range: 720-760 mmHg)")
     parser.add_argument("--at", type=float, help="Air Temperature (deg C)")
     parser.add_argument("--example", action="store_true", help="Run with verified capstone example inputs (RH=74, WD=298, SR=5, BP=740, AT=14)")
 

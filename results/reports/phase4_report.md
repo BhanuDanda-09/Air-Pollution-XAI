@@ -37,7 +37,7 @@ This phase evaluates whether neural network architectures can improve predictive
   1. `RH` — Relative Humidity ($\%$)
   2. `WD` — Wind Direction (degrees, $0^{\circ} - 360^{\circ}$)
   3. `SR` — Solar Radiation ($\text{W/m}^2$)
-  4. `BP` — Barometric Pressure ($\text{hPa}$)
+  4. `BP` — Barometric Pressure ($\text{mmHg}$)
   5. `AT` — Air Temperature ($^{\circ}\text{C}$)
 - **Target Variable:**
   - `PM2.5` — Particulate Matter $2.5$ mass concentration ($\mu\text{g/m}^3$).
@@ -76,8 +76,9 @@ pm25_output (Dense)        (None, 1)                  33      Linear regression 
 Total Trainable Parameters: 11,137 (43.50 KB)
 ```
 
-### Hyperparameters and Training Protocols
-- **Feature Scaling:** `StandardScaler` fitted strictly on $X_{\text{train}}$ ($\mu = 0, \sigma = 1$). Saved to `models/mlp_scaler.pkl`.
+### Hyperparameters and Leak-Free Preprocessing Protocols
+- **Validation-First Partitioning:** To guarantee zero data leakage between sub-training and validation partitions, the $1,621$ training samples were partitioned **first** into $1,377$ sub-training samples ($85\%$) and $244$ validation samples ($15\%$).
+- **Strictly Isolated Preprocessing Fitting:** Both `SimpleImputer(strategy='median')` and `StandardScaler()` were fitted **strictly on the $1,377$ sub-training samples only**. The validation and held-out test sets were transformed using the pre-fitted transformer without re-calculating means, variances, or medians. Serialized to `models/mlp_scaler.pkl`.
 - **Loss Function:** Mean Squared Error ($\text{MSE}$).
 - **Evaluation Metric:** Mean Absolute Error ($\text{MAE}$).
 - **Optimizer:** Adam ($\alpha = 0.001$, $\beta_1 = 0.9, \beta_2 = 0.999$).
@@ -121,11 +122,11 @@ $$R^2 = 1 - \frac{\sum_{i=1}^N (y_i - \hat{y}_i)^2}{\sum_{i=1}^N (y_i - \bar{y})
 
 All three models evaluated on the identical 406 test samples:
 
-| Model | Paradigm | Test MAE ($\mu\text{g/m}^3$) | Test MSE | Test RMSE ($\mu\text{g/m}^3$) | Test $R^2$ Score |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| **XGBoost (Tuned)** | Gradient Boosted Decision Trees | **25.28** | **1349.57** | **36.74** | **0.7455** |
-| **Random Forest** | Bagging Ensemble | 25.62 | 1447.90 | 38.05 | 0.7269 |
-| **Multilayer Perceptron (MLP)** | Deep Feedforward Neural Network | 38.34 | 2524.01 | 50.24 | 0.5239 |
+| Model | Paradigm | Test MAE ($\mu\text{g/m}^3$) | Test MSE | Test RMSE ($\mu\text{g/m}^3$) | Test $R^2$ Score | Overall Rank |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **XGBoost (Tuned)** | Gradient Boosted Decision Trees | **25.28** | **1349.57** | **36.74** | **0.7455** | **1st** |
+| **Random Forest** | Bagging Ensemble | 25.62 | 1447.90 | 38.05 | 0.7269 | 2nd |
+| **Multilayer Perceptron (MLP)** | Deep Feedforward Neural Network | 37.88 | 2434.79 | 49.34 | 0.5408 | 3rd |
 
 ---
 
@@ -167,10 +168,10 @@ All graphs have been generated and saved at 300 DPI:
 
 ## 11. Interactive Prediction Tool
 
-An inference tool is available at `src/predict_mlp.py`. It provides input validation, scales features using the fitted pipeline, and outputs predictions alongside Indian CPCB air quality index categories:
+An inference tool is available at `src/predict_mlp.py`. It provides input validation, scales features using the leak-free fitted pipeline, and outputs predictions alongside indicative CPCB PM2.5 health severity breakpoint categories:
 
 ```bash
-# Run with verified capstone example parameters
+# Run with verified capstone example parameters (BP in mmHg)
 python src/predict_mlp.py --example
 
 # Or specify custom meteorological observations
@@ -189,16 +190,20 @@ INPUT METEOROLOGICAL PARAMETERS:
   • RH  (Relative Humidity   ):    74.00 %
   • WD  (Wind Direction      ):   298.00 degrees
   • SR  (Solar Radiation     ):     5.00 W/m2
-  • BP  (Barometric Pressure ):   740.00 hPa
+  • BP  (Barometric Pressure ):   740.00 mmHg
   • AT  (Air Temperature     ):    14.00 °C
 -----------------------------------------------------------------
-PREDICTED PM2.5 CONCENTRATION:  155.19 µg/m³
-INDIAN CPCB PM2.5 CATEGORY:     Very Poor (121 - 250 µg/m³)
+PREDICTED PM2.5 CONCENTRATION:  157.06 µg/m³
+INDICATIVE CPCB PM2.5 HEALTH BAND:  Very Poor (121 - 250 µg/m³)
 -----------------------------------------------------------------
-SCIENTIFIC NOTICE:
-  * This value is an AI model ESTIMATION derived strictly from 5
-    meteorological features using a trained Multilayer Perceptron.
-  * It is NOT an in-situ certified regulatory sensor measurement.
+SCIENTIFIC NOTICES & REGULATORY DISCLAIMERS:
+  * Model Prediction: This value is an AI regression estimation
+    derived from 5 instantaneous meteorological indicators, NOT an
+    in-situ certified regulatory particulate monitor measurement.
+  * AQI Distinction: This output reflects an indicative single-pollutant
+    health severity band based on CPCB PM2.5 concentration breakpoints.
+    It is NOT an official CPCB AQI calculation, which requires a 24-hour
+    time-weighted running average and multi-pollutant sub-index aggregation.
 =================================================================
 ```
 
@@ -208,6 +213,6 @@ SCIENTIFIC NOTICE:
 
 Phase 4 successfully introduces deep learning into the capstone pipeline while adhering to scientific standards:
 - **Tuned XGBoost** remains the best-performing model ($R^2 = 0.7455$, $\text{RMSE} = 36.74\ \mu\text{g/m}^3$), closely followed by **Random Forest** ($R^2 = 0.7269$).
-- **Multilayer Perceptron (MLP)** provides a working neural network baseline ($R^2 = 0.5239$, $\text{RMSE} = 50.24\ \mu\text{g/m}^3$).
+- **Multilayer Perceptron (MLP)** provides a leak-free neural network baseline ($R^2 = 0.5408$, $\text{RMSE} = 49.34\ \mu\text{g/m}^3$).
 - **Track B (Time-Series)** is documented and blocked due to the lack of timestamps in the current dataset, preserving research integrity. Production-grade scripts for LSTM and Transformer are implemented and waiting for verified chronological data.
 - All code, metrics, and figures are documented, reproducible, and ready for capstone presentation.

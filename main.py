@@ -241,7 +241,7 @@ def run_phase_4(data_dict=None, force_retrain=False):
         sample_inputs["RH"], sample_inputs["WD"], sample_inputs["SR"],
         sample_inputs["BP"], sample_inputs["AT"], mlp_model, mlp_scaler
     )
-    print(f"  Sample Prediction (RH=74, WD=298, SR=5, BP=740, AT=14): {test_pred:.2f} µg/m³ PM2.5")
+    print(f"  Sample Prediction (RH=74, WD=298, SR=5, BP=740 mmHg, AT=14): {test_pred:.2f} µg/m³ PM2.5")
 
     return mlp_model, comparison_df
 

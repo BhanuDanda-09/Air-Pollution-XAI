@@ -15,12 +15,12 @@
     "validation_samples": 244,
     "test_samples": 406,
     "epochs_trained": 200,
-    "best_val_loss_mse": 2895.2715,
-    "best_val_mae": 39.4744,
+    "best_val_loss_mse": 2770.8279,
+    "best_val_mae": 38.4012,
     "test_metrics": {
-        "MAE": 38.3404,
-        "MSE": 2524.012,
-        "RMSE": 50.2395,
-        "R2": 0.5239
+        "MAE": 37.8782,
+        "MSE": 2434.7852,
+        "RMSE": 49.3435,
+        "R2": 0.5408
     }
 }

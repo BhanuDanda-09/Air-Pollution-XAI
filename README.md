@@ -338,8 +338,8 @@ Phase 4 evaluates deep neural networks for particulate prediction across two dis
 
 ### Track A: Multilayer Perceptron (MLP) Deep Learning
 - **Framework:** TensorFlow 2.22 / Keras 3.
-- **Input Features:** 5 Standardized Meteorological Variables (`RH`, `WD`, `SR`, `BP`, `AT`).
-- **Data Scaling:** `StandardScaler` fitted strictly on $X_{\text{train}}$ ($N=1,621$) to eliminate leakage; serialized to `models/mlp_scaler.pkl`.
+- **Input Features:** 5 Standardized Meteorological Variables (`RH`, `WD`, `SR`, `BP` in mmHg, `AT`).
+- **Data Scaling:** `StandardScaler` and `SimpleImputer` fitted **strictly on the sub-training partition ($X_{\text{sub-train}}$, $N=1,377$) after the validation split**, ensuring zero validation and test leakage; serialized to `models/mlp_scaler.pkl`.
 - **Validation Split:** 15% sub-partition ($N=244$) of training data for early stopping and learning rate reduction.
 - **Architecture:**
   - Input Layer: 5 features
@@ -366,15 +366,15 @@ All three paradigms evaluated on the identical 406 held-out test observations ($
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
 | **XGBoost (Tuned)** | Gradient Boosted Decision Trees | **25.28** | **1349.57** | **36.74** | **0.7455 ($74.55\%$)** | **1st (Best)** |
 | **Random Forest** | Bagging Ensemble of Trees | 25.62 | 1447.90 | 38.05 | 0.7269 ($72.69\%$) | 2nd |
-| **Multilayer Perceptron (MLP)** | Deep Feedforward Neural Net | 38.34 | 2524.01 | 50.24 | 0.5239 ($52.39\%$) | 3rd |
+| **Multilayer Perceptron (MLP)** | Deep Feedforward Neural Net | 37.88 | 2434.79 | 49.34 | 0.5408 ($54.08\%$) | 3rd |
 
 > **Scientific Insight:** XGBoost and Random Forest decisively outperform the MLP on this tabular dataset. Because meteorological interactions involve sharp physical thresholds (temperature inversions, wind corridors), decision trees naturally partition orthogonal feature space with high sample efficiency. This benchmark empirically confirms established machine learning literature (*Grinsztajn et al., NeurIPS 2022*).
 
 ### Interactive Prediction Tool
-A verified command-line inference tool is available at `src/predict_mlp.py`:
+A verified command-line inference tool is available at `src/predict_mlp.py`. It accepts Barometric Pressure in verified dataset units ($\text{mmHg}$) and clearly displays indicative CPCB $\text{PM}_{2.5}$ health severity bands with explicit disclaimers distinguishing them from official multi-pollutant 24-hr CPCB AQI:
 
 ```bash
-# Run with capstone example parameters
+# Run with capstone example parameters (BP in mmHg)
 python src/predict_mlp.py --example
 
 # Or specify custom meteorological observations

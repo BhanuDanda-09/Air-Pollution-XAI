@@ -122,27 +122,30 @@ def train_mlp(
     print(f"  Training set:   {X_train_df.shape[0]} samples, {len(features)} features: {features}")
     print(f"  Held-out test:  {X_test_df.shape[0]} samples (identical to Phase 1 & 2)")
 
-    # 2. Fit Imputer + StandardScaler strictly on X_train (Leakage Prevention)
-    print("\n[Step 2/6] Fitting Preprocessing Pipeline (Median Imputer + StandardScaler) on X_train...")
+    # 2. Partition training data FIRST into sub-train (85%) and validation (15%) subsets
+    # This guarantees the validation subset remains completely unseen during imputer & scaler fitting
+    print(f"\n[Step 2/6] Splitting training set into sub-train ({1-validation_split:.0%}) and validation ({validation_split:.0%})...")
+    X_tr_df, X_val_df, y_tr, y_val = train_test_split(
+        X_train_df,
+        y_train_s.values,
+        test_size=validation_split,
+        random_state=random_state
+    )
+    print(f"  Sub-training samples (fitted): {X_tr_df.shape[0]}")
+    print(f"  Validation samples (holdout):  {X_val_df.shape[0]}")
+
+    # 3. Fit SimpleImputer and StandardScaler STRICTLY on X_tr_df (Zero Leakage)
+    print("\n[Step 3/6] Fitting Preprocessing Pipeline (Median Imputer + StandardScaler) STRICTLY on X_tr_df...")
     preprocessor = Pipeline([
         ("imputer", SimpleImputer(strategy="median")),
         ("scaler", StandardScaler())
     ])
 
-    X_train_scaled = preprocessor.fit_transform(X_train_df)
+    X_tr = preprocessor.fit_transform(X_tr_df)
+    X_val = preprocessor.transform(X_val_df)
     X_test_scaled = preprocessor.transform(X_test_df)
     joblib.dump(preprocessor, scaler_save_path)
-    print(f"  Saved preprocessing scaler pipeline to: {scaler_save_path}")
-
-    # 3. Create validation split from training partition only (never touch X_test)
-    print(f"\n[Step 3/6] Splitting training set into sub-train ({1-validation_split:.0%}) and validation ({validation_split:.0%})...")
-    X_tr, X_val, y_tr, y_val = train_test_split(
-        X_train_scaled,
-        y_train_s.values,
-        test_size=validation_split,
-        random_state=random_state
-    )
-    print(f"  Sub-training samples: {X_tr.shape[0]}")
+    print(f"  Saved strictly fitted preprocessing scaler pipeline to: {scaler_save_path}")
     print(f"  Validation samples:   {X_val.shape[0]}")
 
     # 4. Build and Compile Model
