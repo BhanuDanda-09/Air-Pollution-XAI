@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Local cache
+.matplotlib_cache/
+
+# Models & Large Artifacts (optional if large, but baseline model can be tracked or ignored)
+# models/*.pkl
+
+# Dataset & Data files (protecting sensitive/raw data)
+dataset/*.xlsx
+dataset/*.xls
+dataset/*.csv
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
