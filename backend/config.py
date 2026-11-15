@@ -34,10 +34,20 @@ class Config:
     DEBUG = os.getenv("FLASK_DEBUG", "0").lower() in ("1", "true", "yes")
     ENV = os.getenv("FLASK_ENV", "production" if not DEBUG else "development")
 
-    # CORS settings - allows comma-separated origins, e.g. "https://myapp.vercel.app,http://localhost:3000"
-    CORS_ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
-    if CORS_ALLOWED_ORIGINS != "*":
-        CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS.split(",") if origin.strip()]
+    # CORS settings - allows comma-separated origins, with safe production default for Vercel
+    DEFAULT_ALLOWED_ORIGINS = [
+        "https://air-pollution-xai.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+    ENV_ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
+    if ENV_ALLOWED_ORIGINS:
+        if ENV_ALLOWED_ORIGINS.strip() == "*":
+            CORS_ALLOWED_ORIGINS = "*"
+        else:
+            CORS_ALLOWED_ORIGINS = [origin.strip() for origin in ENV_ALLOWED_ORIGINS.split(",") if origin.strip()]
+    else:
+        CORS_ALLOWED_ORIGINS = DEFAULT_ALLOWED_ORIGINS
 
     # Meteorological feature definitions with strict validation bounds & units
     # Note: Barometric Pressure (BP) is strictly calibrated in mmHg (not hPa).
