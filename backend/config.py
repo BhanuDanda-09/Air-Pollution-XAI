@@ -16,8 +16,12 @@ class Config:
         MODELS_DIR = Path(ENV_MODELS_DIR).resolve()
     elif (PROJECT_ROOT / "models" / "random_forest.pkl").exists():
         MODELS_DIR = PROJECT_ROOT / "models"
-    else:
+    elif (Path.cwd() / "models" / "random_forest.pkl").exists():
+        MODELS_DIR = Path.cwd() / "models"
+    elif (BASE_DIR / "models" / "random_forest.pkl").exists():
         MODELS_DIR = BASE_DIR / "models"
+    else:
+        MODELS_DIR = PROJECT_ROOT / "models"
 
     RF_MODEL_PATH = MODELS_DIR / "random_forest.pkl"
     XGB_MODEL_PATH = MODELS_DIR / "xgboost_model.pkl"

@@ -4,7 +4,12 @@
 [![Phase 2 Complete](https://img.shields.io/badge/Phase%202-Completed-brightgreen.svg)]()
 [![Phase 3 Complete](https://img.shields.io/badge/Phase%203-Completed-brightgreen.svg)]()
 [![Phase 4 Complete](https://img.shields.io/badge/Phase%204-Completed-brightgreen.svg)]()
+[![Phase 5 Complete](https://img.shields.io/badge/Phase%205-Completed-brightgreen.svg)]()
+[![Phase 6 Complete](https://img.shields.io/badge/Phase%206-Completed-brightgreen.svg)]()
+[![Phase 7 Complete](https://img.shields.io/badge/Phase%207-Completed-brightgreen.svg)]()
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)]()
+[![React 18](https://img.shields.io/badge/Frontend-React%2018%20%7C%20Vite%20%7C%20Tailwind-61DAFB.svg)]()
+[![Flask REST API](https://img.shields.io/badge/Backend-Flask%203.1-black.svg)]()
 [![TensorFlow: Keras 3](https://img.shields.io/badge/Deep%20Learning-TensorFlow%20%7C%20Keras%203-orange.svg)]()
 [![Explainability: SHAP & LIME](https://img.shields.io/badge/XAI-SHAP%20%7C%20LIME-purple.svg)]()
 [![License: Academic](https://img.shields.io/badge/Project-B.Tech%20Capstone-blueviolet.svg)]()
@@ -39,11 +44,14 @@ Air pollution is among the most severe environmental health emergencies in moder
 
 This final-year B.Tech capstone project establishes a complete **Explainable AI (XAI)** framework for predicting ambient $\text{PM}_{2.5}$ concentrations and demystifying the underlying meteorological drivers behind localized pollution spikes in Delhi.
 
-> **Project Status (Phases 1, 2, 3, and 4 Complete):**  
+> **Project Status (Phases 1, 2, 3, 4, 5, 6, and 7 Complete):**  
 > - **Phase 1:** Dataset Audit, Leak-Free Preprocessing, Exploratory Data Analysis (EDA), and Baseline Random Forest Regressor.  
 > - **Phase 2:** XGBoost Regressor with 5-Fold Cross-Validation Tuning (`RandomizedSearchCV`) and Head-to-Head Model Comparison.  
 > - **Phase 3:** Global and Local Explainability using **SHAP** (`TreeExplainer`) and **LIME** (`LimeTabularExplainer`), generating beeswarm plots, dependence curves, waterfall breakdowns, force plots, and local surrogate explanations.  
 > - **Phase 4:** Deep Learning Multilayer Perceptron (MLP) via TensorFlow/Keras, Time-Series Sequence Modeling verification (LSTM & Transformer), Comprehensive 3-Model Benchmark, and Interactive Prediction CLI.
+> - **Phase 5:** Production-Grade Python Flask REST API backend (`backend/`), Singleton `ModelLoader`, SHAP explanation services, and 27 automated tests.
+> - **Phase 6:** Modern, responsive React 18 user interface (`frontend/`) with Tailwind CSS, Chart.js visualizations, live telemetry, and zero-hallucination API consumption.
+> - **Phase 7:** Full System Integration, End-to-End Verification, Scientific Audit, and Render / Vercel deployment readiness.
 
 ---
 
@@ -399,6 +407,92 @@ To ensure academic and regulatory integrity during capstone defense, the followi
 
 ---
 
-## Future Roadmap (Phase 5)
+## Phase 5: Production Flask REST API Backend
 
-- **Phase 5:** Production Full-Stack Application (Flask/FastAPI REST API, React interactive user dashboard with live SHAP waterfall widgets, MongoDB persistence, and cloud container deployment).
+A production-grade Python Flask REST API backend resides in `backend/`, connecting directly to the saved models from Phases 1–4.
+
+### REST API Endpoints
+
+| Endpoint | HTTP | Purpose | Key Input / Output |
+|:---|:---:|:---|:---|
+| `/api/health` | `GET` | Health check and model availability flags | Returns status and availability of RF, XGBoost, MLP |
+| `/api/models` | `GET` | Model metadata & test benchmarks | Returns test $R^2$, RMSE, MAE and feature schemas |
+| `/api/predict` | `POST` | Single-model $\text{PM}_{2.5}$ inference | Accepts model + 5 features, returns $\mu\text{g/m}^3$ and Indicative CPCB Band |
+| `/api/compare` | `POST` | Simultaneous multi-model comparison | Evaluates RF, XGBoost, and MLP on the identical inputs |
+| `/api/explain` | `POST` | Local SHAP feature attribution | Computes base value, contributions, direction, and ranking |
+
+### Run Backend Server Locally:
+```bash
+# Using Python directly:
+python backend/wsgi.py
+
+# Or run automated backend test suite:
+pytest backend/tests/ -v
+```
+
+---
+
+## Phase 6: React Frontend & Interactive XAI Dashboard
+
+A modern, responsive user interface built with **React 18**, **Vite**, **Tailwind CSS**, and **Chart.js** resides in `frontend/`.
+
+### Frontend Capabilities
+- **Real-Time Prediction Form:** Sliders, numeric controls, and preset buttons with strict client-side validation.
+- **Indicative CPCB Health Bands:** Automatic color-coded severity categorization (*Good, Satisfactory, Moderate, Poor, Very Poor, Severe*).
+- **Multi-Model Comparison Screen:** Side-by-side card and bar chart evaluations distinguishing held-out test benchmarks from instance outputs.
+- **Visual Explainable AI (SHAP):** Interactive diverging horizontal bar chart illustrating exact local feature contributions pushing $\text{PM}_{2.5}$ higher or lower relative to model baseline.
+- **System Telemetry:** Live health query display.
+
+### Run Frontend Locally:
+```bash
+cd frontend
+npm install
+npm test
+npm run dev
+```
+
+---
+
+## Phase 7: Full System Integration & Deployment Preparation
+
+### End-to-End Verification Sample:
+The complete pipeline was verified against the standard capstone environmental test observation:
+```json
+{
+  "RH": 74.0,
+  "WD": 298.0,
+  "SR": 5.0,
+  "BP": 740.0,
+  "AT": 14.0
+}
+```
+**Actual Model Predictions & Attributions:**
+- **Random Forest:** Predicted $\text{PM}_{2.5} = 172.54\,\mu\text{g/m}^3$ (Very Poor) | $\text{Base} = 144.44\,\mu\text{g/m}^3$ | $\sum \text{SHAP} = +28.10\,\mu\text{g/m}^3$ (Exact match)
+- **XGBoost (Tuned):** Predicted $\text{PM}_{2.5} = 182.81\,\mu\text{g/m}^3$ (Very Poor) | $\text{Base} = 144.47\,\mu\text{g/m}^3$ | $\sum \text{SHAP} = +38.61\,\mu\text{g/m}^3$
+- **Multilayer Perceptron (MLP):** Predicted $\text{PM}_{2.5} = 157.06\,\mu\text{g/m}^3$ (Very Poor) | $\text{Base} = 127.01\,\mu\text{g/m}^3$ | $\sum \text{SHAP} = +30.06\,\mu\text{g/m}^3$
+
+*Across all three models, Relative Humidity ($74\%$) is the dominant positive factor driving particulate concentrations into the "Very Poor" health band.*
+
+### Production Deployment Architecture
+```
+[User Browser]
+      │
+      ▼
+[Vercel Public Frontend] (React 18 SPA)
+      │ HTTPS via VITE_API_URL
+      ▼
+[Render Public Web Service] (Flask WSGI via Gunicorn)
+      │
+      ├── models/random_forest.pkl
+      ├── models/xgboost_model.pkl
+      ├── models/mlp_model.keras
+      └── models/mlp_scaler.pkl
+```
+
+#### Deployment Environment Variables:
+- **Render Web Service:**
+  - `PORT`: Automatically set by Render
+  - `FLASK_ENV`: `production`
+  - `ALLOWED_ORIGINS`: `https://<your-vercel-app>.vercel.app` (restricts CORS to frontend)
+- **Vercel Frontend:**
+  - `VITE_API_URL`: `https://<your-render-service>.onrender.com`
