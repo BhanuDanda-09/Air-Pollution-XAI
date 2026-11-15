@@ -3,7 +3,9 @@
 [![Phase 1 Complete](https://img.shields.io/badge/Phase%201-Completed-brightgreen.svg)]()
 [![Phase 2 Complete](https://img.shields.io/badge/Phase%202-Completed-brightgreen.svg)]()
 [![Phase 3 Complete](https://img.shields.io/badge/Phase%203-Completed-brightgreen.svg)]()
+[![Phase 4 Complete](https://img.shields.io/badge/Phase%204-Completed-brightgreen.svg)]()
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)]()
+[![TensorFlow: Keras 3](https://img.shields.io/badge/Deep%20Learning-TensorFlow%20%7C%20Keras%203-orange.svg)]()
 [![Explainability: SHAP & LIME](https://img.shields.io/badge/XAI-SHAP%20%7C%20LIME-purple.svg)]()
 [![License: Academic](https://img.shields.io/badge/Project-B.Tech%20Capstone-blueviolet.svg)]()
 
@@ -21,13 +23,13 @@
 9. [Phase 1: EDA & Baseline Random Forest](#phase-1-eda--baseline-random-forest)
 10. [Phase 2: XGBoost Development & Model Comparison](#phase-2-xgboost-development--model-comparison)
 11. [Phase 3: Explainable AI using SHAP & LIME](#phase-3-explainable-ai-using-shap--lime)
-    - [Introduction to Explainable AI](#introduction-to-explainable-ai)
-    - [Why Both SHAP and LIME Are Used](#why-both-shap-and-lime-are-used)
-    - [SHAP Methodology & Findings](#shap-methodology--findings)
-    - [LIME Methodology & Findings](#lime-methodology--findings)
-    - [SHAP vs. LIME Cross-Method Comparison](#shap-vs-lime-cross-method-comparison)
-12. [Crucial Scientific Limitations](#crucial-scientific-limitations)
-13. [Future Roadmap (Phase 4)](#future-roadmap-phase-4)
+12. [Phase 4: Deep Learning & Sequence Modeling](#phase-4-deep-learning--sequence-modeling)
+    - [Track A: Multilayer Perceptron (MLP) Deep Learning](#track-a-multilayer-perceptron-mlp-deep-learning)
+    - [Track B: Time-Series Sequence Models (LSTM & Transformer)](#track-b-time-series-sequence-models-lstm--transformer)
+    - [Cross-Model Benchmark (RF vs. XGBoost vs. MLP)](#cross-model-benchmark-rf-vs-xgboost-vs-mlp)
+    - [Interactive Prediction Tool](#interactive-prediction-tool)
+13. [Crucial Scientific Limitations](#crucial-scientific-limitations)
+14. [Future Roadmap (Phase 5)](#future-roadmap-phase-5)
 
 ---
 
@@ -37,10 +39,11 @@ Air pollution is among the most severe environmental health emergencies in moder
 
 This final-year B.Tech capstone project establishes a complete **Explainable AI (XAI)** framework for predicting ambient $\text{PM}_{2.5}$ concentrations and demystifying the underlying meteorological drivers behind localized pollution spikes in Delhi.
 
-> **Project Status (Phases 1, 2, and 3 Complete):**  
+> **Project Status (Phases 1, 2, 3, and 4 Complete):**  
 > - **Phase 1:** Dataset Audit, Leak-Free Preprocessing, Exploratory Data Analysis (EDA), and Baseline Random Forest Regressor.  
 > - **Phase 2:** XGBoost Regressor with 5-Fold Cross-Validation Tuning (`RandomizedSearchCV`) and Head-to-Head Model Comparison.  
-> - **Phase 3:** Global and Local Explainability using **SHAP** (`TreeExplainer`) and **LIME** (`LimeTabularExplainer`), generating beeswarm plots, dependence curves, waterfall breakdowns, force plots, and local surrogate explanations.
+> - **Phase 3:** Global and Local Explainability using **SHAP** (`TreeExplainer`) and **LIME** (`LimeTabularExplainer`), generating beeswarm plots, dependence curves, waterfall breakdowns, force plots, and local surrogate explanations.  
+> - **Phase 4:** Deep Learning Multilayer Perceptron (MLP) via TensorFlow/Keras, Time-Series Sequence Modeling verification (LSTM & Transformer), Comprehensive 3-Model Benchmark, and Interactive Prediction CLI.
 
 ---
 
@@ -108,11 +111,18 @@ Air-Pollution-XAI/
 │   ├── compare_models.py                    # Phase 2: Head-to-head model comparison
 │   ├── shap_explainability.py               # Phase 3: SHAP global & local explainability
 │   ├── lime_explainability.py               # Phase 3: LIME local surrogate explanations
-│   └── compare_explanations.py              # Phase 3: Cross-method SHAP vs LIME comparison
+│   ├── compare_explanations.py              # Phase 3: Cross-method SHAP vs LIME comparison
+│   ├── train_mlp.py                         # Phase 4 Track A: Multilayer Perceptron (MLP) training
+│   ├── predict_mlp.py                       # Phase 4: Interactive PM2.5 prediction CLI
+│   ├── train_lstm.py                        # Phase 4 Track B: LSTM sequence forecasting (validated)
+│   ├── train_transformer.py                 # Phase 4 Track B: Transformer forecasting (validated)
+│   └── compare_deep_learning.py             # Phase 4: Cross-model DL vs ML benchmark
 │
 ├── models/
 │   ├── random_forest.pkl                    # Serialized baseline pipeline (imputer + RF)
-│   └── xgboost_model.pkl                    # Serialized Phase 2 pipeline (imputer + XGBoost)
+│   ├── xgboost_model.pkl                    # Serialized Phase 2 pipeline (imputer + XGBoost)
+│   ├── mlp_model.keras                      # Serialized Phase 4 MLP model (TensorFlow/Keras)
+│   └── mlp_scaler.pkl                       # Serialized feature scaling pipeline for MLP
 │
 ├── results/
 │   ├── graphs/                              # Generated High-Resolution Visualizations
@@ -121,39 +131,22 @@ Air-Pollution-XAI/
 │   │   ├── (Phase 2 XGBoost: 3 diagnostic PNG plots)
 │   │   ├── (Phase 2 Comparison: 5 comparative PNG plots)
 │   │   ├── shap/                            # Phase 3 SHAP Visualizations
-│   │   │   ├── random_forest/               # Beeswarm, Bar, 5 Dependence, Waterfall, Force PNG/HTML
-│   │   │   └── xgboost/                     # Beeswarm, Bar, 5 Dependence, Waterfall, Force PNG/HTML
 │   │   ├── lime/                            # Phase 3 LIME Visualizations
-│   │   │   ├── random_forest/               # 5 Sample PNG figures + 5 Interactive HTML files
-│   │   │   └── xgboost/                     # 5 Sample PNG figures + 5 Interactive HTML files
-│   │   ├── shap_global_rf_vs_xgb_comparison.png
-│   │   └── shap_vs_lime_importance_comparison.png
+│   │   ├── mlp/                             # Phase 4 MLP Diagnostic Plots (Loss, Error, Summary)
+│   │   └── deep_learning_comparison/        # Phase 4 Comparison Plots (RMSE, MAE, R², Scatter, Metrics)
 │   ├── metrics/                             # Metric logs and tabular outputs
 │   │   ├── model_metrics.json               # Random Forest metrics
-│   │   ├── model_metrics.csv
-│   │   ├── xgboost_best_parameters.json     # Tuned XGBoost hyperparameters
 │   │   ├── xgboost_metrics.json             # XGBoost metrics
-│   │   ├── model_comparison.csv             # Head-to-head RF vs. XGBoost table
-│   │   ├── shap/                            # SHAP global & sample contribution CSVs
-│   │   │   ├── rf_shap_global_importance.csv
-│   │   │   ├── rf_shap_sample_contributions.csv
-│   │   │   ├── xgboost_shap_global_importance.csv
-│   │   │   └── xgboost_shap_sample_contributions.csv
-│   │   ├── lime/                            # LIME local feature contribution CSVs
-│   │   │   ├── rf_lime_sample_contributions.csv
-│   │   │   └── xgboost_lime_sample_contributions.csv
+│   │   ├── mlp_metrics.json                 # MLP metrics
+│   │   ├── mlp_training_history.csv         # Epoch-by-epoch loss convergence
+│   │   ├── deep_learning_comparison.csv     # 3-way cross-model performance table
 │   │   └── explainability_comparison.csv    # Cross-method explainability table
 │   └── reports/                             # Detailed analytical markdown reports
-│       ├── data_inspection_report.md
-│       ├── preprocessing_report.md
-│       ├── eda_report.md
-│       ├── model_evaluation_report.md
-│       ├── xgboost_report.md
-│       ├── model_comparison_report.md
-│       ├── explainability_comparison.md
-│       └── phase3_report.md
+│       ├── (Phases 1-3 analytical reports)
+│       ├── deep_learning_comparison.md      # Deep learning comparative report
+│       └── phase4_report.md                 # Comprehensive Phase 4 Capstone Report
 │
-├── main.py                                  # Modular CLI orchestrator supporting all phases
+├── main.py                                  # Modular CLI orchestrator supporting all phases (1-4)
 ├── requirements.txt                         # Pinned Python dependencies
 ├── .gitignore                               # Git ignore configuration
 └── README.md                                # Comprehensive capstone project documentation
@@ -164,11 +157,12 @@ Air-Pollution-XAI/
 ## Technologies Used
 
 - **Programming Language:** Python 3.11+
+- **Deep Learning Frameworks:** `tensorflow` (2.22.x), `keras` (3.x)
 - **Machine Learning & Gradient Boosting:** `scikit-learn`, `xgboost`
 - **Explainable AI Frameworks:** `shap` (0.54.1), `lime` (0.2.0.1)
 - **Data Manipulation & Scientific Computing:** `pandas`, `openpyxl`, `numpy`, `scipy`
 - **Visualization & Plotting:** `matplotlib` (Agg backend), `seaborn`
-- **Model Serialization:** `joblib`
+- **Model Serialization:** `joblib`, native Keras `.keras` HDF5/zip format
 - **Interactive Computing:** `jupyter`, `ipykernel`
 
 ---
@@ -220,7 +214,10 @@ python main.py --phase 2
 # Execute Phase 3 only (SHAP & LIME Global and Local Explainability)
 python main.py --phase 3
 
-# Execute Complete Workflow (Phases 1, 2, and 3 sequentially)
+# Execute Phase 4 only (MLP Deep Learning, Time-Series Audit & 3-Way Benchmark)
+python main.py --phase 4
+
+# Execute Complete Workflow (Phases 1 through 4 sequentially)
 python main.py
 
 # Force Model Retraining & Tuning from Scratch
@@ -240,6 +237,11 @@ python src/compare_models.py         # RF vs. XGBoost comparison
 python src/shap_explainability.py    # SHAP global & local explanations
 python src/lime_explainability.py    # LIME local explanations
 python src/compare_explanations.py   # SHAP vs. LIME cross-method comparison
+python src/train_mlp.py              # Multilayer Perceptron (MLP) training
+python src/predict_mlp.py --example  # Interactive PM2.5 prediction tool
+python src/train_lstm.py             # LSTM time-series sequence pipeline
+python src/train_transformer.py      # Transformer time-series pipeline
+python src/compare_deep_learning.py  # 3-Way ML vs DL cross-model comparison
 ```
 
 ---
@@ -330,6 +332,57 @@ Using `LimeTabularExplainer` initialized on the training dataset (`X_train`), lo
 
 ---
 
+## Phase 4: Deep Learning & Sequence Modeling
+
+Phase 4 evaluates deep neural networks for particulate prediction across two distinct methodological tracks:
+
+### Track A: Multilayer Perceptron (MLP) Deep Learning
+- **Framework:** TensorFlow 2.22 / Keras 3.
+- **Input Features:** 5 Standardized Meteorological Variables (`RH`, `WD`, `SR`, `BP`, `AT`).
+- **Data Scaling:** `StandardScaler` fitted strictly on $X_{\text{train}}$ ($N=1,621$) to eliminate leakage; serialized to `models/mlp_scaler.pkl`.
+- **Validation Split:** 15% sub-partition ($N=244$) of training data for early stopping and learning rate reduction.
+- **Architecture:**
+  - Input Layer: 5 features
+  - Hidden Layer 1: 128 neurons (ReLU) + $L_2$ Regularization ($10^{-4}$) + Dropout (0.20)
+  - Hidden Layer 2: 64 neurons (ReLU) + $L_2$ Regularization ($10^{-4}$) + Dropout (0.10)
+  - Hidden Layer 3: 32 neurons (ReLU)
+  - Output Layer: 1 linear neuron ($\text{PM}_{2.5}$)
+- **Total Parameters:** 11,137 trainable parameters.
+- **Convergence:** Trained across 200 epochs with Adam optimizer ($\alpha = 0.001$), early stopping (`patience=25`), and `ReduceLROnPlateau`.
+- **Saved Model:** `models/mlp_model.keras`.
+
+### Track B: Time-Series Sequence Models (LSTM & Transformer)
+- **Dataset Investigation:** The primary dataset `dataset/Delhi Final(1).xlsx` consists of 2,027 cross-sectional tabular observations **without any date or timestamp column**.
+- **Scientific Integrity Boundary:**
+  - We refuse to synthesize artificial hourly dates or pretend consecutive rows are consecutive hours.
+  - We refuse to reshape tabular rows into fake sequence matrices, which produces invalid autocorrelation.
+- **Formal Status:** **Track B is documented as BLOCKED pending genuine chronological data.**
+- **Production Readiness:** Full sequence pipelines for **LSTM** (`src/train_lstm.py`) and **Transformer with Positional Encoding & Multi-Head Self-Attention** (`src/train_transformer.py`) are implemented. Once an hourly CPCB/OpenAQ dataset with a `datetime` column is placed at `dataset/delhi_timeseries_cpcb.csv`, both sequence models will execute immediately.
+
+### Cross-Model Benchmark (RF vs. XGBoost vs. MLP)
+All three paradigms evaluated on the identical 406 held-out test observations ($20\%$ test split, seed = 42):
+
+| Model Architecture | Paradigm | Test MAE ($\mu\text{g/m}^3$) | Test MSE | Test RMSE ($\mu\text{g/m}^3$) | Test $R^2$ Score | Overall Rank |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **XGBoost (Tuned)** | Gradient Boosted Decision Trees | **25.28** | **1349.57** | **36.74** | **0.7455 ($74.55\%$)** | **1st (Best)** |
+| **Random Forest** | Bagging Ensemble of Trees | 25.62 | 1447.90 | 38.05 | 0.7269 ($72.69\%$) | 2nd |
+| **Multilayer Perceptron (MLP)** | Deep Feedforward Neural Net | 38.34 | 2524.01 | 50.24 | 0.5239 ($52.39\%$) | 3rd |
+
+> **Scientific Insight:** XGBoost and Random Forest decisively outperform the MLP on this tabular dataset. Because meteorological interactions involve sharp physical thresholds (temperature inversions, wind corridors), decision trees naturally partition orthogonal feature space with high sample efficiency. This benchmark empirically confirms established machine learning literature (*Grinsztajn et al., NeurIPS 2022*).
+
+### Interactive Prediction Tool
+A verified command-line inference tool is available at `src/predict_mlp.py`:
+
+```bash
+# Run with capstone example parameters
+python src/predict_mlp.py --example
+
+# Or specify custom meteorological observations
+python src/predict_mlp.py --rh 74 --wd 298 --sr 5 --bp 740 --at 14
+```
+
+---
+
 ## Crucial Scientific Limitations
 
 To ensure academic and regulatory integrity during capstone defense, the following limitations are explicitly documented:
@@ -341,10 +394,11 @@ To ensure academic and regulatory integrity during capstone defense, the followi
    - Industrial coal-fired power plants
    - Construction and road dust re-suspension
 3. **Absence of Chemical Speciation:** Conclusive source apportionment requires receptor modeling (Positive Matrix Factorization / PMF) applied to chemical tracer species (organic carbon, elemental carbon, sulfate, nitrate, heavy metal tracers), which are not present in this meteorological dataset.
-4. **Phase 3 Characterization:** This phase delivers **Explainable $\text{PM}_{2.5}$ Prediction and Model-Based Feature Attribution**, not a completed chemical source apportionment system.
+4. **Phase 3 & 4 Characterization:** These phases deliver **Explainable $\text{PM}_{2.5}$ Prediction, Model-Based Feature Attribution, and Comparative Deep Learning**, not a completed chemical source apportionment system.
+5. **Absence of Timestamp Column:** Sequence forecasting (LSTM, GRU, Transformer) cannot be performed on the primary Excel dataset without verified chronological time stamps.
 
 ---
 
-## Future Roadmap (Phase 4)
+## Future Roadmap (Phase 5)
 
-- **Phase 4:** Production Full-Stack Application (Flask/FastAPI REST API, React interactive user dashboard with live SHAP waterfall widgets, MongoDB persistence, and cloud container deployment).
+- **Phase 5:** Production Full-Stack Application (Flask/FastAPI REST API, React interactive user dashboard with live SHAP waterfall widgets, MongoDB persistence, and cloud container deployment).

@@ -1,0 +1,26 @@
+{
+    "model_name": "Multilayer Perceptron (MLP)",
+    "framework": "TensorFlow/Keras",
+    "keras_version": "3.16.0.dev2026111503",
+    "tensorflow_version": "2.22.0-rc0",
+    "input_features": [
+        "RH",
+        "WD",
+        "SR",
+        "BP",
+        "AT"
+    ],
+    "target_variable": "PM2.5",
+    "training_samples": 1377,
+    "validation_samples": 244,
+    "test_samples": 406,
+    "epochs_trained": 200,
+    "best_val_loss_mse": 2895.2715,
+    "best_val_mae": 39.4744,
+    "test_metrics": {
+        "MAE": 38.3404,
+        "MSE": 2524.012,
+        "RMSE": 50.2395,
+        "R2": 0.5239
+    }
+}

@@ -7,13 +7,15 @@ Supports modular execution across all project phases:
 - Phase 1: Data Inspection, Preprocessing, EDA, and Baseline Random Forest Pipeline
 - Phase 2: XGBoost Regressor Development, 5-Fold Cross-Validation Tuning, & Model Comparison
 - Phase 3: Explainable AI using SHAP (TreeExplainer) and LIME (LimeTabularExplainer)
+- Phase 4: Deep Learning (MLP Regressor, Time-Series Sequence Validation, & Cross-Model Comparison)
 - Complete: End-to-end execution across all phases
 
 CLI Usage:
-    python main.py                  # Executes complete workflow (Phases 1, 2, and 3)
+    python main.py                  # Executes complete workflow (Phases 1, 2, 3, and 4)
     python main.py --phase 1        # Executes Phase 1 only (Dataset, Preprocessing, EDA, RF Baseline)
     python main.py --phase 2        # Executes Phase 2 only (XGBoost & Model Comparison)
     python main.py --phase 3        # Executes Phase 3 only (SHAP & LIME Explainability)
+    python main.py --phase 4        # Executes Phase 4 only (MLP Deep Learning & Comparison)
     python main.py --retrain        # Forces model retraining and hyperparameter re-tuning
 """
 
@@ -27,6 +29,8 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 # Ensure matplotlib uses local writable directory and non-interactive Agg backend
 os.environ.setdefault("MPLCONFIGDIR", os.path.abspath(os.path.join(os.path.dirname(__file__), ".matplotlib_cache")))
+os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 import matplotlib
 matplotlib.use("Agg")
 
@@ -40,6 +44,13 @@ from src.compare_models import compare_models
 from src.shap_explainability import explain_model_shap
 from src.lime_explainability import explain_model_lime
 from src.compare_explanations import run_explainability_comparison
+
+# Phase 4 imports
+from src.train_mlp import train_mlp
+from src.train_lstm import run_lstm_pipeline
+from src.train_transformer import run_transformer_pipeline
+from src.compare_deep_learning import compare_models as compare_deep_learning_models
+from src.predict_mlp import load_inference_artifacts, predict_pm25
 
 
 def get_or_load_data(random_state=42):
@@ -83,6 +94,28 @@ def get_or_train_xgb(data_dict, force_retrain=False):
             random_state=42
         )
     return xgb_pipeline
+
+
+def get_or_train_mlp(force_retrain=False):
+    """Load or train Multilayer Perceptron (MLP) model."""
+    mlp_model_path = "models/mlp_model.keras"
+    mlp_scaler_path = "models/mlp_scaler.pkl"
+    if os.path.exists(mlp_model_path) and os.path.exists(mlp_scaler_path) and not force_retrain:
+        print(f"    [INFO] Existing trained MLP model found at {mlp_model_path}. Loading without retraining.")
+        import keras
+        import joblib
+        mlp_model = keras.models.load_model(mlp_model_path)
+        mlp_scaler = joblib.load(mlp_scaler_path)
+        return mlp_model, mlp_scaler
+    else:
+        print(f"    [INFO] Training Multilayer Perceptron (MLP) Deep Learning Regressor...")
+        mlp_model, mlp_scaler, _ = train_mlp(
+            model_save_path=mlp_model_path,
+            scaler_save_path=mlp_scaler_path,
+            epochs=200,
+            batch_size=32
+        )
+        return mlp_model, mlp_scaler
 
 
 def run_phase_1(data_dict=None, force_retrain=False):
@@ -175,13 +208,51 @@ def run_phase_3(data_dict=None):
     return rf_shap, xgb_shap, rf_lime, xgb_lime, comp_exp
 
 
+def run_phase_4(data_dict=None, force_retrain=False):
+    """Execute Phase 4 Workflow (Deep Learning Models & Comparison)."""
+    print("\n" + "=" * 70)
+    print(" >>> EXECUTING PHASE 4: DEEP LEARNING FOR AIR POLLUTION PREDICTION")
+    print("=" * 70)
+
+    if data_dict is None:
+        data_dict = get_or_load_data()
+
+    # Ensure previous models exist for comparison
+    get_or_train_rf(data_dict, force_retrain=False)
+    get_or_train_xgb(data_dict, force_retrain=False)
+
+    # 1. Track A: Multilayer Perceptron (MLP)
+    print("\n[PHASE 4 - Step 1] Track A: Multilayer Perceptron (MLP) Training & Diagnostics...")
+    mlp_model, mlp_scaler = get_or_train_mlp(force_retrain=force_retrain)
+
+    # 2. Track B: Time-Series Sequence Models Status (LSTM & Transformer)
+    print("\n[PHASE 4 - Step 2] Track B: Time-Series Sequence Models (LSTM & Transformer)...")
+    lstm_res = run_lstm_pipeline()
+    transformer_res = run_transformer_pipeline()
+
+    # 3. Cross-Model Benchmark Comparison (RF vs XGBoost vs MLP)
+    print("\n[PHASE 4 - Step 3] Deep Learning vs. Machine Learning Cross-Model Comparison...")
+    comparison_df = compare_deep_learning_models()
+
+    # 4. Interactive Prediction Tool Verification
+    print("\n[PHASE 4 - Step 4] Verifying Interactive Prediction Tool...")
+    sample_inputs = {"RH": 74.0, "WD": 298.0, "SR": 5.0, "BP": 740.0, "AT": 14.0}
+    test_pred = predict_pm25(
+        sample_inputs["RH"], sample_inputs["WD"], sample_inputs["SR"],
+        sample_inputs["BP"], sample_inputs["AT"], mlp_model, mlp_scaler
+    )
+    print(f"  Sample Prediction (RH=74, WD=298, SR=5, BP=740, AT=14): {test_pred:.2f} µg/m³ PM2.5")
+
+    return mlp_model, comparison_df
+
+
 def main():
     parser = argparse.ArgumentParser(description="Explainable AI-Based Air Pollution Prediction & Source Attribution")
     parser.add_argument(
         "--phase",
-        choices=["1", "2", "3", "all"],
+        choices=["1", "2", "3", "4", "all"],
         default="all",
-        help="Specify project phase to execute: '1' (Baseline), '2' (XGBoost & Comparison), '3' (SHAP & LIME), or 'all' (default)"
+        help="Specify project phase to execute: '1', '2', '3', '4', or 'all' (default)"
     )
     parser.add_argument(
         "--retrain",
@@ -207,10 +278,14 @@ def main():
     elif args.phase == "3":
         data_dict = get_or_load_data()
         run_phase_3(data_dict=data_dict)
+    elif args.phase == "4":
+        data_dict = get_or_load_data()
+        run_phase_4(data_dict=data_dict, force_retrain=args.retrain)
     else:  # all
         data_dict, rf_pipeline = run_phase_1(force_retrain=args.retrain)
         _, xgb_pipeline, _ = run_phase_2(data_dict=data_dict, force_retrain=args.retrain)
         run_phase_3(data_dict=data_dict)
+        run_phase_4(data_dict=data_dict, force_retrain=args.retrain)
 
     elapsed = time.time() - start_time
     print("\n" + banner)
@@ -218,16 +293,20 @@ def main():
     print(banner)
     print(f" Total Elapsed Time: {elapsed:.2f} seconds")
     print("\n Key Output Locations:")
-    print("  * Serialized Models:        models/random_forest.pkl, models/xgboost_model.pkl")
+    print("  * Serialized Models:        models/random_forest.pkl, models/xgboost_model.pkl, models/mlp_model.keras")
+    print("  * Scaler Pipeline:          models/mlp_scaler.pkl")
     print("  * Phase 1 EDA Visuals:      results/graphs/ (9 plots)")
-    print("  * Phase 2 Comparison Plots: results/graphs/model_comparison_*.png (5 plots)")
+    print("  * Phase 2 Comparison:       results/graphs/model_comparison_*.png (5 plots)")
     print("  * Phase 3 SHAP Explanations:results/graphs/shap/ (Beeswarm, Bar, Dependence, Waterfall, Force)")
     print("  * Phase 3 LIME Local Plots: results/graphs/lime/ (PNG plots & Interactive HTMLs)")
-    print("  * Numerical Metrics:        results/metrics/ (RF, XGBoost, Comparison, SHAP, LIME)")
+    print("  * Phase 4 MLP Diagnostics:  results/graphs/mlp/ (Loss curve, Actual vs Pred, Residuals, Errors, Summary)")
+    print("  * Phase 4 Comparison:       results/graphs/deep_learning_comparison/ (RMSE, MAE, R², Scatter, Metrics)")
+    print("  * Numerical Metrics:        results/metrics/ (RF, XGBoost, MLP, Comparison CSVs & JSONs)")
     print("  * Analytical Reports:       results/reports/ (data_inspection, preprocessing, eda,")
     print("                                                 model_evaluation, xgboost_report,")
     print("                                                 model_comparison, explainability_comparison,")
-    print("                                                 phase3_report)")
+    print("                                                 phase3_report, deep_learning_comparison,")
+    print("                                                 phase4_report)")
     print(banner)
 
 
