@@ -1,26 +1,34 @@
 """
 main.py
 -------
-Main Execution Workflow for Explainable AI-Based Air Pollution Prediction.
+Main Execution Workflow for Explainable AI-Based Air Pollution Prediction and Source Attribution.
 
-Supports end-to-end execution of:
-- Phase 1: Data Inspection, Preprocessing, EDA, and Baseline Random Forest
-- Phase 2: XGBoost Regressor Training, Hyperparameter Tuning, and Cross-Model Comparison
+Supports modular execution across all project phases:
+- Phase 1: Data Inspection, Preprocessing, EDA, and Baseline Random Forest Pipeline
+- Phase 2: XGBoost Regressor Development, 5-Fold Cross-Validation Tuning, & Model Comparison
+- Phase 3: Explainable AI using SHAP (TreeExplainer) and LIME (LimeTabularExplainer)
+- Complete: End-to-end execution across all phases
 
-Usage:
-    python main.py                  # Executes full workflow (uses cached models if available)
-    python main.py --retrain        # Forces retraining and hyperparameter re-tuning
+CLI Usage:
+    python main.py                  # Executes complete workflow (Phases 1, 2, and 3)
+    python main.py --phase 1        # Executes Phase 1 only (Dataset, Preprocessing, EDA, RF Baseline)
+    python main.py --phase 2        # Executes Phase 2 only (XGBoost & Model Comparison)
+    python main.py --phase 3        # Executes Phase 3 only (SHAP & LIME Explainability)
+    python main.py --retrain        # Forces model retraining and hyperparameter re-tuning
 """
 
 import os
 import sys
 import time
+import argparse
 
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-# Ensure matplotlib uses local writable directory
+# Ensure matplotlib uses local writable directory and non-interactive Agg backend
 os.environ.setdefault("MPLCONFIGDIR", os.path.abspath(os.path.join(os.path.dirname(__file__), ".matplotlib_cache")))
+import matplotlib
+matplotlib.use("Agg")
 
 from src.data_inspection import inspect_dataset
 from src.preprocessing import preprocess_data
@@ -29,51 +37,19 @@ from src.train_random_forest import train_model, load_model, predict_sample
 from src.evaluate_model import evaluate_model
 from src.train_xgboost import tune_and_train_xgboost, load_xgboost_model, predict_xgboost_sample
 from src.compare_models import compare_models
+from src.shap_explainability import explain_model_shap
+from src.lime_explainability import explain_model_lime
+from src.compare_explanations import run_explainability_comparison
 
 
-def run_pipeline(force_retrain=False):
-    start_time = time.time()
-    banner = "=" * 80
-    print(banner)
-    print(" EXPLAINABLE AI-BASED AIR POLLUTION PREDICTION & SOURCE ATTRIBUTION ")
-    print(" PHASES 1 & 2: DATA PREPROCESSING, RANDOM FOREST BASELINE & XGBOOST MODEL ")
-    print(banner)
+def get_or_load_data(random_state=42):
+    """Load or preprocess data cleanly."""
+    return preprocess_data(remove_duplicates=True, test_size=0.2, random_state=random_state, save_processed=True)
 
-    # -------------------------------------------------------------
-    # Step 1: Dataset Inspection
-    # -------------------------------------------------------------
-    print("\n>>> STEP 1: Running Dataset Inspection & Quality Assessment...")
-    inspection_results = inspect_dataset(save_report=True)
-    print(f"    - Raw Observations: {inspection_results['total_rows']}")
-    print(f"    - Core Verified Features: {inspection_results['present_core']}")
-    print(f"    - Missing Values in Core Features: {inspection_results['missing_core']}")
-    print(f"    - Duplicate Rows: {inspection_results['exact_duplicates_core']}")
-    print(f"    - Inspection Report: results/reports/data_inspection_report.md")
 
-    # -------------------------------------------------------------
-    # Step 2: Data Preprocessing & Leakage-Free Train-Test Splitting
-    # -------------------------------------------------------------
-    print("\n>>> STEP 2: Running Data Preprocessing & Train-Test Splitting (80/20)...")
-    data_dict = preprocess_data(remove_duplicates=True, test_size=0.2, random_state=42, save_processed=True)
-    print(f"    - Cleaned Dataset (Deduplicated): {data_dict['metadata']['cleaned_shape'][0]} rows")
-    print(f"    - Training Split (80%): {data_dict['metadata']['train_rows']} samples")
-    print(f"    - Testing Split (20%): {data_dict['metadata']['test_rows']} samples (held-out)")
-    print(f"    - Cleaned Dataset Saved: dataset/preprocessed_delhi_air_quality.csv")
-    print(f"    - Preprocessing Report: results/reports/preprocessing_report.md")
-
-    # -------------------------------------------------------------
-    # Step 3: Exploratory Data Analysis (EDA)
-    # -------------------------------------------------------------
-    print("\n>>> STEP 3: Generating Exploratory Data Analysis (EDA) Visualizations...")
-    saved_eda_plots = run_eda(df=data_dict["df_cleaned"])
-    print(f"    - Generated {len(saved_eda_plots)} Publication-Quality Graphs in: results/graphs/")
-    print(f"    - EDA Report: results/reports/eda_report.md")
-
-    # -------------------------------------------------------------
-    # Step 4: Random Forest Baseline Model
-    # -------------------------------------------------------------
+def get_or_train_rf(data_dict, force_retrain=False):
+    """Load or train Random Forest pipeline."""
     rf_model_path = "models/random_forest.pkl"
-    print("\n>>> STEP 4: Random Forest Baseline Model Pipeline...")
     if os.path.exists(rf_model_path) and not force_retrain:
         print(f"    [INFO] Existing Random Forest model found at {rf_model_path}. Loading without retraining.")
         rf_pipeline = load_model(rf_model_path)
@@ -86,19 +62,12 @@ def run_pipeline(force_retrain=False):
             random_state=42,
             n_estimators=100
         )
+    return rf_pipeline
 
-    # Evaluate Random Forest on held-out test data
-    rf_metrics = evaluate_model(pipeline=rf_pipeline, data_dict=data_dict, model_path=rf_model_path)
-    rf_test_m = rf_metrics["test_metrics"]
-    print(f"    - Random Forest Test MAE:  {rf_test_m['MAE']:.2f} µg/m³")
-    print(f"    - Random Forest Test RMSE: {rf_test_m['RMSE']:.2f} µg/m³")
-    print(f"    - Random Forest Test R²:   {rf_test_m['R2_Score']:.4f} ({rf_test_m['R2_Score'] * 100:.2f}%)")
 
-    # -------------------------------------------------------------
-    # Step 5: Phase 2 XGBoost Regressor & Hyperparameter Tuning
-    # -------------------------------------------------------------
+def get_or_train_xgb(data_dict, force_retrain=False):
+    """Load or train/tune XGBoost pipeline."""
     xgb_model_path = "models/xgboost_model.pkl"
-    print("\n>>> STEP 5: Phase 2 XGBoost Model & Hyperparameter Tuning...")
     if os.path.exists(xgb_model_path) and not force_retrain:
         print(f"    [INFO] Existing XGBoost model found at {xgb_model_path}. Loading without retraining.")
         xgb_pipeline = load_xgboost_model(xgb_model_path)
@@ -113,62 +82,154 @@ def run_pipeline(force_retrain=False):
             n_iter=30,
             random_state=42
         )
+    return xgb_pipeline
 
-    # -------------------------------------------------------------
-    # Step 6: Head-to-Head Model Comparison (Random Forest vs. XGBoost)
-    # -------------------------------------------------------------
-    print("\n>>> STEP 6: Conducting Cross-Model Comparison on Identical Test Split...")
+
+def run_phase_1(data_dict=None, force_retrain=False):
+    """Execute Phase 1 Workflow."""
+    print("\n" + "=" * 70)
+    print(" >>> EXECUTING PHASE 1: DATASET INSPECTION, PREPROCESSING & BASELINE RF")
+    print("=" * 70)
+
+    # 1. Dataset Inspection
+    print("\n[PHASE 1 - Step 1] Running Dataset Inspection...")
+    inspect_results = inspect_dataset(save_report=True)
+    print(f"  - Total Observations: {inspect_results['total_rows']}")
+    print(f"  - Core Features: {inspect_results['present_core']}")
+
+    # 2. Preprocessing
+    if data_dict is None:
+        print("\n[PHASE 1 - Step 2] Running Data Preprocessing & 80/20 Train-Test Splitting...")
+        data_dict = get_or_load_data()
+    print(f"  - Cleaned Rows: {data_dict['metadata']['cleaned_shape'][0]} (Deduplicated)")
+    print(f"  - Train Set: {data_dict['metadata']['train_rows']} rows, Test Set: {data_dict['metadata']['test_rows']} rows")
+
+    # 3. EDA
+    print("\n[PHASE 1 - Step 3] Generating 9 Publication-Grade EDA Visualizations...")
+    run_eda(df=data_dict["df_cleaned"])
+
+    # 4. Train & Evaluate Random Forest
+    print("\n[PHASE 1 - Step 4] Random Forest Baseline Model Training & Evaluation...")
+    rf_pipeline = get_or_train_rf(data_dict, force_retrain=force_retrain)
+    rf_eval = evaluate_model(pipeline=rf_pipeline, data_dict=data_dict, model_path="models/random_forest.pkl")
+
+    rf_m = rf_eval["test_metrics"]
+    print(f"\n  * Random Forest Test MAE:  {rf_m['MAE']:.2f} µg/m³")
+    print(f"  * Random Forest Test RMSE: {rf_m['RMSE']:.2f} µg/m³")
+    print(f"  * Random Forest Test R²:   {rf_m['R2_Score']:.4f} ({rf_m['R2_Score']*100:.2f}%)")
+    return data_dict, rf_pipeline
+
+
+def run_phase_2(data_dict=None, force_retrain=False):
+    """Execute Phase 2 Workflow."""
+    print("\n" + "=" * 70)
+    print(" >>> EXECUTING PHASE 2: XGBOOST REGRESSOR & CROSS-MODEL COMPARISON")
+    print("=" * 70)
+
+    if data_dict is None:
+        data_dict = get_or_load_data()
+
+    # Ensure Random Forest model is available
+    get_or_train_rf(data_dict, force_retrain=False)
+
+    # Train/Tune XGBoost
+    print("\n[PHASE 2 - Step 1] XGBoost Model Development & Hyperparameter Tuning...")
+    xgb_pipeline = get_or_train_xgb(data_dict, force_retrain=force_retrain)
+
+    # Cross-Model Comparison
+    print("\n[PHASE 2 - Step 2] Head-to-Head Model Comparison on Identical Test Set...")
     comp_df = compare_models(
-        rf_model_path=rf_model_path,
-        xgb_model_path=xgb_model_path
+        rf_model_path="models/random_forest.pkl",
+        xgb_model_path="models/xgboost_model.pkl"
     )
+    return data_dict, xgb_pipeline, comp_df
 
-    # -------------------------------------------------------------
-    # Step 7: Live Inference Verification on Unseen Test Sample
-    # -------------------------------------------------------------
-    print("\n>>> STEP 7: Testing Live Inference on a Held-out Test Sample...")
-    sample_idx = data_dict["X_test"].index[0]
-    sample_features = data_dict["X_test"].loc[sample_idx].to_dict()
-    ground_truth = float(data_dict["y_test"].loc[sample_idx])
 
-    rf_pred = predict_sample(sample_features, model_path=rf_model_path)
-    xgb_pred = predict_xgboost_sample(sample_features, model_path=xgb_model_path)
+def run_phase_3(data_dict=None):
+    """Execute Phase 3 Workflow (SHAP & LIME)."""
+    print("\n" + "=" * 70)
+    print(" >>> EXECUTING PHASE 3: EXPLAINABLE AI USING SHAP AND LIME")
+    print("=" * 70)
 
-    print(f"    - Input Features: {sample_features}")
-    print(f"    - Ground Truth PM2.5:     {ground_truth:.2f} µg/m³")
-    print(f"    - Random Forest Forecast: {rf_pred:.2f} µg/m³ (Error: {abs(ground_truth - rf_pred):.2f} µg/m³)")
-    print(f"    - XGBoost Forecast:       {xgb_pred:.2f} µg/m³ (Error: {abs(ground_truth - xgb_pred):.2f} µg/m³)")
-    print("    [PASS] Both model pipelines verified for live prediction.")
+    if data_dict is None:
+        data_dict = get_or_load_data()
 
-    # -------------------------------------------------------------
-    # Final Completion Summary
-    # -------------------------------------------------------------
+    # Ensure models exist
+    rf_pipeline = get_or_train_rf(data_dict, force_retrain=False)
+    xgb_pipeline = get_or_train_xgb(data_dict, force_retrain=False)
+
+    # 1. SHAP Explanations
+    print("\n[PHASE 3 - Step 1] Calculating SHAP Global and Local Explanations...")
+    rf_shap = explain_model_shap(model_name="random_forest", pipeline=rf_pipeline, data_dict=data_dict)
+    xgb_shap = explain_model_shap(model_name="xgboost", pipeline=xgb_pipeline, data_dict=data_dict)
+
+    # 2. LIME Explanations
+    print("\n[PHASE 3 - Step 2] Generating LIME Local Explanations across Representative Samples...")
+    rf_lime = explain_model_lime(model_name="random_forest", pipeline=rf_pipeline, data_dict=data_dict)
+    xgb_lime = explain_model_lime(model_name="xgboost", pipeline=xgb_pipeline, data_dict=data_dict)
+
+    # 3. Cross-Method Comparison
+    print("\n[PHASE 3 - Step 3] Conducting Cross-Method Explainability Comparison (SHAP vs. LIME)...")
+    comp_exp = run_explainability_comparison()
+
+    return rf_shap, xgb_shap, rf_lime, xgb_lime, comp_exp
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Explainable AI-Based Air Pollution Prediction & Source Attribution")
+    parser.add_argument(
+        "--phase",
+        choices=["1", "2", "3", "all"],
+        default="all",
+        help="Specify project phase to execute: '1' (Baseline), '2' (XGBoost & Comparison), '3' (SHAP & LIME), or 'all' (default)"
+    )
+    parser.add_argument(
+        "--retrain",
+        action="store_true",
+        help="Force retraining and tuning of models rather than loading cached weights"
+    )
+    args = parser.parse_args()
+
+    start_time = time.time()
+    banner = "=" * 80
+    print(banner)
+    print(" EXPLAINABLE AI-BASED AIR POLLUTION PREDICTION & SOURCE ATTRIBUTION ")
+    print(f" EXECUTION TARGET: PHASE {args.phase.upper()}")
+    print(banner)
+
+    data_dict = None
+
+    if args.phase == "1":
+        run_phase_1(force_retrain=args.retrain)
+    elif args.phase == "2":
+        data_dict = get_or_load_data()
+        run_phase_2(data_dict=data_dict, force_retrain=args.retrain)
+    elif args.phase == "3":
+        data_dict = get_or_load_data()
+        run_phase_3(data_dict=data_dict)
+    else:  # all
+        data_dict, rf_pipeline = run_phase_1(force_retrain=args.retrain)
+        _, xgb_pipeline, _ = run_phase_2(data_dict=data_dict, force_retrain=args.retrain)
+        run_phase_3(data_dict=data_dict)
+
     elapsed = time.time() - start_time
     print("\n" + banner)
-    print(" [PHASES 1 & 2 COMPLETE] ALL TASKS EXECUTED AND VERIFIED SUCCESSFULLY")
+    print(" [EXECUTION COMPLETE] ALL REQUESTED PIPELINE STAGES VERIFIED SUCCESSFULLY")
     print(banner)
-    print(f" Execution Duration: {elapsed:.2f} seconds\n")
-    print(" Summary of Generated Artifacts:")
-    print("  * Serialized Models:")
-    print("      - models/random_forest.pkl")
-    print("      - models/xgboost_model.pkl")
-    print("  * Metric Logs:")
-    print("      - results/metrics/model_metrics.json (Random Forest)")
-    print("      - results/metrics/xgboost_best_parameters.json (Tuned Hyperparameters)")
-    print("      - results/metrics/xgboost_metrics.json (XGBoost)")
-    print("      - results/metrics/model_comparison.csv (Head-to-Head Table)")
-    print("  * Evaluation & Comparison Graphs:")
-    print("      - results/graphs/ (17 PNG figures total)")
-    print("  * Detailed Analytical Reports:")
-    print("      - results/reports/data_inspection_report.md")
-    print("      - results/reports/preprocessing_report.md")
-    print("      - results/reports/eda_report.md")
-    print("      - results/reports/model_evaluation_report.md (Random Forest)")
-    print("      - results/reports/xgboost_report.md (XGBoost)")
-    print("      - results/reports/model_comparison_report.md (Comparative Analysis)")
+    print(f" Total Elapsed Time: {elapsed:.2f} seconds")
+    print("\n Key Output Locations:")
+    print("  * Serialized Models:        models/random_forest.pkl, models/xgboost_model.pkl")
+    print("  * Phase 1 EDA Visuals:      results/graphs/ (9 plots)")
+    print("  * Phase 2 Comparison Plots: results/graphs/model_comparison_*.png (5 plots)")
+    print("  * Phase 3 SHAP Explanations:results/graphs/shap/ (Beeswarm, Bar, Dependence, Waterfall, Force)")
+    print("  * Phase 3 LIME Local Plots: results/graphs/lime/ (PNG plots & Interactive HTMLs)")
+    print("  * Numerical Metrics:        results/metrics/ (RF, XGBoost, Comparison, SHAP, LIME)")
+    print("  * Analytical Reports:       results/reports/ (data_inspection, preprocessing, eda,")
+    print("                                                 model_evaluation, xgboost_report,")
+    print("                                                 model_comparison, explainability_comparison,")
+    print("                                                 phase3_report)")
     print(banner)
 
 
 if __name__ == "__main__":
-    retrain_flag = "--retrain" in sys.argv
-    run_pipeline(force_retrain=retrain_flag)
+    main()

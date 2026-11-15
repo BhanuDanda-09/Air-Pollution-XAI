@@ -1,0 +1,26 @@
+Model,Sample_Type,Test_Index,Actual_PM2.5,Predicted_PM2.5,Feature,Feature_Value,LIME_Weight,Impact_Direction
+Random Forest,01_Min_PM2.5,78,6.0,53.79,RH,69.0,35.2331,Increases PM2.5
+Random Forest,01_Min_PM2.5,78,6.0,53.79,SR,167.0,16.0864,Increases PM2.5
+Random Forest,01_Min_PM2.5,78,6.0,53.79,BP,742.0,-8.8792,Decreases PM2.5
+Random Forest,01_Min_PM2.5,78,6.0,53.79,WD,212.0,0.4754,Increases PM2.5
+Random Forest,01_Min_PM2.5,78,6.0,53.79,AT,15.0,-0.4031,Decreases PM2.5
+Random Forest,02_25th_Percentile,134,91.0,123.03,RH,46.0,36.5837,Increases PM2.5
+Random Forest,02_25th_Percentile,134,91.0,123.03,SR,322.0,24.2011,Increases PM2.5
+Random Forest,02_25th_Percentile,134,91.0,123.03,BP,739.0,-7.8164,Decreases PM2.5
+Random Forest,02_25th_Percentile,134,91.0,123.03,WD,196.0,-1.8496,Decreases PM2.5
+Random Forest,02_25th_Percentile,134,91.0,123.03,AT,19.0,-0.7549,Decreases PM2.5
+Random Forest,03_Median_PM2.5,127,132.0,145.49,RH,74.0,36.8664,Increases PM2.5
+Random Forest,03_Median_PM2.5,127,132.0,145.49,BP,739.0,-9.1449,Decreases PM2.5
+Random Forest,03_Median_PM2.5,127,132.0,145.49,SR,5.0,8.8208,Increases PM2.5
+Random Forest,03_Median_PM2.5,127,132.0,145.49,WD,261.0,1.029,Increases PM2.5
+Random Forest,03_Median_PM2.5,127,132.0,145.49,AT,13.0,0.0928,Increases PM2.5
+Random Forest,04_75th_Percentile,100,186.0,179.84,RH,90.0,35.6979,Increases PM2.5
+Random Forest,04_75th_Percentile,100,186.0,179.84,BP,728.0,-12.9107,Decreases PM2.5
+Random Forest,04_75th_Percentile,100,186.0,179.84,SR,4.0,5.1125,Increases PM2.5
+Random Forest,04_75th_Percentile,100,186.0,179.84,WD,241.0,2.9219,Increases PM2.5
+Random Forest,04_75th_Percentile,100,186.0,179.84,AT,12.0,1.24,Increases PM2.5
+Random Forest,05_Max_PM2.5_Smog_Spike,13,353.0,322.71,RH,89.0,27.8141,Increases PM2.5
+Random Forest,05_Max_PM2.5_Smog_Spike,13,353.0,322.71,SR,326.0,22.6714,Increases PM2.5
+Random Forest,05_Max_PM2.5_Smog_Spike,13,353.0,322.71,BP,738.0,-7.9547,Decreases PM2.5
+Random Forest,05_Max_PM2.5_Smog_Spike,13,353.0,322.71,WD,94.0,4.1104,Increases PM2.5
+Random Forest,05_Max_PM2.5_Smog_Spike,13,353.0,322.71,AT,11.0,1.6132,Increases PM2.5

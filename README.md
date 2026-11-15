@@ -2,8 +2,9 @@
 
 [![Phase 1 Complete](https://img.shields.io/badge/Phase%201-Completed-brightgreen.svg)]()
 [![Phase 2 Complete](https://img.shields.io/badge/Phase%202-Completed-brightgreen.svg)]()
+[![Phase 3 Complete](https://img.shields.io/badge/Phase%203-Completed-brightgreen.svg)]()
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)]()
-[![Models: Random Forest & XGBoost](https://img.shields.io/badge/Models-RF%20%7C%20XGBoost-orange.svg)]()
+[![Explainability: SHAP & LIME](https://img.shields.io/badge/XAI-SHAP%20%7C%20LIME-purple.svg)]()
 [![License: Academic](https://img.shields.io/badge/Project-B.Tech%20Capstone-blueviolet.svg)]()
 
 ---
@@ -11,78 +12,76 @@
 ## Table of Contents
 1. [Project Overview](#project-overview)
 2. [Problem Statement & Motivation](#problem-statement--motivation)
-3. [Project Objectives](#project-objectives)
+3. [Project Objectives Across Phases](#project-objectives-across-phases)
 4. [Dataset Description & Quality Audit](#dataset-description--quality-audit)
 5. [Repository Structure](#repository-structure)
 6. [Technologies Used](#technologies-used)
 7. [Environment Setup & Installation](#environment-setup--installation)
 8. [Step-by-Step Execution Guide](#step-by-step-execution-guide)
 9. [Phase 1: EDA & Baseline Random Forest](#phase-1-eda--baseline-random-forest)
-10. [Phase 2: XGBoost Development & Hyperparameter Tuning](#phase-2-xgboost-development--hyperparameter-tuning)
-11. [Random Forest vs. XGBoost Head-to-Head Comparison](#random-forest-vs-xgboost-head-to-head-comparison)
-12. [Model Interpretation & Feature Importance](#model-interpretation--feature-importance)
-13. [Scientific Boundaries & Limitations](#scientific-boundaries--limitations)
-14. [Future Roadmap (Phases 3 & 4)](#future-roadmap-phases-3--4)
+10. [Phase 2: XGBoost Development & Model Comparison](#phase-2-xgboost-development--model-comparison)
+11. [Phase 3: Explainable AI using SHAP & LIME](#phase-3-explainable-ai-using-shap--lime)
+    - [Introduction to Explainable AI](#introduction-to-explainable-ai)
+    - [Why Both SHAP and LIME Are Used](#why-both-shap-and-lime-are-used)
+    - [SHAP Methodology & Findings](#shap-methodology--findings)
+    - [LIME Methodology & Findings](#lime-methodology--findings)
+    - [SHAP vs. LIME Cross-Method Comparison](#shap-vs-lime-cross-method-comparison)
+12. [Crucial Scientific Limitations](#crucial-scientific-limitations)
+13. [Future Roadmap (Phase 4)](#future-roadmap-phase-4)
 
 ---
 
 ## Project Overview
 
-Air pollution is one of the most critical environmental and public health hazards in modern urban regions, with fine particulate matter ($\text{PM}_{2.5}$) being the primary contributor to severe respiratory and cardiovascular morbidity. 
+Air pollution is among the most severe environmental health emergencies in modern urban areas, with fine particulate matter ($\text{PM}_{2.5}$) being the primary contributor to cardiovascular and pulmonary illnesses.
 
-This final-year B.Tech capstone project aims to design an **Explainable AI (XAI)** system for predicting ambient $\text{PM}_{2.5}$ pollutant concentrations and attributing variations to underlying meteorological drivers.
+This final-year B.Tech capstone project establishes a complete **Explainable AI (XAI)** framework for predicting ambient $\text{PM}_{2.5}$ concentrations and demystifying the underlying meteorological drivers behind localized pollution spikes in Delhi.
 
-> **Current Project Status (Phases 1 & 2 Complete):**  
-> - **Phase 1:** Dataset Inspection, Leak-Free Preprocessing, Exploratory Data Analysis (EDA), and a Baseline Random Forest Regressor Pipeline.  
-> - **Phase 2:** XGBoost Regressor Development, 5-Fold Cross-Validated Hyperparameter Optimization (`RandomizedSearchCV`), and a rigorous head-to-head empirical comparison on an identical held-out test set.
+> **Project Status (Phases 1, 2, and 3 Complete):**  
+> - **Phase 1:** Dataset Audit, Leak-Free Preprocessing, Exploratory Data Analysis (EDA), and Baseline Random Forest Regressor.  
+> - **Phase 2:** XGBoost Regressor with 5-Fold Cross-Validation Tuning (`RandomizedSearchCV`) and Head-to-Head Model Comparison.  
+> - **Phase 3:** Global and Local Explainability using **SHAP** (`TreeExplainer`) and **LIME** (`LimeTabularExplainer`), generating beeswarm plots, dependence curves, waterfall breakdowns, force plots, and local surrogate explanations.
 
 ---
 
 ## Problem Statement & Motivation
 
-Urban centers such as the National Capital Region (Delhi) suffer from chronic, hazardous smog episodes characterized by particulate concentrations exceeding World Health Organization (WHO) and Indian National Ambient Air Quality Standards (NAAQS) by multiple folds. 
+Urban airsheds like the National Capital Region (Delhi) regularly endure toxic winter smog episodes where $\text{PM}_{2.5}$ levels exceed World Health Organization (WHO) safety thresholds by more than 20-fold. 
 
-Traditional atmospheric dispersion models are computationally demanding and require extensive real-time emission inventories. While machine learning algorithms can model non-linear pollutant behavior, they often function as opaque black boxes. 
+While machine learning models can capture non-linear interactions between weather patterns and aerosol accumulation, standard models operate as opaque "black boxes." In critical decision-support environments such as municipal environmental departments, stakeholders cannot blindly trust black-box outputs. 
 
-This project addresses this challenge in structured phases:
-1. **Phase 1:** Establishing an empirical data understanding, leak-free preprocessing, exploratory data analysis, and an end-to-end baseline Random Forest model.
-2. **Phase 2 (Completed):** Developing an optimized Extreme Gradient Boosting (`XGBRegressor`) pipeline, performing systematic hyperparameter tuning, and comparing models on identical held-out test observations.
-3. **Subsequent Phases:** Implementing Explainable AI frameworks (SHAP, LIME), followed by a production full-stack application and interactive dashboard.
+This project bridges the gap between **predictive accuracy** and **interpretability** through structured, rigorous phases.
 
 ---
 
-## Project Objectives
+## Project Objectives Across Phases
 
-- **Dataset Verification:** Perform comprehensive auditing of raw data, feature data types, missingness, duplicates, and physical validity.
-- **Leak-Free Preprocessing:** Clean extra sheet artifacts, justify and eliminate duplicate rows to prevent cross-split leakage, and encapsulate median imputation within an isolated Scikit-learn Pipeline.
-- **Exploratory Data Analysis:** Generate 9 publication-grade visualizations examining target distributions, meteorological correlations, and particulate trends.
-- **Baseline Machine Learning Pipeline:** Train a reproducible `RandomForestRegressor` baseline model strictly on verified meteorological features.
-- **XGBoost Development & Tuning:** Construct an `XGBRegressor` pipeline and optimize key hyperparameters using 5-fold cross-validation strictly on training data.
-- **Empirical Cross-Model Comparison:** Evaluate both models using identical held-out test observations, comparing MAE, MSE, RMSE, and $R^2$, and analyzing feature importance discrepancies.
-- **Reproducible Execution:** Deliver a unified one-command execution script (`main.py`) and an interactive Jupyter Notebook.
+- **Phase 1:** Clean artifact columns, eliminate 156 duplicate rows to prevent train-test leakage, generate 9 publication-grade EDA visualizations, and train a reproducible `RandomForestRegressor` baseline pipeline.
+- **Phase 2:** Develop an `XGBRegressor` pipeline, optimize hyperparameters across 30 iterations with 5-fold cross-validation strictly on training data, evaluate on the identical held-out test set, and compare performance head-to-head.
+- **Phase 3:** Apply **SHAP** (`TreeExplainer`) for global feature ranking and local game-theoretic attributions; apply **LIME** (`LimeTabularExplainer`) for continuous local neighborhood surrogates across 5 representative pollution scenarios; evaluate consensus and explain divergence between global and local explanation paradigms.
 
 ---
 
 ## Dataset Description & Quality Audit
 
-The dataset analyzed is **`Delhi Final(1).xlsx`**, containing real-world ambient environmental measurements from continuous monitoring stations in Delhi.
+The dataset analyzed is **`Delhi Final(1).xlsx`**, containing real-world continuous ambient air monitoring records from Delhi.
 
 ### Verified Column Schema:
-| Column | Variable Role | Units | Description & Expected Domain |
-|:---|:---|:---:|:---|
-| **`PM2.5`** | **Target ($y$)** | $\mu\text{g/m}^3$ | Fine inhalable particulate matter ($\le 2.5\,\mu\text{m}$) |
-| **`RH`** | **Input Feature ($X_1$)** | $\%$ | Ambient Relative Humidity ($0\text{--}100\%$) |
-| **`WD`** | **Input Feature ($X_2$)** | Degrees ($^\circ$) | Wind Direction ($0\text{--}360^\circ$ clockwise from True North) |
-| **`SR`** | **Input Feature ($X_3$)** | $\text{W/m}^2$ | Solar Radiation intensity |
-| **`BP`** | **Input Feature ($X_4$)** | $\text{mmHg}$ | Barometric Atmospheric Pressure |
-| **`AT`** | **Input Feature ($X_5$)** | $^\circ\text{C}$ | Ambient Air Temperature |
+| Column | Role | Units | Physical Bounds | Description |
+|:---|:---|:---:|:---:|:---|
+| **`PM2.5`** | **Target ($y$)** | $\mu\text{g/m}^3$ | $[1.0, 427.0]$ | Fine inhalable particulate matter ($\le 2.5\,\mu\text{m}$) |
+| **`RH`** | **Feature ($X_1$)** | $\%$ | $[36.0, 95.0]$ | Ambient Relative Humidity |
+| **`WD`** | **Feature ($X_2$)** | Degrees ($^\circ$) | $[7.0, 332.0]$ | Wind Direction ($0\text{--}360^\circ$ clockwise from True North) |
+| **`SR`** | **Feature ($X_3$)** | $\text{W/m}^2$ | $[2.0, 334.0]$ | Solar Radiation intensity |
+| **`BP`** | **Feature ($X_4$)** | $\text{mmHg}$ | $[726.0, 749.0]$ | Barometric Atmospheric Pressure |
+| **`AT`** | **Feature ($X_5$)** | $^\circ\text{C}$ | $[11.0, 23.0]$ | Ambient Air Temperature |
 
-### Key Dataset Audit Findings:
-- **Total Raw Observations:** 2,183 rows across 13 columns.
-- **Artifact Columns:** Columns `Unnamed: 6` to `Unnamed: 12` are empty Excel artifacts (with a single text label `'Delhi'` in row 4) and were dropped.
-- **Duplicate Rows:** 156 duplicate rows were identified. These arise from stagnant nocturnal conditions where sensor logs repeat. To eliminate cross-fold data leakage in tabular regression, duplicate records were dropped, yielding **2,027 unique observations**.
-- **Missing Values:** Only Solar Radiation (`SR`) had missing entries (**12 out of 2,183 rows, or 0.55%**). These are cleanly imputed using training-set medians.
-- **Physical Validity:** All values fall within physically realistic environmental ranges (no negative concentrations, temperatures, or impossible humidities).
+### Quality Audit & Preprocessing Decisions:
+- **Raw Dimensions:** 2,183 rows across 13 columns.
+- **Artifact Columns:** Columns `Unnamed: 6` to `Unnamed: 12` contained 100% `NaN` values (with one stray text label `'Delhi'` in row 4) and were dropped.
+- **Deduplication:** 156 duplicate rows were identified and removed. Because the dataset lacks timestamps, keeping identical rows creates cross-fold data leakage where identical samples appear in both train and test partitions. Removing duplicates left **2,027 unique samples**.
+- **Missing Values:** Only `SR` contained missing entries (**12 out of 2,183 rows, or 0.55%**). These are cleanly imputed using `SimpleImputer(strategy='median')` fitted strictly on `X_train` ($160.0\,\text{W/m}^2$) within an isolated pipeline.
+- **Partitions:** 80% Training ($1,621$ observations) and 20% Held-out Testing ($406$ observations) with `random_state=42`.
 
 ---
 
@@ -96,59 +95,65 @@ Air-Pollution-XAI/
 │   └── preprocessed_delhi_air_quality.csv   # Preprocessed, deduplicated dataset
 │
 ├── notebooks/
-│   └── 01_data_analysis.ipynb              # Complete interactive analysis notebook
+│   └── 01_data_analysis.ipynb              # Comprehensive 22-cell interactive analysis notebook
 │
 ├── src/
 │   ├── __init__.py                          # Package identifier
 │   ├── data_inspection.py                   # Raw data audit and quality assessment
 │   ├── preprocessing.py                     # Data cleaning, split, and imputer pipeline
 │   ├── eda.py                               # 9 publication-grade EDA visualizations
-│   ├── train_random_forest.py               # Baseline Random Forest model training
-│   ├── evaluate_model.py                    # Random Forest evaluation and metrics
+│   ├── train_random_forest.py               # Phase 1: Baseline Random Forest pipeline
+│   ├── evaluate_model.py                    # Phase 1: Random Forest test evaluation
 │   ├── train_xgboost.py                     # Phase 2: XGBoost training and tuning
-│   └── compare_models.py                    # Phase 2: Head-to-head model comparison
+│   ├── compare_models.py                    # Phase 2: Head-to-head model comparison
+│   ├── shap_explainability.py               # Phase 3: SHAP global & local explainability
+│   ├── lime_explainability.py               # Phase 3: LIME local surrogate explanations
+│   └── compare_explanations.py              # Phase 3: Cross-method SHAP vs LIME comparison
 │
 ├── models/
 │   ├── random_forest.pkl                    # Serialized baseline pipeline (imputer + RF)
 │   └── xgboost_model.pkl                    # Serialized Phase 2 pipeline (imputer + XGBoost)
 │
 ├── results/
-│   ├── graphs/                              # 17 Generated High-DPI Visualizations
-│   │   ├── pm25_distribution_histogram.png
-│   │   ├── pm25_boxplot.png
-│   │   ├── correlation_heatmap.png
-│   │   ├── rh_vs_pm25_scatter.png
-│   │   ├── wd_vs_pm25_scatter.png
-│   │   ├── sr_vs_pm25_scatter.png
-│   │   ├── bp_vs_pm25_scatter.png
-│   │   ├── at_vs_pm25_scatter.png
-│   │   ├── feature_distributions.png
-│   │   ├── actual_vs_predicted.png          # Random Forest actual vs. predicted
-│   │   ├── residual_plot.png                # Random Forest residuals
-│   │   ├── feature_importance.png           # Random Forest feature importance
-│   │   ├── xgboost_actual_vs_predicted.png  # XGBoost actual vs. predicted
-│   │   ├── xgboost_residual_plot.png        # XGBoost residuals
-│   │   ├── xgboost_feature_importance.png   # XGBoost feature importance
-│   │   ├── model_comparison_mae.png         # Head-to-head MAE bar chart
-│   │   ├── model_comparison_rmse.png        # Head-to-head RMSE bar chart
-│   │   ├── model_comparison_r2.png          # Head-to-head R² bar chart
-│   │   ├── model_comparison_metrics.png     # Multi-metric comparative dashboard
-│   │   └── model_comparison_feature_importance.png # Grouped feature importance comparison
-│   ├── metrics/                             # Empirical test-set metrics
+│   ├── graphs/                              # Generated High-Resolution Visualizations
+│   │   ├── (Phase 1 EDA: 9 PNG plots)
+│   │   ├── (Phase 1 RF: 3 diagnostic PNG plots)
+│   │   ├── (Phase 2 XGBoost: 3 diagnostic PNG plots)
+│   │   ├── (Phase 2 Comparison: 5 comparative PNG plots)
+│   │   ├── shap/                            # Phase 3 SHAP Visualizations
+│   │   │   ├── random_forest/               # Beeswarm, Bar, 5 Dependence, Waterfall, Force PNG/HTML
+│   │   │   └── xgboost/                     # Beeswarm, Bar, 5 Dependence, Waterfall, Force PNG/HTML
+│   │   ├── lime/                            # Phase 3 LIME Visualizations
+│   │   │   ├── random_forest/               # 5 Sample PNG figures + 5 Interactive HTML files
+│   │   │   └── xgboost/                     # 5 Sample PNG figures + 5 Interactive HTML files
+│   │   ├── shap_global_rf_vs_xgb_comparison.png
+│   │   └── shap_vs_lime_importance_comparison.png
+│   ├── metrics/                             # Metric logs and tabular outputs
 │   │   ├── model_metrics.json               # Random Forest metrics
 │   │   ├── model_metrics.csv
 │   │   ├── xgboost_best_parameters.json     # Tuned XGBoost hyperparameters
 │   │   ├── xgboost_metrics.json             # XGBoost metrics
-│   │   └── model_comparison.csv             # Cross-model evaluation table
-│   └── reports/                             # Detailed documentation reports
+│   │   ├── model_comparison.csv             # Head-to-head RF vs. XGBoost table
+│   │   ├── shap/                            # SHAP global & sample contribution CSVs
+│   │   │   ├── rf_shap_global_importance.csv
+│   │   │   ├── rf_shap_sample_contributions.csv
+│   │   │   ├── xgboost_shap_global_importance.csv
+│   │   │   └── xgboost_shap_sample_contributions.csv
+│   │   ├── lime/                            # LIME local feature contribution CSVs
+│   │   │   ├── rf_lime_sample_contributions.csv
+│   │   │   └── xgboost_lime_sample_contributions.csv
+│   │   └── explainability_comparison.csv    # Cross-method explainability table
+│   └── reports/                             # Detailed analytical markdown reports
 │       ├── data_inspection_report.md
 │       ├── preprocessing_report.md
 │       ├── eda_report.md
-│       ├── model_evaluation_report.md       # Random Forest report
-│       ├── xgboost_report.md                # Phase 2 XGBoost report
-│       └── model_comparison_report.md       # Comparative analysis report
+│       ├── model_evaluation_report.md
+│       ├── xgboost_report.md
+│       ├── model_comparison_report.md
+│       ├── explainability_comparison.md
+│       └── phase3_report.md
 │
-├── main.py                                  # One-command end-to-end execution pipeline
+├── main.py                                  # Modular CLI orchestrator supporting all phases
 ├── requirements.txt                         # Pinned Python dependencies
 ├── .gitignore                               # Git ignore configuration
 └── README.md                                # Comprehensive capstone project documentation
@@ -160,8 +165,9 @@ Air-Pollution-XAI/
 
 - **Programming Language:** Python 3.11+
 - **Machine Learning & Gradient Boosting:** `scikit-learn`, `xgboost`
-- **Data Manipulation & I/O:** `pandas`, `openpyxl`, `numpy`
-- **Visualization & Plotting:** `matplotlib`, `seaborn`
+- **Explainable AI Frameworks:** `shap` (0.54.1), `lime` (0.2.0.1)
+- **Data Manipulation & Scientific Computing:** `pandas`, `openpyxl`, `numpy`, `scipy`
+- **Visualization & Plotting:** `matplotlib` (Agg backend), `seaborn`
 - **Model Serialization:** `joblib`
 - **Interactive Computing:** `jupyter`, `ipykernel`
 
@@ -169,7 +175,7 @@ Air-Pollution-XAI/
 
 ## Environment Setup & Installation
 
-### Option 1: Standard Python Virtual Environment
+### Option 1: Standard Virtual Environment
 
 ```bash
 # 1. Clone repository
@@ -185,7 +191,7 @@ python -m venv .venv
 # Linux / macOS:
 source .venv/bin/activate
 
-# 4. Install dependencies
+# 4. Install all dependencies
 pip install -r requirements.txt
 ```
 
@@ -200,56 +206,47 @@ uv pip install -r requirements.txt
 
 ## Step-by-Step Execution Guide
 
-### Run End-to-End Workflow with a Single Command
+### Run via Modular Command-Line Options
 
-Execute the complete Phase 1 & Phase 2 pipeline:
+The unified orchestrator `main.py` provides targeted phase execution without redundant retraining:
 
 ```bash
+# Execute Phase 1 only (Dataset Inspection, Preprocessing, EDA, RF Baseline)
+python main.py --phase 1
+
+# Execute Phase 2 only (XGBoost Training, Tuning & Model Comparison)
+python main.py --phase 2
+
+# Execute Phase 3 only (SHAP & LIME Global and Local Explainability)
+python main.py --phase 3
+
+# Execute Complete Workflow (Phases 1, 2, and 3 sequentially)
 python main.py
-```
 
-To force retraining and hyperparameter re-tuning from scratch:
-
-```bash
+# Force Model Retraining & Tuning from Scratch
 python main.py --retrain
 ```
 
 ### Run Individual Modules Independently
 
 ```bash
-# 1. Dataset Inspection only
-python src/data_inspection.py
-
-# 2. Preprocessing & Data Splitting only
-python src/preprocessing.py
-
-# 3. EDA Visualizations only
-python src/eda.py
-
-# 4. Train Random Forest Baseline only
-python src/train_random_forest.py
-
-# 5. Evaluate Random Forest only
-python src/evaluate_model.py
-
-# 6. Train & Tune XGBoost only
-python src/train_xgboost.py
-
-# 7. Run Model Comparison only
-python src/compare_models.py
-```
-
-### Run Interactive Jupyter Notebook
-
-```bash
-jupyter notebook notebooks/01_data_analysis.ipynb
+python src/data_inspection.py        # Dataset quality audit
+python src/preprocessing.py          # Data cleaning & 80/20 split
+python src/eda.py                    # 9 EDA figures
+python src/train_random_forest.py    # Random Forest baseline training
+python src/evaluate_model.py         # Random Forest evaluation
+python src/train_xgboost.py          # XGBoost 5-fold CV tuning
+python src/compare_models.py         # RF vs. XGBoost comparison
+python src/shap_explainability.py    # SHAP global & local explanations
+python src/lime_explainability.py    # LIME local explanations
+python src/compare_explanations.py   # SHAP vs. LIME cross-method comparison
 ```
 
 ---
 
 ## Phase 1: EDA & Baseline Random Forest
 
-In Phase 1, data auditing and exploratory analysis confirmed the absence of negative or out-of-domain measurements. Baseline modeling established an initial benchmark:
+Baseline Random Forest modeling established an initial benchmark:
 - **Architecture:** `RandomForestRegressor(n_estimators=100, random_state=42)`
 - **Evaluation Partition:** 406 held-out test samples (20% split)
 - **Baseline Test Metrics:**
@@ -259,79 +256,95 @@ In Phase 1, data auditing and exploratory analysis confirmed the absence of nega
 
 ---
 
-## Phase 2: XGBoost Development & Hyperparameter Tuning
+## Phase 2: XGBoost Development & Model Comparison
 
-In Phase 2, Extreme Gradient Boosting (`XGBRegressor`) was implemented to test whether sequential boosting and regularized tree learning improve upon bagging ensembles.
+Extreme Gradient Boosting (`XGBRegressor`) was optimized using `RandomizedSearchCV` with 5-fold cross-validation strictly on `X_train` (Best CV RMSE: $39.25\,\mu\text{g/m}^3$).
 
-### Hyperparameter Tuning Methodology:
-- **Optimization Strategy:** `RandomizedSearchCV` across 30 iterations with 5-fold cross-validation.
-- **Search Space:** Tree depth ($3\text{--}8$), learning rate ($0.01\text{--}0.15$), subsampling ($0.6\text{--}1.0$), column subsampling ($0.6\text{--}1.0$), min child weight ($1\text{--}10$), and L1/L2 regularization terms ($\alpha, \lambda$).
-- **Leakage Prevention:** Cross-validation was conducted **strictly on the 1,621 training samples**. The test set remained completely untouched during tuning.
-- **Best 5-Fold CV Training RMSE:** **$39.25\,\mu\text{g/m}^3$**
-
-### Optimal Hyperparameters Found:
-| Hyperparameter | Value | Functional Role |
-|:---|:---:|:---|
-| **`n_estimators`** | `250` | Number of sequential boosting rounds |
-| **`max_depth`** | `7` | Maximum tree depth per weak learner |
-| **`learning_rate`** | `0.1` | Step size shrinkage ($\eta$) to prevent overfitting |
-| **`subsample`** | `0.9` | Fraction of training rows sampled per tree |
-| **`colsample_bytree`**| `0.8` | Feature subsampling ratio per tree |
-| **`min_child_weight`**| `2` | Minimum hessian weight required in child nodes |
-| **`reg_lambda`** | `5.0` | L2 leaf regularization parameter |
-| **`reg_alpha`** | `0.0` | L1 leaf regularization parameter |
-
----
-
-## Random Forest vs. XGBoost Head-to-Head Comparison
-
-Both models were evaluated on the **exact same 406 held-out test observations** (`seed=42`):
-
+### Head-to-Head Comparison on Identical 406 Test Samples:
 | Model Architecture | MAE ($\mu\text{g/m}^3$) | MSE $(\mu\text{g/m}^3)^2$ | RMSE ($\mu\text{g/m}^3$) | $R^2$ Score | Performance Rank |
 |:---|:---:|:---:|:---:|:---:|:---:|
 | **Random Forest (Baseline)** | 25.62 | 1447.90 | 38.05 | 0.7269 ($72.69\%$) | 2nd |
 | **XGBoost (Tuned)** | **25.28** | **1349.57** | **36.74** | **0.7455 ($74.55\%$)** | **1st (Top)** |
 
-### Performance Analysis:
-1. **Best-Performing Model:** **XGBoost achieved superior generalization** across all four performance indicators.
-2. **Error Reductions:**
-   - **MAE:** Improved from $25.62\,\mu\text{g/m}^3$ to **$25.28\,\mu\text{g/m}^3$** ($0.34\,\mu\text{g/m}^3$ reduction).
-   - **RMSE:** Improved from $38.05\,\mu\text{g/m}^3$ to **$36.74\,\mu\text{g/m}^3$** ($1.31\,\mu\text{g/m}^3$ reduction).
-   - **$R^2$ Variance Explained:** Improved from $72.69\%$ to **$74.55\%$** ($+1.85\%$ percentage points improvement).
-3. **Algorithmic Justification:**
-   - Random Forest fits trees independently using bootstrap aggregation (bagging).
-   - XGBoost iteratively focuses new trees on the pseudo-residuals of earlier iterations, optimizing continuous gradients and applying L2 leaf penalties (`reg_lambda=5.0`), allowing it to capture subtle non-linear atmospheric boundaries more effectively.
+**Key Takeaway:** XGBoost achieved lower error ($\Delta\text{MAE} = -0.34\,\mu\text{g/m}^3$, $\Delta\text{RMSE} = -1.31\,\mu\text{g/m}^3$) and explained $+1.85\%$ more variance in $\text{PM}_{2.5}$, benefiting from gradient residual boosting and $L_2$ leaf weight regularization (`reg_lambda=5.0`).
 
 ---
 
-## Model Interpretation & Feature Importance
+## Phase 3: Explainable AI using SHAP & LIME
 
-### Feature Importance Comparison:
-| Feature | Physical Meaning | Random Forest (Gini %) | XGBoost (Gain %) | Consensus Role |
-|:---|:---|:---:|:---:|:---|
-| **`RH`** | Relative Humidity (%) | **$37.39\%$** | **$27.36\%$** | Primary driver; high humidity accelerates secondary aerosol condensation. |
-| **`AT`** | Air Temperature ($^\circ\text{C}$) | $4.73\%$ | **$21.81\%$** | High gain in XGBoost; cold temperatures govern thermal inversion trapping. |
-| **`BP`** | Barometric Pressure ($\text{mmHg}$) | $18.33\%$ | **$19.99\%$** | Strong consensus; anticyclonic high pressure caps atmospheric ventilation. |
-| **`SR`** | Solar Radiation ($\text{W/m}^2$) | $16.77\%$ | **$16.15\%$** | Daytime solar heating deepens boundary layer mixing, diluting PM2.5. |
-| **`WD`** | Wind Direction ($^\circ$) | $22.78\%$ | **$14.69\%$** | Accounts for regional transport corridors across the Delhi airshed. |
+### Introduction to Explainable AI
+Machine learning models are frequently deployed as black boxes that output point predictions without providing physical or logical justifications. In environmental forecasting, knowing *why* a model predicted $350\,\mu\text{g/m}^3$ (a severe public health emergency) versus $50\,\mu\text{g/m}^3$ is critical for regulatory validation and emergency interventions.
 
-### Interpretation of Calculations:
-- **Random Forest (Mean Decrease in Impurity / Gini):** Total reduction in variance across all tree splits involving the feature.
-- **XGBoost (Gain):** Average improvement in the objective loss function brought by a feature across all boosting iterations.
-- **Scientific Caveat:** Feature importance measures mathematical model reliance, **not emission source causation**. Attributing $\text{PM}_{2.5}$ to specific chemical sources (e.g. stubble burning vs. vehicular traffic) requires chemical speciation or receptor modeling.
+### Why Both SHAP and LIME Are Used
+1. **SHAP (SHapley Additive exPlanations):**
+   - Grounded in cooperative game theory (Lloyd Shapley, Nobel Prize in Economics).
+   - Computes the unique additive attribution values that satisfy four fundamental mathematical properties: **Efficiency**, **Symmetry**, **Dummy Player**, and **Additivity**.
+   - Provides **both Global Explainability** (aggregating attributions across all 406 test instances) and **Local Explainability** (waterfall and force plots).
+2. **LIME (Local Interpretable Model-agnostic Explanations):**
+   - Treats the model as a completely black box.
+   - Perturbs the feature space around a single test point, weights perturbations using an exponential distance metric, and trains an interpretable linear surrogate model locally.
+   - Provides **strictly Local Explainability**, answering: *“In the immediate meteorological vicinity of this specific observation, how does each feature nudge the prediction?”*
+
+### SHAP Methodology & Findings
+
+Using `shap.TreeExplainer`, SHAP values were calculated across all 406 held-out test observations for both Random Forest and XGBoost. Input features were passed through the pipeline's median imputer, strictly preserving feature names.
+
+#### Global Feature Importance Ranking (Mean Absolute SHAP Value):
+| Rank | Feature | Random Forest Mean \|SHAP\| | RF Rel. % | XGBoost Mean \|SHAP\| | XGB Rel. % | Consensus Role |
+|:---:|:---|:---:|:---:|:---:|:---:|:---|
+| **1** | **`RH` (Relative Humidity)** | **$37.49\,\mu\text{g/m}^3$** | **$48.11\%$** | **$32.42\,\mu\text{g/m}^3$** | **$40.76\%$** | Unanimous top driver; humidity drives secondary aerosol condensation. |
+| **2** | **`WD` (Wind Direction)** | $12.02\,\mu\text{g/m}^3$ | $15.42\%$ | **$14.10\,\mu\text{g/m}^3$** | **$17.73\%$** | Ranks #2 in XGBoost; captures regional transport corridors into Delhi. |
+| **3** | **`SR` (Solar Radiation)** | $13.12\,\mu\text{g/m}^3$ | $16.83\%$ | $13.59\,\mu\text{g/m}^3$ | $17.09\%$ | Strong consensus #2/#3; dictates daytime convective boundary layer depth. |
+| **4** | **`BP` (Barometric Pressure)**| $12.25\,\mu\text{g/m}^3$ | $15.73\%$ | $11.83\,\mu\text{g/m}^3$ | $14.87\%$ | Consistent negative attribution; anticyclonic subsidence traps air. |
+| **5** | **`AT` (Air Temperature)** | $3.04\,\mu\text{g/m}^3$ | $3.90\%$ | $7.60\,\mu\text{g/m}^3$ | $9.55\%$ | Higher attribution in XGBoost; captures winter thermal inversion caps. |
+
+#### Visualizations Generated in `results/graphs/shap/`:
+- **Summary Beeswarm Plots:** Reveal that high `RH` (red dots) shifts predictions strongly positive, while high `SR` and higher `AT` shift predictions negative (convective dispersion).
+- **Global Feature Importance Plots:** Quantify mean absolute impact in physical concentration units ($\mu\text{g/m}^3$).
+- **Dependence Plots:** Reveal non-linear threshold effects (e.g. sharp upward inflection in $\text{PM}_{2.5}$ when relative humidity exceeds $70\%$).
+- **Waterfall & Force Plots:** Detail the step-by-step additive progression from base value ($144.2\,\mu\text{g/m}^3$) to the final prediction.
+
+### LIME Methodology & Findings
+
+Using `LimeTabularExplainer` initialized on the training dataset (`X_train`), local surrogate explanations were computed across 5 diverse test scenarios representing the complete air quality spectrum:
+
+| Scenario | Test Index | Actual $\text{PM}_{2.5}$ | RF Forecast | XGBoost Forecast | Dominant Local Drivers Identified by LIME |
+|:---|:---:|:---:|:---:|:---:|:---|
+| **1. Minimum Pollution** | Idx 78 | $6.0\,\mu\text{g/m}^3$ | $53.8\,\mu\text{g/m}^3$ | $42.8\,\mu\text{g/m}^3$ | Moderate humidity ($69\%$) and high pressure ($742\,\text{mmHg}$) counterbalanced extreme spike potential. |
+| **2. 25th Percentile** | Idx 134 | $91.0\,\mu\text{g/m}^3$ | $123.0\,\mu\text{g/m}^3$ | $120.6\,\mu\text{g/m}^3$ | Moderate solar radiation ($322\,\text{W/m}^2$) provided local daytime ventilation. |
+| **3. Median Pollution** | Idx 127 | $132.0\,\mu\text{g/m}^3$ | $145.5\,\mu\text{g/m}^3$ | $127.8\,\mu\text{g/m}^3$ | Balanced atmospheric state; humidity ($74\%$) balanced by moderate wind. |
+| **4. 75th Percentile** | Idx 100 | $186.0\,\mu\text{g/m}^3$ | $179.8\,\mu\text{g/m}^3$ | $178.9\,\mu\text{g/m}^3$ | High humidity ($90\%$) pushed predictions upwards by $+35.7\,\mu\text{g/m}^3$. |
+| **5. Severe Smog Spike** | Idx 13 | $353.0\,\mu\text{g/m}^3$ | $322.7\,\mu\text{g/m}^3$ | $325.1\,\mu\text{g/m}^3$ | Extreme humidity ($89\%$) and low temperature ($11^\circ\text{C}$) combined to drive a massive $+27.8\,\mu\text{g/m}^3$ local push. |
+
+*Generated Output Formats:* Saved as both publication-ready PNG figures and interactive standalone HTML files in `results/graphs/lime/`.
+
+### SHAP vs. LIME Cross-Method Comparison
+
+| Analytical Dimension | SHAP (`TreeExplainer`) | LIME (`LimeTabularExplainer`) |
+|:---|:---|:---|
+| **Analytical Scope** | **Global & Local:** Explains entire dataset & individuals. | **Strictly Local:** Explains single point instances. |
+| **Theoretical Foundation**| Cooperative Game Theory (Shapley Values). | Local Linear Perturbation Regression. |
+| **Additivity Property** | **Guaranteed:** $\sum \phi_i = f(x) - E[f(x)]$. | Not guaranteed to sum to prediction exactly. |
+| **Feature Correlation** | Handled natively via tree path marginalization. | Assumes perturbation independence around local radius. |
+| **Computational Speed**| Fast exact tree traversal ($O(TLD^2)$). | Slower; stochastically samples hundreds of perturbations. |
 
 ---
 
-## Scientific Boundaries & Limitations
+## Crucial Scientific Limitations
 
-1. **No Temporal Forecasting Claim:** The dataset has no confirmed timestamp column. Observations are treated as cross-sectional tabular samples. It cannot be presented as an autoregressive time-series forecast (e.g. ARIMA, LSTM) without genuine timestamps.
-2. **Predictor Feature Boundaries:** The dataset contains only $\text{PM}_{2.5}$ and 5 meteorological variables (`RH`, `WD`, `SR`, `BP`, `AT`). No additional pollutant columns ($\text{NO}_2, \text{SO}_2, \text{CO}, \text{O}_3$) were fabricated.
-3. **Feature Importance vs. Emission Causation:** Feature importance reflects model split reliance to minimize prediction error. It does **not** prove chemical or industrial emission source attribution.
-4. **Current Scope:** Phase 2 provides an optimized gradient boosted regressor and empirical model benchmark, completing classical ML model development.
+To ensure academic and regulatory integrity during capstone defense, the following limitations are explicitly documented:
+
+1. **Model Reliance vs. Emission Causation:** SHAP and LIME describe **how the trained model utilizes inputs to calculate output concentrations**. They quantify statistical and algorithmic reliance, **NOT physical emission causation**.
+2. **Inability to Attribute Chemical Sources:** Meteorological feature importance cannot prove or differentiate between actual physical emission sources such as:
+   - Vehicular traffic exhaust
+   - Agricultural stubble burning plumes
+   - Industrial coal-fired power plants
+   - Construction and road dust re-suspension
+3. **Absence of Chemical Speciation:** Conclusive source apportionment requires receptor modeling (Positive Matrix Factorization / PMF) applied to chemical tracer species (organic carbon, elemental carbon, sulfate, nitrate, heavy metal tracers), which are not present in this meteorological dataset.
+4. **Phase 3 Characterization:** This phase delivers **Explainable $\text{PM}_{2.5}$ Prediction and Model-Based Feature Attribution**, not a completed chemical source apportionment system.
 
 ---
 
-## Future Roadmap (Phases 3 & 4)
+## Future Roadmap (Phase 4)
 
-- **Phase 3:** Explainable AI (XAI) Integration with SHAP (SHapley Additive exPlanations: TreeExplainer, beeswarm plots, dependence plots, waterfall plots) and LIME (Local Interpretable Model-agnostic Explanations).
-- **Phase 4:** Production Full-Stack Application (Flask/FastAPI backend, React user interface, MongoDB persistence, and cloud deployment).
+- **Phase 4:** Production Full-Stack Application (Flask/FastAPI REST API, React interactive user dashboard with live SHAP waterfall widgets, MongoDB persistence, and cloud container deployment).

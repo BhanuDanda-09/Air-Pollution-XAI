@@ -1,0 +1,26 @@
+Model,Sample_Type,Test_Index,Actual_PM2.5,Predicted_PM2.5,Feature,Feature_Value,LIME_Weight,Impact_Direction
+XGBoost,01_Min_PM2.5,78,6.0,42.77,RH,69.0,34.2459,Increases PM2.5
+XGBoost,01_Min_PM2.5,78,6.0,42.77,SR,167.0,12.3326,Increases PM2.5
+XGBoost,01_Min_PM2.5,78,6.0,42.77,BP,742.0,-11.4286,Decreases PM2.5
+XGBoost,01_Min_PM2.5,78,6.0,42.77,AT,15.0,0.6675,Increases PM2.5
+XGBoost,01_Min_PM2.5,78,6.0,42.77,WD,212.0,0.6544,Increases PM2.5
+XGBoost,02_25th_Percentile,134,91.0,120.64,RH,46.0,30.0352,Increases PM2.5
+XGBoost,02_25th_Percentile,134,91.0,120.64,SR,322.0,17.8248,Increases PM2.5
+XGBoost,02_25th_Percentile,134,91.0,120.64,BP,739.0,-10.3065,Decreases PM2.5
+XGBoost,02_25th_Percentile,134,91.0,120.64,WD,196.0,-1.6376,Decreases PM2.5
+XGBoost,02_25th_Percentile,134,91.0,120.64,AT,19.0,0.3266,Increases PM2.5
+XGBoost,03_Median_PM2.5,127,132.0,127.81,RH,74.0,35.8726,Increases PM2.5
+XGBoost,03_Median_PM2.5,127,132.0,127.81,BP,739.0,-11.4802,Decreases PM2.5
+XGBoost,03_Median_PM2.5,127,132.0,127.81,SR,5.0,5.5604,Increases PM2.5
+XGBoost,03_Median_PM2.5,127,132.0,127.81,AT,13.0,1.6155,Increases PM2.5
+XGBoost,03_Median_PM2.5,127,132.0,127.81,WD,261.0,1.5634,Increases PM2.5
+XGBoost,04_75th_Percentile,100,186.0,178.87,RH,90.0,38.9046,Increases PM2.5
+XGBoost,04_75th_Percentile,100,186.0,178.87,BP,728.0,-11.9542,Decreases PM2.5
+XGBoost,04_75th_Percentile,100,186.0,178.87,AT,12.0,3.5188,Increases PM2.5
+XGBoost,04_75th_Percentile,100,186.0,178.87,WD,241.0,2.7996,Increases PM2.5
+XGBoost,04_75th_Percentile,100,186.0,178.87,SR,4.0,2.296,Increases PM2.5
+XGBoost,05_Max_PM2.5_Smog_Spike,13,353.0,325.07,RH,89.0,32.6263,Increases PM2.5
+XGBoost,05_Max_PM2.5_Smog_Spike,13,353.0,325.07,SR,326.0,16.5062,Increases PM2.5
+XGBoost,05_Max_PM2.5_Smog_Spike,13,353.0,325.07,BP,738.0,-8.4297,Decreases PM2.5
+XGBoost,05_Max_PM2.5_Smog_Spike,13,353.0,325.07,WD,94.0,3.1989,Increases PM2.5
+XGBoost,05_Max_PM2.5_Smog_Spike,13,353.0,325.07,AT,11.0,2.3441,Increases PM2.5
