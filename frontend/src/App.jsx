@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
+import LiveAssessmentPage from './pages/LiveAssessmentPage';
 import Prediction from './pages/Prediction';
 import ModelComparisonPage from './pages/ModelComparisonPage';
 import Explainability from './pages/Explainability';
@@ -34,6 +35,7 @@ export default function App() {
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/live-assessment" element={<LiveAssessmentPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/prediction" element={<Prediction />} />
             <Route path="/comparison" element={<ModelComparisonPage />} />

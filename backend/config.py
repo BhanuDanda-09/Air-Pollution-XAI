@@ -49,6 +49,30 @@ class Config:
     else:
         CORS_ALLOWED_ORIGINS = DEFAULT_ALLOWED_ORIGINS
 
+    # Real-world Live Assessment & Geographic Validation Settings
+    DELHI_NCR_BOUNDS = {
+        "lat_min": 28.1,
+        "lat_max": 28.9,
+        "lon_min": 76.8,
+        "lon_max": 77.6,
+    }
+    OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
+    OPEN_METEO_AIR_QUALITY_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
+    OPEN_METEO_TIMEOUT = 6.0  # 6-second timeout (satisfies 5-8s constraint)
+    LOCATION_CACHE_TTL = 600   # 10 minutes cache validity
+    LOCATION_CACHE_MAXSIZE = 256
+    LOCATION_RATE_LIMIT_MAX = 30  # Max requests per minute per IP
+    OPENAQ_API_KEY = os.getenv("OPENAQ_API_KEY", None)
+
+    # Actual Training Feature Distribution Bounds for Out-of-Range Warning (No silent clamping)
+    TRAINING_FEATURE_RANGES = {
+        "RH": {"min": 36.0, "max": 95.0, "unit": "%", "name": "Relative Humidity"},
+        "WD": {"min": 7.0, "max": 332.0, "unit": "°", "name": "Wind Direction"},
+        "SR": {"min": 2.0, "max": 334.0, "unit": "W/m²", "name": "Solar Radiation"},
+        "BP": {"min": 726.0, "max": 749.0, "unit": "mmHg", "name": "Barometric Pressure"},
+        "AT": {"min": 11.0, "max": 23.0, "unit": "°C", "name": "Air Temperature"},
+    }
+
     # Meteorological feature definitions with strict validation bounds & units
     # Note: Barometric Pressure (BP) is strictly calibrated in mmHg (not hPa).
     FEATURE_SPECS = {

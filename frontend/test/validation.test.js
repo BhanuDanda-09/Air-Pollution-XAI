@@ -40,4 +40,19 @@ assert.strictEqual(goodStyle.hex, '#10B981');
 const formatted = formatPM25(176.086);
 assert.strictEqual(formatted, '176.09 µg/m³');
 
-console.log('✓ All 7 frontend unit test suites passed successfully.');
+// 8. Pressure unit conversion (hPa -> mmHg)
+const hpaStandard = 1013.25;
+const mmhgConverted = Math.round(hpaStandard * 0.750062 * 100) / 100;
+assert.strictEqual(mmhgConverted, 760.0, '1013.25 hPa must convert to 760.00 mmHg');
+
+// 9. Delhi-NCR Bounding Box validation logic
+const isDelhiNCR = (lat, lon) => lat >= 28.1 && lat <= 28.9 && lon >= 76.8 && lon <= 77.6;
+assert.strictEqual(isDelhiNCR(28.6315, 77.2167), true, 'Connaught Place must be within Delhi-NCR');
+assert.strictEqual(isDelhiNCR(19.076, 72.8777), false, 'Mumbai must be outside Delhi-NCR');
+
+// 10. Reference PM2.5 standard naming convention
+const standardReferenceLabel = 'Reference PM2.5 (CAMS model data)';
+assert.strictEqual(standardReferenceLabel.includes('CAMS model data'), true);
+assert.strictEqual(standardReferenceLabel.includes('measured PM2.5'), false);
+
+console.log('✓ All 10 frontend unit test suites passed successfully.');

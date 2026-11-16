@@ -14,7 +14,13 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from backend.config import Config
 from backend.models.model_loader import get_model_loader
-from backend.routes import explanation_bp, health_bp, model_bp, prediction_bp
+from backend.routes import (
+    explanation_bp,
+    health_bp,
+    location_bp,
+    model_bp,
+    prediction_bp,
+)
 from backend.utils.response import error_response, success_response
 
 logging.basicConfig(
@@ -49,6 +55,7 @@ def create_app(config_class=Config):
     app.register_blueprint(model_bp)
     app.register_blueprint(prediction_bp)
     app.register_blueprint(explanation_bp)
+    app.register_blueprint(location_bp)
 
     # Root route for quick verification
     @app.route("/", methods=["GET"])
@@ -63,6 +70,7 @@ def create_app(config_class=Config):
                     "predict": "/api/predict",
                     "compare": "/api/compare",
                     "explain": "/api/explain",
+                    "location_assess": "/api/location/assess",
                 },
                 "documentation": "See backend/README.md for API documentation and examples.",
             },
