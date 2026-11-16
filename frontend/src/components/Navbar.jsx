@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Wind, MapPin, BarChart3, Activity, GitCompare, Sparkles, Info, Menu, X, ShieldAlert } from 'lucide-react';
+import { Wind, Compass, MapPin, BarChart3, Activity, GitCompare, Sparkles, Info, Menu, X, ShieldAlert } from 'lucide-react';
 
 export default function Navbar({ isBackendOnline }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { to: '/', label: 'Home', icon: Wind },
+    { to: '/livability', label: 'Livability Verdict', icon: Compass },
     { to: '/live-assessment', label: 'Live Assessment', icon: MapPin },
     { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { to: '/prediction', label: 'Prediction', icon: Activity },

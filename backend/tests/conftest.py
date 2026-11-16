@@ -1,5 +1,6 @@
 """Pytest fixtures for backend test suite."""
 
+import os
 import sys
 from pathlib import Path
 import pytest
@@ -8,6 +9,10 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+# Ensure Matplotlib writes cache inside workspace to avoid permission issues
+os.environ.setdefault("MPLCONFIGDIR", str(PROJECT_ROOT / ".matplotlib_cache"))
+(PROJECT_ROOT / ".matplotlib_cache").mkdir(exist_ok=True)
 
 from backend.app import create_app
 

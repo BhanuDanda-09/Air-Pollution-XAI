@@ -47,6 +47,8 @@ class AirQualityService:
                 "latitude": lat,
                 "longitude": lon,
                 "current": "pm2_5,european_aqi,us_aqi",
+                "hourly": "pm2_5",
+                "forecast_days": 2,
             }
             response = requests.get(url, params=params, timeout=Config.OPEN_METEO_TIMEOUT)
             response.raise_for_status()
@@ -55,8 +57,38 @@ class AirQualityService:
 
             ref_pm25 = current.get("pm2_5")
             if ref_pm25 is not None:
+                ref_pm25_float = round(float(ref_pm25), 2)
+
+                # Process next 24h forecast from hourly CAMS data
+                hourly_data = data.get("hourly", {})
+                hourly_pm25 = hourly_data.get("pm2_5", [])
+                hourly_times = hourly_data.get("time", [])
+
+                forecast_24h_mean = None
+                forecast_24h_max = None
+                forecast_trend = "stable"
+                hourly_series = []
+
+                if hourly_pm25 and isinstance(hourly_pm25, list):
+                    # Filter valid positive numbers for the next 24 intervals
+                    valid_forecast = [float(v) for v in hourly_pm25[:24] if v is not None and not (isinstance(v, float) and v < 0)]
+                    if valid_forecast:
+                        forecast_24h_mean = round(sum(valid_forecast) / len(valid_forecast), 2)
+                        forecast_24h_max = round(max(valid_forecast), 2)
+                        if forecast_24h_mean - ref_pm25_float > 8.0:
+                            forecast_trend = "worsening"
+                        elif ref_pm25_float - forecast_24h_mean > 8.0:
+                            forecast_trend = "improving"
+                        else:
+                            forecast_trend = "stable"
+
+                    # Build short 24h series for frontend charting
+                    for t, p in zip(hourly_times[:24], hourly_pm25[:24]):
+                        if p is not None:
+                            hourly_series.append({"time": t, "pm25": round(float(p), 1)})
+
                 result = {
-                    "reference_pm25": round(float(ref_pm25), 2),
+                    "reference_pm25": ref_pm25_float,
                     "unit": "µg/m³",
                     "reference_source": "Copernicus Atmosphere Monitoring Service (CAMS via Open-Meteo)",
                     "reference_label": "Reference PM2.5 (CAMS model data)",
@@ -65,6 +97,12 @@ class AirQualityService:
                     "timestamp": current.get("time"),
                     "status": "available",
                     "is_direct_ground_station": False,
+                    "forecast_24h": {
+                        "mean_pm25": forecast_24h_mean,
+                        "max_pm25": forecast_24h_max,
+                        "trend": forecast_trend,
+                        "series": hourly_series,
+                    },
                 }
                 aq_cache.set(cache_key, result)
                 return result

@@ -17,6 +17,7 @@ from backend.models.model_loader import get_model_loader
 from backend.routes import (
     explanation_bp,
     health_bp,
+    livability_bp,
     location_bp,
     model_bp,
     prediction_bp,
@@ -56,6 +57,7 @@ def create_app(config_class=Config):
     app.register_blueprint(prediction_bp)
     app.register_blueprint(explanation_bp)
     app.register_blueprint(location_bp)
+    app.register_blueprint(livability_bp)
 
     # Root route for quick verification
     @app.route("/", methods=["GET"])
@@ -71,6 +73,7 @@ def create_app(config_class=Config):
                     "compare": "/api/compare",
                     "explain": "/api/explain",
                     "location_assess": "/api/location/assess",
+                    "livability_assess": "/api/location/livability",
                 },
                 "documentation": "See backend/README.md for API documentation and examples.",
             },

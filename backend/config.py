@@ -73,6 +73,67 @@ class Config:
         "AT": {"min": 11.0, "max": 23.0, "unit": "°C", "name": "Air Temperature"},
     }
 
+    # Phase 2 Livability & Exposure Score Engine Configuration
+    # Primary driver: Reference PM2.5 (CAMS model data) + forecast
+    # Secondary context only: ML model estimate (trained on Delhi winter data: AT 11-23°C)
+    LIVABILITY_CONFIG = {
+        "weights": {
+            "reference_current": 0.60,
+            "reference_forecast_24h": 0.25,
+            "meteorological_stagnation": 0.15,
+        },
+        "score_tiers": [
+            {
+                "min_score": 80,
+                "tier": "Favorable / Recommended",
+                "cpcb_match": "Good (0-30 µg/m³)",
+                "color": "#10B981",
+                "go_verdict": "Safe for all outdoor activities, recreation, and travel.",
+                "stay_verdict": "Clean ambient air. Natural ventilation and outdoor residency encouraged.",
+            },
+            {
+                "min_score": 65,
+                "tier": "Acceptable / Minor Caution",
+                "cpcb_match": "Satisfactory (30-60 µg/m³)",
+                "color": "#84CC16",
+                "go_verdict": "Generally safe. Sensitive individuals should monitor minor irritation.",
+                "stay_verdict": "Acceptable air quality for habitation. Normal ventilation suitable.",
+            },
+            {
+                "min_score": 50,
+                "tier": "Caution for Sensitive Groups",
+                "cpcb_match": "Moderate (60-90 µg/m³)",
+                "color": "#F59E0B",
+                "go_verdict": "Children, elderly, and respiratory patients should reduce heavy exertion.",
+                "stay_verdict": "Marginal air quality. Run indoor HEPA air purifiers during peak hours.",
+            },
+            {
+                "min_score": 35,
+                "tier": "Unfavorable / Exposure Risk",
+                "cpcb_match": "Poor (90-120 µg/m³)",
+                "color": "#F97316",
+                "go_verdict": "Unfavorable for outdoor activities. Breathing discomfort likely upon prolonged exposure.",
+                "stay_verdict": "Substantial chronic exposure. Keep windows closed and operate indoor purifiers.",
+            },
+            {
+                "min_score": 20,
+                "tier": "High Risk / Chronic Danger",
+                "cpcb_match": "Very Poor (120-250 µg/m³)",
+                "color": "#EF4444",
+                "go_verdict": "Hazardous for outdoor recreation. N95 respirator strongly advised outdoors.",
+                "stay_verdict": "Severe chronic exposure risk. Unfavorable for relocation without high-grade air filtration.",
+            },
+            {
+                "min_score": 0,
+                "tier": "Severe / Hazardous Exposure",
+                "cpcb_match": "Severe (>250 µg/m³)",
+                "color": "#7C3AED",
+                "go_verdict": "Emergency air quality. Avoid all outdoor exposure. High acute respiratory distress risk.",
+                "stay_verdict": "Not recommended for residential habitation during seasonal peaks without continuous medical-grade filtration.",
+            },
+        ],
+    }
+
     # Meteorological feature definitions with strict validation bounds & units
     # Note: Barometric Pressure (BP) is strictly calibrated in mmHg (not hPa).
     FEATURE_SPECS = {

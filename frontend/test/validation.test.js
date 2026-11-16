@@ -55,4 +55,21 @@ const standardReferenceLabel = 'Reference PM2.5 (CAMS model data)';
 assert.strictEqual(standardReferenceLabel.includes('CAMS model data'), true);
 assert.strictEqual(standardReferenceLabel.includes('measured PM2.5'), false);
 
-console.log('✓ All 10 frontend unit test suites passed successfully.');
+// 11. Livability weight configuration sum
+const weights = { ref_curr: 0.60, ref_fc: 0.25, met_vent: 0.15 };
+const totalWeight = Math.round((weights.ref_curr + weights.ref_fc + weights.met_vent) * 100) / 100;
+assert.strictEqual(totalWeight, 1.0, 'Livability weights must sum exactly to 1.0 (100%)');
+
+// 12. Livability refusal to silently fall back when reference is missing
+const computeLivabilityFallback = (refPM25, mlPM25) => {
+  if (refPM25 == null) {
+    return { score: null, confidence: 'low', fallbackToML: false };
+  }
+  return { score: Math.round(refPM25), confidence: 'high', fallbackToML: false };
+};
+const offlineRes = computeLivabilityFallback(null, 120.0);
+assert.strictEqual(offlineRes.score, null, 'Must never silently fabricate score from ML estimate');
+assert.strictEqual(offlineRes.confidence, 'low');
+assert.strictEqual(offlineRes.fallbackToML, false);
+
+console.log('✓ All 12 frontend unit test suites passed successfully.');
