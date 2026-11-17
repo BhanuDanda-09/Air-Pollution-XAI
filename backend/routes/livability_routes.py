@@ -105,10 +105,12 @@ def assess_livability():
     reference_info = AirQualityService.get_reference_air_quality(lat, lon)
 
     # 4. Synthesize Livability Assessment using strict primary vs secondary rules
+    health_profile = payload.get("health_profile")
     livability_eval = LivabilityService.evaluate_livability(
         reference_info=reference_info,
         weather_info=weather_info,
         ml_prediction=ml_prediction,
+        health_profile=health_profile,
     )
 
     response_data = {

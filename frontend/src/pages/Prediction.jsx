@@ -3,6 +3,7 @@ import usePrediction from '../hooks/usePrediction';
 import PredictionForm from '../components/PredictionForm';
 import PredictionResult from '../components/PredictionResult';
 import ErrorMessage from '../components/ErrorMessage';
+import ColdStartNotice from '../components/ColdStartNotice';
 import { Activity, ShieldAlert, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function Prediction() {
@@ -35,6 +36,9 @@ export default function Prediction() {
           Enter surface meteorological observations to estimate ambient fine particulate matter (PM2.5) and classify it into an indicative CPCB health band.
         </p>
       </div>
+
+      {/* Cold Start Notice (Render 5s Delay Indicator) */}
+      <ColdStartNotice isLoading={loading} />
 
       {/* Error Alert */}
       {error && (

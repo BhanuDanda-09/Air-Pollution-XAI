@@ -45,9 +45,12 @@ const hpaStandard = 1013.25;
 const mmhgConverted = Math.round(hpaStandard * 0.750062 * 100) / 100;
 assert.strictEqual(mmhgConverted, 760.0, '1013.25 hPa must convert to 760.00 mmHg');
 
-// 9. Delhi-NCR Bounding Box validation logic
+// 9. Delhi-NCR Bounding Box validation logic (including Gurugram, Noida, Faridabad)
 const isDelhiNCR = (lat, lon) => lat >= 28.1 && lat <= 28.9 && lon >= 76.8 && lon <= 77.6;
 assert.strictEqual(isDelhiNCR(28.6315, 77.2167), true, 'Connaught Place must be within Delhi-NCR');
+assert.strictEqual(isDelhiNCR(28.4595, 77.0266), true, 'Gurugram must be within Delhi-NCR');
+assert.strictEqual(isDelhiNCR(28.5355, 77.3910), true, 'Noida must be within Delhi-NCR');
+assert.strictEqual(isDelhiNCR(28.4089, 77.3178), true, 'Faridabad must be within Delhi-NCR');
 assert.strictEqual(isDelhiNCR(19.076, 72.8777), false, 'Mumbai must be outside Delhi-NCR');
 
 // 10. Reference PM2.5 standard naming convention

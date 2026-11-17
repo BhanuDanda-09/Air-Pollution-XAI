@@ -28,13 +28,15 @@ def test_hpa_to_mmhg_conversion():
 
 
 def test_is_within_delhi_ncr():
-    """Verify geographic bounding box logic for Delhi-NCR."""
+    """Verify geographic bounding box logic for Delhi-NCR (including Gurugram, Noida, Faridabad)."""
     # Delhi Connaught Place
     assert WeatherService.is_within_delhi_ncr(28.6315, 77.2167) is True
-    # Noida
+    # Noida (Sector 62 / City Center)
     assert WeatherService.is_within_delhi_ncr(28.5355, 77.3910) is True
-    # Gurgaon
+    # Gurugram (Cyber City / Sector 29)
     assert WeatherService.is_within_delhi_ncr(28.4595, 77.0266) is True
+    # Faridabad (Sector 16 / NIT)
+    assert WeatherService.is_within_delhi_ncr(28.4089, 77.3178) is True
 
     # Mumbai (Outside)
     assert WeatherService.is_within_delhi_ncr(19.0760, 72.8777) is False

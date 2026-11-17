@@ -10,13 +10,18 @@ export const locationService = {
    * Assess air quality for given geographic coordinates.
    * @param {number} lat - Latitude (-90 to 90)
    * @param {number} lon - Longitude (-180 to 180)
+   * @param {Object} [healthProfile] - Optional user health profile
    * @returns {Promise<Object>} Assessment payload from backend
    */
-  async assessLocation(lat, lon) {
-    return api.post('/api/location/assess', {
+  async assessLocation(lat, lon, healthProfile = null) {
+    const payload = {
       lat: parseFloat(lat),
       lon: parseFloat(lon),
-    });
+    };
+    if (healthProfile) {
+      payload.health_profile = healthProfile;
+    }
+    return api.post('/api/location/assess', payload);
   },
 
   /**

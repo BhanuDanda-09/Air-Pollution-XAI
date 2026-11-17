@@ -4,6 +4,7 @@ from flask import Blueprint, request
 from backend.config import Config
 from backend.services.air_quality_service import AirQualityService
 from backend.services.explanation_service import ExplanationService
+from backend.services.livability_service import LivabilityService
 from backend.services.prediction_service import PredictionService
 from backend.services.weather_service import WeatherService
 from backend.utils.rate_limiter import InMemoryRateLimiter
@@ -165,6 +166,21 @@ def assess_location():
             ),
         }
 
+    # 6. Synthesize Livability Assessment using strict primary vs secondary rules
+    health_profile = payload.get("health_profile")
+    livability_eval = LivabilityService.evaluate_livability(
+        reference_info=reference_info,
+        weather_info=weather_info,
+        ml_prediction={
+            "model_key": "xgboost",
+            "model_name": prediction_result["model_name"],
+            "pm25": model_pm25,
+            "unit": "µg/m³",
+            "cpcb_category": prediction_result["cpcb_category"],
+        },
+        health_profile=health_profile,
+    )
+
     response_data = {
         "location": {
             "latitude": lat,
@@ -174,6 +190,7 @@ def assess_location():
             "validity": weather_info["validity"],
             "validity_warning": weather_info["validity_warning"],
         },
+        "livability": livability_eval,
         "model_prediction": {
             "model_key": "xgboost",
             "model_name": prediction_result["model_name"],

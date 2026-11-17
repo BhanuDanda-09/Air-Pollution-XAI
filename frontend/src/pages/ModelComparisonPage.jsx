@@ -3,6 +3,7 @@ import usePrediction from '../hooks/usePrediction';
 import PredictionForm from '../components/PredictionForm';
 import ModelComparison from '../components/ModelComparison';
 import ErrorMessage from '../components/ErrorMessage';
+import ColdStartNotice from '../components/ColdStartNotice';
 import { GitCompare, Trophy, BarChart2, ShieldAlert, AlertTriangle } from 'lucide-react';
 
 export default function ModelComparisonPage() {
@@ -32,6 +33,9 @@ export default function ModelComparisonPage() {
           Simultaneously evaluate Random Forest, tuned XGBoost, and Deep Learning (MLP) on identical meteorological conditions alongside held-out generalization benchmarks.
         </p>
       </div>
+
+      {/* Cold Start Notice (Render 5s Delay Indicator) */}
+      <ColdStartNotice isLoading={loading} />
 
       {/* Error Alert (only if no results could be retrieved) */}
       {error && !comparisonResult && (

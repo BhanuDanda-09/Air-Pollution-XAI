@@ -1,22 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Compass, AlertCircle, RefreshCw } from 'lucide-react';
+import { Home, Compass, AlertCircle, RefreshCw, SlidersHorizontal } from 'lucide-react';
 import LocationPicker from '../components/LocationPicker';
+import HealthProfileSelector from '../components/HealthProfileSelector';
 import LivabilityScoreCard from '../components/LivabilityScoreCard';
 import PersonaAdviceSection from '../components/PersonaAdviceSection';
+import ColdStartNotice from '../components/ColdStartNotice';
 import livabilityService from '../services/livabilityService';
+
+const DEFAULT_PROFILE = {
+  age_group: 'adult',
+  asthma: false,
+  has_heart_condition: false,
+  is_pregnant: false,
+  is_outdoor_worker: false,
+};
 
 export default function LivabilityPage() {
   const [latitude, setLatitude] = useState(28.6315); // Connaught Place, New Delhi default
   const [longitude, setLongitude] = useState(77.2167);
+  const [healthProfile, setHealthProfile] = useState(DEFAULT_PROFILE);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [assessmentData, setAssessmentData] = useState(null);
 
-  const fetchLivability = async (lat = latitude, lon = longitude) => {
+  const fetchLivability = async (lat = latitude, lon = longitude, profile = healthProfile) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await livabilityService.assessLivability(lat, lon);
+      const response = await livabilityService.assessLivability(lat, lon, profile);
       const result = response.data || response;
       setAssessmentData(result);
     } catch (err) {
@@ -30,12 +41,18 @@ export default function LivabilityPage() {
   };
 
   useEffect(() => {
-    fetchLivability(28.6315, 77.2167);
+    fetchLivability(28.6315, 77.2167, DEFAULT_PROFILE);
   }, []);
 
   const handleLocationChange = (newLat, newLon) => {
     setLatitude(newLat);
     setLongitude(newLon);
+  };
+
+  const handleProfileChange = (updatedProfile) => {
+    setHealthProfile(updatedProfile);
+    // Automatically trigger assessment update with new profile
+    fetchLivability(latitude, longitude, updatedProfile);
   };
 
   return (
@@ -64,7 +81,7 @@ export default function LivabilityPage() {
 
           <button
             type="button"
-            onClick={() => fetchLivability(latitude, longitude)}
+            onClick={() => fetchLivability(latitude, longitude, healthProfile)}
             disabled={isLoading}
             className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-semibold border border-slate-300 transition-colors disabled:opacity-50 cursor-pointer"
           >
@@ -73,6 +90,9 @@ export default function LivabilityPage() {
           </button>
         </div>
       </div>
+
+      {/* Cold Start Notice (Render 5s Delay Indicator) */}
+      <ColdStartNotice isLoading={isLoading} />
 
       {/* Error Alert */}
       {error && (
@@ -84,8 +104,8 @@ export default function LivabilityPage() {
           </div>
           <button
             type="button"
-            onClick={() => fetchLivability(latitude, longitude)}
-            className="text-xs underline font-semibold text-rose-900 hover:text-rose-950"
+            onClick={() => fetchLivability(latitude, longitude, healthProfile)}
+            className="text-xs underline font-semibold text-rose-900 hover:text-rose-950 cursor-pointer"
           >
             Retry
           </button>
@@ -97,8 +117,14 @@ export default function LivabilityPage() {
         latitude={latitude}
         longitude={longitude}
         onLocationChange={handleLocationChange}
-        onAssess={() => fetchLivability(latitude, longitude)}
+        onAssess={() => fetchLivability(latitude, longitude, healthProfile)}
         isLoading={isLoading}
+      />
+
+      {/* Health Risk Profile Selector */}
+      <HealthProfileSelector
+        value={healthProfile}
+        onChange={handleProfileChange}
       />
 
       {/* Master Livability Score & Verdict Card */}

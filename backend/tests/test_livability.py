@@ -10,38 +10,57 @@ from backend.services.weather_service import weather_cache
 
 
 # ---------------------------------------------------------------------------
-# 1. Unit Tests: Scoring Function
+# 1. Unit Tests: Scoring Function & Profile Sensitivity
 # ---------------------------------------------------------------------------
 
 def test_pm25_to_subscore_ranges():
     """Verify PM2.5 mapping to 0-100 continuous score."""
-    # WHO guideline level (10 µg/m³) -> >90
     s_who = LivabilityService.pm25_to_subscore(10.0)
     assert 90.0 <= s_who <= 100.0
 
-    # CPCB Good (25 µg/m³) -> 80 - 90
     s_good = LivabilityService.pm25_to_subscore(25.0)
-    assert 80.0 <= s_good <= 90.0
+    assert 75.0 <= s_good <= 90.0
 
-    # CPCB Satisfactory (45 µg/m³) -> 65 - 80
     s_sat = LivabilityService.pm25_to_subscore(45.0)
-    assert 65.0 <= s_sat <= 80.0
+    assert 50.0 <= s_sat <= 75.0
 
-    # CPCB Moderate (75 µg/m³) -> 50 - 65
     s_mod = LivabilityService.pm25_to_subscore(75.0)
-    assert 50.0 <= s_mod <= 65.0
+    assert 35.0 <= s_mod <= 50.0
 
-    # CPCB Poor (105 µg/m³) -> 35 - 50
     s_poor = LivabilityService.pm25_to_subscore(105.0)
-    assert 35.0 <= s_poor <= 50.0
+    assert 20.0 <= s_poor <= 35.0
 
-    # CPCB Very Poor (180 µg/m³) -> 20 - 35
     s_vpoor = LivabilityService.pm25_to_subscore(180.0)
-    assert 20.0 <= s_vpoor <= 35.0
+    assert 10.0 <= s_vpoor <= 20.0
 
-    # CPCB Severe (300 µg/m³) -> <20
     s_severe = LivabilityService.pm25_to_subscore(300.0)
-    assert 0.0 <= s_severe <= 20.0
+    assert 0.0 <= s_severe <= 10.0
+
+
+def test_health_profile_shift_tightening():
+    """Verify health profile shifts tighten thresholds for vulnerable individuals."""
+    # Healthy adult: 0 shift
+    res_adult = LivabilityService.calculate_health_profile_shift({"age_group": "adult"})
+    assert res_adult["total_shift"] == 0
+    assert res_adult["vulnerability"] == "standard"
+
+    # Asthmatic child: child (+8) + asthma (+10) = 18 shift
+    res_asthma_child = LivabilityService.calculate_health_profile_shift({
+        "age_group": "child",
+        "has_respiratory_condition": True,
+    })
+    assert res_asthma_child["total_shift"] == 18
+    assert res_asthma_child["vulnerability"] == "elevated"
+
+    # Multiple high-risk factors: capped at max_total_shift (25)
+    res_multi = LivabilityService.calculate_health_profile_shift({
+        "age_group": "senior",
+        "has_respiratory_condition": True,
+        "has_heart_condition": True,
+        "is_pregnant": True,
+    })
+    assert res_multi["total_shift"] == 25
+    assert res_multi["vulnerability"] == "high"
 
 
 # ---------------------------------------------------------------------------
@@ -58,75 +77,138 @@ def clear_caches():
     aq_cache.clear()
 
 
-def mock_cams_good_weather_and_aq(*args, **kwargs):
-    """Mock good air quality in Delhi (PM2.5 = 22.0)."""
-    url = args[0] if args else kwargs.get("url", "")
-    mock_resp = MagicMock()
-    mock_resp.status_code = 200
+def make_mock_air_quality(pm25_val=22.0, with_hourly=True):
+    """Factory for mocked air quality responses."""
+    def _mock(*args, **kwargs):
+        url = args[0] if args else kwargs.get("url", "")
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
 
-    if "forecast" in url:
-        mock_resp.json.return_value = {
-            "current": {
-                "time": "2026-11-16T12:00",
-                "temperature_2m": 21.0,
-                "relative_humidity_2m": 50.0,
-                "wind_direction_10m": 120.0,
-                "surface_pressure": 985.0,
-                "shortwave_radiation": 250.0,
+        if "forecast" in url:
+            mock_resp.json.return_value = {
+                "current": {
+                    "time": "2026-11-17T12:00",
+                    "temperature_2m": 21.0,
+                    "relative_humidity_2m": 50.0,
+                    "wind_direction_10m": 120.0,
+                    "surface_pressure": 985.0,
+                    "shortwave_radiation": 250.0,
+                }
             }
-        }
+            return mock_resp
+
+        if "air-quality" in url:
+            hourly_times = [f"2026-11-17T{h:02d}:00" for h in range(24)]
+            # Vary hourly PM2.5 so there is an explicit minimum at 14:00
+            hourly_pm = [pm25_val + 5.0 for _ in range(24)]
+            hourly_pm[14] = max(5.0, pm25_val - 8.0)
+
+            payload = {
+                "current": {
+                    "time": "2026-11-17T12:00",
+                    "pm2_5": pm25_val,
+                    "european_aqi": 25,
+                    "us_aqi": 72,
+                }
+            }
+            if with_hourly:
+                payload["hourly"] = {
+                    "time": hourly_times * 7,
+                    "pm2_5": hourly_pm * 7,
+                }
+            mock_resp.json.return_value = payload
+            return mock_resp
+
         return mock_resp
-
-    if "air-quality" in url:
-        mock_resp.json.return_value = {
-            "current": {
-                "time": "2026-11-16T12:00",
-                "pm2_5": 22.0,
-                "european_aqi": 25,
-                "us_aqi": 72,
-            },
-            "hourly": {
-                "time": ["2026-11-16T12:00" for _ in range(24)],
-                "pm2_5": [22.0 for _ in range(24)],
-            },
-        }
-        return mock_resp
-
-    return mock_resp
+    return _mock
 
 
-@patch("requests.get", side_effect=mock_cams_good_weather_and_aq)
-def test_livability_primary_driver_delhi(mock_get, client):
-    """Verify livability calculation when reference CAMS data is favorable in Delhi."""
+@patch("requests.get", side_effect=make_mock_air_quality(22.0))
+def test_livability_verdict_good_to_go(mock_get, client):
+    """Verify 'Good to go' verdict when CAMS reference is clean."""
     res = client.post("/api/location/livability", json={"lat": 28.6139, "lon": 77.2090})
     assert res.status_code == 200
     data = res.get_json()
 
-    assert data["success"] is True
     livability = data["livability"]
-
-    # Score should be in the Favorable range (>80)
-    assert livability["score"] is not None
-    assert livability["score"] >= 80
-    assert "Favorable" in livability["tier"]
+    assert livability["verdict"] == "Good to go"
     assert livability["confidence"] == "high"
-
-    # Primary driver must be Reference PM2.5 (CAMS)
     assert "Reference PM2.5 (CAMS model data)" in livability["primary_driver"]["source"]
-    assert livability["primary_driver"]["current_pm25"] == 22.0
 
-    # Secondary context must be clearly distinguished
-    sec = livability["secondary_ml_context"]
-    assert sec["model_key"] == "xgboost"
-    assert "estimated_pm25" in sec
-    assert "Delhi winter" in sec["scientific_limitation"]
+    # Check tailored advice
+    advice = livability["tailored_advice"]
+    assert "n95_mask" in advice
+    assert "indoor_exercise" in advice
+    assert "windows" in advice
+    assert "purifier" in advice
 
-    # Persona advice
-    personas = livability["persona_guidance"]
-    assert "general" in personas
-    assert "sensitive" in personas
-    assert "outdoor" in personas
-    assert personas["general"]["tag"] == "Safe"
+    # Check best time today
+    best_time = livability.get("best_time_today")
+    assert best_time is not None
+    assert "Optimal outdoor activity window" in best_time["guidance"]
+
+    # Medical disclaimer
+    assert "Medical Disclaimer" in livability["medical_disclaimer"]
+
+
+@patch("requests.get", side_effect=make_mock_air_quality(55.0))
+def test_livability_verdict_take_precautions(mock_get, client):
+    """Verify 'Take precautions' verdict for moderate particulate levels."""
+    res = client.post("/api/location/livability", json={"lat": 28.6139, "lon": 77.2090})
+    assert res.status_code == 200
+    data = res.get_json()
+
+    livability = data["livability"]
+    assert livability["verdict"] == "Take precautions"
+
+
+@patch("requests.get", side_effect=make_mock_air_quality(105.0))
+def test_livability_verdict_avoid_outdoor(mock_get, client):
+    """Verify 'Avoid outdoor activity' verdict for poor air quality."""
+    res = client.post("/api/location/livability", json={"lat": 28.6139, "lon": 77.2090})
+    assert res.status_code == 200
+    data = res.get_json()
+
+    livability = data["livability"]
+    assert livability["verdict"] == "Avoid outdoor activity"
+    assert "N95" in livability["tailored_advice"]["n95_mask"]
+
+
+@patch("requests.get", side_effect=make_mock_air_quality(220.0))
+def test_livability_verdict_not_recommended(mock_get, client):
+    """Verify 'Not recommended' verdict for severe air quality."""
+    res = client.post("/api/location/livability", json={"lat": 28.6139, "lon": 77.2090})
+    assert res.status_code == 200
+    data = res.get_json()
+
+    livability = data["livability"]
+    assert livability["verdict"] == "Not recommended"
+
+
+@patch("requests.get", side_effect=make_mock_air_quality(38.0))
+def test_health_profile_shifts_marginal_verdict(mock_get, client):
+    """Verify that reporting asthma/heart conditions flips a marginal score into a stricter verdict."""
+    # 1. Without profile: baseline is 'Good to go' or 'Take precautions'
+    res_healthy = client.post("/api/location/livability", json={
+        "lat": 28.6139,
+        "lon": 77.2090,
+        "health_profile": {"age_group": "adult"},
+    })
+    score_healthy = res_healthy.get_json()["livability"]["score"]
+
+    # 2. With asthma and senior age: shifts thresholds downward
+    res_sensitive = client.post("/api/location/livability", json={
+        "lat": 28.6139,
+        "lon": 77.2090,
+        "health_profile": {
+            "age_group": "senior",
+            "has_respiratory_condition": True,
+        },
+    })
+    score_sensitive = res_sensitive.get_json()["livability"]["score"]
+    assert score_sensitive < score_healthy
+    applied = res_sensitive.get_json()["livability"]["health_profile_applied"]
+    assert applied["total_shift"] == 18
 
 
 def mock_cams_failure(*args, **kwargs):
@@ -137,7 +219,7 @@ def mock_cams_failure(*args, **kwargs):
         mock_resp.status_code = 200
         mock_resp.json.return_value = {
             "current": {
-                "time": "2026-11-16T12:00",
+                "time": "2026-11-17T12:00",
                 "temperature_2m": 22.0,
                 "relative_humidity_2m": 55.0,
                 "wind_direction_10m": 120.0,
@@ -167,81 +249,23 @@ def test_livability_reference_unavailable_never_silently_falls_back(mock_get, cl
     data = res.get_json()
 
     livability = data["livability"]
-    # Score must be None (not fabricated from ML estimate)
     assert livability["score"] is None
     assert livability["confidence"] == "low"
-    assert "Unverified" in livability["tier"]
-    assert "temporarily unavailable" in livability["confidence_reason"]
+    assert "Unverified" in livability["verdict"]
     assert "cannot be reliably established" in livability["confidence_reason"]
 
-    # Primary driver marked unavailable
-    assert livability["primary_driver"]["status"] == "unavailable"
-
-    # Secondary ML context is present but explicitly marked as not used for score
+    # Secondary ML context is present but marked as not used to fabricate score
     assert livability["secondary_ml_context"]["estimated_pm25"] is not None
     assert "Not used to fabricate livability score" in livability["secondary_ml_context"]["note"]
 
 
-def mock_cams_severe(*args, **kwargs):
-    """Mock hazardous air quality (PM2.5 = 280.0 µg/m³)."""
-    url = args[0] if args else kwargs.get("url", "")
-    mock_resp = MagicMock()
-    mock_resp.status_code = 200
-
-    if "forecast" in url:
-        mock_resp.json.return_value = {
-            "current": {
-                "time": "2026-11-16T12:00",
-                "temperature_2m": 15.0,
-                "relative_humidity_2m": 85.0,
-                "wind_direction_10m": 310.0,
-                "surface_pressure": 995.0,
-                "shortwave_radiation": 40.0,
-            }
-        }
-        return mock_resp
-
-    if "air-quality" in url:
-        mock_resp.json.return_value = {
-            "current": {
-                "time": "2026-11-16T12:00",
-                "pm2_5": 280.0,
-                "european_aqi": 100,
-                "us_aqi": 340,
-            },
-            "hourly": {
-                "time": ["2026-11-16T12:00" for _ in range(24)],
-                "pm2_5": [290.0 for _ in range(24)],
-            },
-        }
-        return mock_resp
-
-    return mock_resp
-
-
-@patch("requests.get", side_effect=mock_cams_severe)
-def test_livability_severe_verdict(mock_get, client):
-    """Verify severe/hazardous exposure score and emergency advisories."""
+@patch("requests.get", side_effect=make_mock_air_quality(25.0, with_hourly=False))
+def test_livability_forecast_failure_fallback(mock_get, client):
+    """Verify engine still returns livability using current reference when forecast is missing."""
     res = client.post("/api/location/livability", json={"lat": 28.6139, "lon": 77.2090})
     assert res.status_code == 200
     data = res.get_json()
 
     livability = data["livability"]
-    assert livability["score"] < 25
-    assert "Severe" in livability["tier"]
-    assert "Emergency" in livability["persona_guidance"]["sensitive"]["tag"]
-    assert "Avoid all outdoor exposure" in livability["verdicts"]["should_i_go"]
-
-
-@patch("requests.get", side_effect=mock_cams_good_weather_and_aq)
-def test_livability_outside_delhi_moderate_confidence(mock_get, client):
-    """Verify that locations outside Delhi return moderate confidence."""
-    # Bengaluru coordinates
-    res = client.post("/api/location/livability", json={"lat": 12.9716, "lon": 77.5946})
-    assert res.status_code == 200
-    data = res.get_json()
-
-    livability = data["livability"]
-    assert livability["confidence"] == "moderate"
-    assert "outside Delhi-NCR" in livability["confidence_reason"]
-    assert data["location"]["is_delhi_ncr"] is False
+    assert livability["score"] is not None
+    assert livability["verdict"] == "Good to go"

@@ -48,7 +48,7 @@ class AirQualityService:
                 "longitude": lon,
                 "current": "pm2_5,european_aqi,us_aqi",
                 "hourly": "pm2_5",
-                "forecast_days": 2,
+                "forecast_days": 7,
             }
             response = requests.get(url, params=params, timeout=Config.OPEN_METEO_TIMEOUT)
             response.raise_for_status()
@@ -59,7 +59,7 @@ class AirQualityService:
             if ref_pm25 is not None:
                 ref_pm25_float = round(float(ref_pm25), 2)
 
-                # Process next 24h forecast from hourly CAMS data
+                # Process hourly CAMS data for 24h, best time today, and 7-day trend
                 hourly_data = data.get("hourly", {})
                 hourly_pm25 = hourly_data.get("pm2_5", [])
                 hourly_times = hourly_data.get("time", [])
@@ -67,14 +67,22 @@ class AirQualityService:
                 forecast_24h_mean = None
                 forecast_24h_max = None
                 forecast_trend = "stable"
-                hourly_series = []
+                hourly_series_24h = []
+                best_time_today = None
+                seven_day_daily = []
+                seven_day_trend = "stable"
 
-                if hourly_pm25 and isinstance(hourly_pm25, list):
-                    # Filter valid positive numbers for the next 24 intervals
-                    valid_forecast = [float(v) for v in hourly_pm25[:24] if v is not None and not (isinstance(v, float) and v < 0)]
-                    if valid_forecast:
-                        forecast_24h_mean = round(sum(valid_forecast) / len(valid_forecast), 2)
-                        forecast_24h_max = round(max(valid_forecast), 2)
+                if hourly_pm25 and isinstance(hourly_pm25, list) and hourly_times:
+                    # 1. Next 24h Forecast
+                    valid_24h = [
+                        (t, float(p))
+                        for t, p in zip(hourly_times[:24], hourly_pm25[:24])
+                        if p is not None and not (isinstance(p, float) and p < 0)
+                    ]
+                    if valid_24h:
+                        vals_24h = [v[1] for v in valid_24h]
+                        forecast_24h_mean = round(sum(vals_24h) / len(vals_24h), 2)
+                        forecast_24h_max = round(max(vals_24h), 2)
                         if forecast_24h_mean - ref_pm25_float > 8.0:
                             forecast_trend = "worsening"
                         elif ref_pm25_float - forecast_24h_mean > 8.0:
@@ -82,10 +90,66 @@ class AirQualityService:
                         else:
                             forecast_trend = "stable"
 
-                    # Build short 24h series for frontend charting
-                    for t, p in zip(hourly_times[:24], hourly_pm25[:24]):
+                        # Build 24h series for charting
+                        for t, p in valid_24h:
+                            hourly_series_24h.append({"time": t, "pm25": round(p, 1)})
+
+                        # 2. Best time to go out today (lowest PM2.5 hour in first 24h)
+                        min_slot = min(valid_24h, key=lambda x: x[1])
+                        slot_time = min_slot[0]
+                        hour_str = slot_time.split("T")[-1] if "T" in slot_time else slot_time
+                        best_time_today = {
+                            "time": slot_time,
+                            "hour": hour_str,
+                            "pm25": round(min_slot[1], 1),
+                            "guidance": (
+                                f"Optimal outdoor activity window around {hour_str} "
+                                f"with lowest estimated PM2.5 of {round(min_slot[1], 1)} µg/m³."
+                            ),
+                        }
+
+                    # 3. 7-Day Trend Aggregation (group by date)
+                    from collections import defaultdict
+                    daily_groups = defaultdict(list)
+                    for t, p in zip(hourly_times[:168], hourly_pm25[:168]):
                         if p is not None:
-                            hourly_series.append({"time": t, "pm25": round(float(p), 1)})
+                            date_str = t.split("T")[0] if "T" in t else t[:10]
+                            daily_groups[date_str].append(float(p))
+
+                    for date_k, p_list in list(daily_groups.items())[:7]:
+                        if p_list:
+                            d_mean = round(sum(p_list) / len(p_list), 1)
+                            d_max = round(max(p_list), 1)
+                            # CPCB category helper
+                            if d_mean <= 30:
+                                d_cat = "Good"
+                            elif d_mean <= 60:
+                                d_cat = "Satisfactory"
+                            elif d_mean <= 90:
+                                d_cat = "Moderate"
+                            elif d_mean <= 120:
+                                d_cat = "Poor"
+                            elif d_mean <= 250:
+                                d_cat = "Very Poor"
+                            else:
+                                d_cat = "Severe"
+
+                            seven_day_daily.append({
+                                "date": date_k,
+                                "mean_pm25": d_mean,
+                                "max_pm25": d_max,
+                                "cpcb_category": d_cat,
+                            })
+
+                    if len(seven_day_daily) >= 3:
+                        first_avg = seven_day_daily[0]["mean_pm25"]
+                        last_avg = seven_day_daily[-1]["mean_pm25"]
+                        if last_avg - first_avg > 12.0:
+                            seven_day_trend = "worsening"
+                        elif first_avg - last_avg > 12.0:
+                            seven_day_trend = "improving"
+                        else:
+                            seven_day_trend = "stable"
 
                 result = {
                     "reference_pm25": ref_pm25_float,
@@ -101,7 +165,12 @@ class AirQualityService:
                         "mean_pm25": forecast_24h_mean,
                         "max_pm25": forecast_24h_max,
                         "trend": forecast_trend,
-                        "series": hourly_series,
+                        "series": hourly_series_24h,
+                    },
+                    "best_time_today": best_time_today,
+                    "seven_day_forecast": {
+                        "trend": seven_day_trend,
+                        "days": seven_day_daily,
                     },
                 }
                 aq_cache.set(cache_key, result)

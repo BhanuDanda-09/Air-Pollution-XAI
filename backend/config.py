@@ -82,57 +82,76 @@ class Config:
             "reference_forecast_24h": 0.25,
             "meteorological_stagnation": 0.15,
         },
-        "score_tiers": [
+        # 4 Standard Verdicts with Baseline Thresholds
+        "verdicts": [
             {
-                "min_score": 80,
-                "tier": "Favorable / Recommended",
-                "cpcb_match": "Good (0-30 µg/m³)",
-                "color": "#10B981",
-                "go_verdict": "Safe for all outdoor activities, recreation, and travel.",
-                "stay_verdict": "Clean ambient air. Natural ventilation and outdoor residency encouraged.",
+                "key": "good_to_go",
+                "label": "Good to go",
+                "min_baseline_score": 75,
+                "color": "#10B981",  # Emerald Green
+                "summary": "Air quality is favorable. Outdoor exercise, daily transit, and natural home ventilation are safe.",
+                "actions": {
+                    "n95_mask": "Not required for general population.",
+                    "indoor_exercise": "Outdoor workouts encouraged; enjoy parks and open spaces.",
+                    "windows": "Open windows for fresh air ventilation.",
+                    "purifier": "Air purifiers optional.",
+                },
             },
             {
-                "min_score": 65,
-                "tier": "Acceptable / Minor Caution",
-                "cpcb_match": "Satisfactory (30-60 µg/m³)",
-                "color": "#84CC16",
-                "go_verdict": "Generally safe. Sensitive individuals should monitor minor irritation.",
-                "stay_verdict": "Acceptable air quality for habitation. Normal ventilation suitable.",
+                "key": "take_precautions",
+                "label": "Take precautions",
+                "min_baseline_score": 50,
+                "color": "#F59E0B",  # Amber
+                "summary": "Air quality is moderate. Sensitive individuals and vulnerable health profiles should reduce prolonged heavy exertion.",
+                "actions": {
+                    "n95_mask": "Advised for sensitive individuals in heavy traffic corridors.",
+                    "indoor_exercise": "Healthy adults can exercise outdoors; sensitive groups should consider indoor gym workouts.",
+                    "windows": "Keep windows closed during morning/evening rush hour peaks.",
+                    "purifier": "Run indoor purifiers in bedrooms during sleep hours.",
+                },
             },
             {
-                "min_score": 50,
-                "tier": "Caution for Sensitive Groups",
-                "cpcb_match": "Moderate (60-90 µg/m³)",
-                "color": "#F59E0B",
-                "go_verdict": "Children, elderly, and respiratory patients should reduce heavy exertion.",
-                "stay_verdict": "Marginal air quality. Run indoor HEPA air purifiers during peak hours.",
+                "key": "avoid_outdoor",
+                "label": "Avoid outdoor activity",
+                "min_baseline_score": 30,
+                "color": "#F97316",  # Orange/Dark Amber
+                "summary": "Unfavorable particulate pollution. Significant risk of respiratory irritation, coughing, and cardiovascular strain.",
+                "actions": {
+                    "n95_mask": "N95 / FFP2 respirator strongly recommended outdoors.",
+                    "indoor_exercise": "Move all cardio and athletic workouts indoors.",
+                    "windows": "Keep windows and external doors closed continuously.",
+                    "purifier": "Operate HEPA air purifiers continuously on medium/high speed.",
+                },
             },
             {
-                "min_score": 35,
-                "tier": "Unfavorable / Exposure Risk",
-                "cpcb_match": "Poor (90-120 µg/m³)",
-                "color": "#F97316",
-                "go_verdict": "Unfavorable for outdoor activities. Breathing discomfort likely upon prolonged exposure.",
-                "stay_verdict": "Substantial chronic exposure. Keep windows closed and operate indoor purifiers.",
-            },
-            {
-                "min_score": 20,
-                "tier": "High Risk / Chronic Danger",
-                "cpcb_match": "Very Poor (120-250 µg/m³)",
-                "color": "#EF4444",
-                "go_verdict": "Hazardous for outdoor recreation. N95 respirator strongly advised outdoors.",
-                "stay_verdict": "Severe chronic exposure risk. Unfavorable for relocation without high-grade air filtration.",
-            },
-            {
-                "min_score": 0,
-                "tier": "Severe / Hazardous Exposure",
-                "cpcb_match": "Severe (>250 µg/m³)",
-                "color": "#7C3AED",
-                "go_verdict": "Emergency air quality. Avoid all outdoor exposure. High acute respiratory distress risk.",
-                "stay_verdict": "Not recommended for residential habitation during seasonal peaks without continuous medical-grade filtration.",
+                "key": "not_recommended",
+                "label": "Not recommended",
+                "min_baseline_score": 0,
+                "color": "#EF4444",  # Crimson Red
+                "summary": "Severe air pollution crisis. Outdoor exposure carries severe health consequences. Unfavorable for residence without continuous high-grade filtration.",
+                "actions": {
+                    "n95_mask": "N95/P100 respirator strictly mandatory for any outdoor transit.",
+                    "indoor_exercise": "Strict indoor confinement. No strenuous physical exertion.",
+                    "windows": "Seal window gaps; do not ventilate with unpurified ambient air.",
+                    "purifier": "High-capacity HEPA purifiers running continuously; monitor indoor PM2.5.",
+                },
             },
         ],
+        "health_profile_shifts": {
+            "respiratory_condition": 10,
+            "heart_condition": 10,
+            "pregnant": 10,
+            "child": 8,
+            "senior": 8,
+            "outdoor_worker": 8,
+            "max_total_shift": 25,  # Maximum tightening penalty
+        },
     }
+
+    MEDICAL_DISCLAIMER = (
+        "Medical Disclaimer: This assessment is informational only and does not constitute medical advice, "
+        "clinical diagnosis, or treatment. Consult a licensed physician for clinical respiratory or cardiovascular health management."
+    )
 
     # Meteorological feature definitions with strict validation bounds & units
     # Note: Barometric Pressure (BP) is strictly calibrated in mmHg (not hPa).

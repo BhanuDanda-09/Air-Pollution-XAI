@@ -8,13 +8,18 @@ export const livabilityService = {
    * Assess livability & exposure verdict for geographic coordinates.
    * @param {number} lat - Latitude (-90 to 90)
    * @param {number} lon - Longitude (-180 to 180)
+   * @param {Object} [healthProfile] - Optional health risk factors (age group, asthma, etc.)
    * @returns {Promise<Object>} Livability assessment payload
    */
-  async assessLivability(lat, lon) {
-    return api.post('/api/location/livability', {
+  async assessLivability(lat, lon, healthProfile = null) {
+    const payload = {
       lat: parseFloat(lat),
       lon: parseFloat(lon),
-    });
+    };
+    if (healthProfile) {
+      payload.health_profile = healthProfile;
+    }
+    return api.post('/api/location/livability', payload);
   },
 };
 
