@@ -1,7 +1,7 @@
 """SQLAlchemy models for user persistence, health profiles, saved places, and history."""
 
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from werkzeug.security import check_password_hash, generate_password_hash
 from backend.database import db
 
@@ -28,6 +28,23 @@ class User(db.Model):
     saved_locations = db.relationship("SavedLocation", backref="user", cascade="all, delete-orphan", lazy="dynamic")
     history = db.relationship("AssessmentHistory", backref="user", cascade="all, delete-orphan", lazy="dynamic")
     alert_preferences = db.relationship("AlertPreference", backref="user", cascade="all, delete-orphan", lazy="dynamic")
+
+    def __init__(
+        self,
+        email: str = "",
+        password_hash: str = "",
+        name: Optional[str] = None,
+        role: str = "citizen",
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        if email:
+            self.email = email
+        if password_hash:
+            self.password_hash = password_hash
+        if name is not None:
+            self.name = name
+        self.role = role
 
     def set_password(self, password: str) -> None:
         """Hash and set user password."""
@@ -63,6 +80,25 @@ class HealthProfile(db.Model):
     is_outdoor_worker = db.Column(db.Boolean, default=False, nullable=False)
     updated_at = db.Column(db.DateTime(timezone=True), default=_utc_now, onupdate=_utc_now, nullable=False)
 
+    def __init__(
+        self,
+        user_id: Optional[int] = None,
+        age_group: str = "adult",
+        asthma: bool = False,
+        has_heart_condition: bool = False,
+        is_pregnant: bool = False,
+        is_outdoor_worker: bool = False,
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        if user_id is not None:
+            self.user_id = user_id
+        self.age_group = age_group
+        self.asthma = asthma
+        self.has_heart_condition = has_heart_condition
+        self.is_pregnant = is_pregnant
+        self.is_outdoor_worker = is_outdoor_worker
+
     def to_dict(self) -> Dict[str, Any]:
         """Serialize health profile matching frontend form schema."""
         return {
@@ -87,6 +123,23 @@ class SavedLocation(db.Model):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), default=_utc_now, nullable=False)
+
+    def __init__(
+        self,
+        user_id: Optional[int] = None,
+        label: str = "Saved Place",
+        name: str = "",
+        latitude: float = 0.0,
+        longitude: float = 0.0,
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        if user_id is not None:
+            self.user_id = user_id
+        self.label = label
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -115,6 +168,29 @@ class AssessmentHistory(db.Model):
     pm25_model = db.Column(db.Float, nullable=True)
     timestamp = db.Column(db.DateTime(timezone=True), default=_utc_now, index=True, nullable=False)
 
+    def __init__(
+        self,
+        user_id: Optional[int] = None,
+        latitude: float = 0.0,
+        longitude: float = 0.0,
+        place_name: Optional[str] = None,
+        score: Optional[int] = None,
+        verdict: str = "Good to go",
+        pm25_reference: Optional[float] = None,
+        pm25_model: Optional[float] = None,
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        if user_id is not None:
+            self.user_id = user_id
+        self.latitude = latitude
+        self.longitude = longitude
+        self.place_name = place_name
+        self.score = score
+        self.verdict = verdict
+        self.pm25_reference = pm25_reference
+        self.pm25_model = pm25_model
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,
@@ -140,6 +216,21 @@ class AlertPreference(db.Model):
     pm25_threshold = db.Column(db.Float, default=100.0, nullable=False)
     is_email_enabled = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), default=_utc_now, nullable=False)
+
+    def __init__(
+        self,
+        user_id: Optional[int] = None,
+        saved_location_id: Optional[int] = None,
+        pm25_threshold: float = 100.0,
+        is_email_enabled: bool = False,
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        if user_id is not None:
+            self.user_id = user_id
+        self.saved_location_id = saved_location_id
+        self.pm25_threshold = pm25_threshold
+        self.is_email_enabled = is_email_enabled
 
     def to_dict(self) -> Dict[str, Any]:
         return {
