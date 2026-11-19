@@ -8,6 +8,7 @@ from .livability_routes import livability_bp
 from .location_routes import location_bp
 from .model_routes import model_bp
 from .prediction_routes import prediction_bp
+from .user_routes import user_bp
 from .worker_routes import worker_bp
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "location_bp",
     "model_bp",
     "prediction_bp",
+    "user_bp",
     "worker_bp",
 ]

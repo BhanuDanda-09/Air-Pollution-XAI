@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   Wind,
   Compass,
@@ -13,13 +13,24 @@ import {
   X,
   Shield,
   HardHat,
+  Bookmark,
+  History,
+  User as UserIcon,
+  LogOut,
+  LogIn,
 } from 'lucide-react';
 import RoleSwitcher from './RoleSwitcher';
-import { hasRoleAccess, isDemoModeEnabled } from '../services/demoAuth';
+import { hasRoleAccess } from '../services/demoAuth';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ isBackendOnline }) {
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout, openAuthModal } = useAuth();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [roleUpdated, setRoleUpdated] = useState(0);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const onRoleChanged = () => setRoleUpdated((prev) => prev + 1);
@@ -27,13 +38,26 @@ export default function Navbar({ isBackendOnline }) {
     return () => window.removeEventListener('auth:role-changed', onRoleChanged);
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const navLinks = [
     { to: '/', label: 'Home', icon: Wind },
     { to: '/livability', label: 'Livability Verdict', icon: Compass },
     { to: '/live-assessment', label: 'Live Assessment', icon: MapPin },
+    { to: '/saved-places', label: 'Saved Places', icon: Bookmark },
+    { to: '/history', label: 'History', icon: History },
     { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { to: '/prediction', label: 'Prediction', icon: Activity },
-    { to: '/comparison', label: 'Model Comparison', icon: GitCompare },
+    { to: '/comparison', label: 'Comparison', icon: GitCompare },
     { to: '/explainability', label: 'Explainability', icon: Sparkles },
     { to: '/about', label: 'About', icon: Info },
   ];
@@ -63,7 +87,7 @@ export default function Navbar({ isBackendOnline }) {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden xl:flex items-center space-x-1">
             {navLinks.map((item) => {
               const Icon = item.icon;
               return (
@@ -71,14 +95,14 @@ export default function Navbar({ isBackendOnline }) {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    `flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       isActive
                         ? 'bg-blue-50 text-blue-700 font-semibold shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`
                   }
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
                 </NavLink>
               );
@@ -87,10 +111,8 @@ export default function Navbar({ isBackendOnline }) {
               <NavLink
                 to="/worker"
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    isActive
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'text-blue-700 bg-blue-50/70 hover:bg-blue-100'
+                  `flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                    isActive ? 'bg-blue-100 text-blue-800' : 'text-blue-700 bg-blue-50/70 hover:bg-blue-100'
                   }`
                 }
               >
@@ -103,10 +125,8 @@ export default function Navbar({ isBackendOnline }) {
               <NavLink
                 to="/admin"
                 className={({ isActive }) =>
-                  `flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    isActive
-                      ? 'bg-purple-100 text-purple-800'
-                      : 'text-purple-700 bg-purple-50/70 hover:bg-purple-100'
+                  `flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                    isActive ? 'bg-purple-100 text-purple-800' : 'text-purple-700 bg-purple-50/70 hover:bg-purple-100'
                   }`
                 }
               >
@@ -116,26 +136,95 @@ export default function Navbar({ isBackendOnline }) {
             )}
           </nav>
 
-          {/* Status Indicator, Role Switcher & Mobile Toggle */}
-          <div className="flex items-center gap-3">
+          {/* User Auth, Role Switcher & Status */}
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Demo Role Switcher (strictly gated behind VITE_ENABLE_DEMO_MODE) */}
             <RoleSwitcher />
 
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+            {/* User Account / Auth Actions */}
+            {isAuthenticated ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-all"
+                  aria-expanded={userDropdownOpen}
+                >
+                  <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
+                    {user?.name ? user.name[0] : (user?.email ? user.email[0] : 'U')}
+                  </div>
+                  <span className="hidden sm:inline-block max-w-[100px] truncate font-semibold">
+                    {user?.name || user?.email?.split('@')[0]}
+                  </span>
+                </button>
+
+                {userDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fadeIn">
+                    <div className="px-4 py-2 border-b border-slate-100">
+                      <p className="text-xs font-bold text-navy-900 truncate">{user?.name || 'User Account'}</p>
+                      <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
+                    </div>
+
+                    <div className="py-1">
+                      <Link
+                        to="/saved-places"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                      >
+                        <Bookmark className="w-4 h-4 text-blue-600" />
+                        <span>Saved Places</span>
+                      </Link>
+                      <Link
+                        to="/history"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                      >
+                        <History className="w-4 h-4 text-indigo-600" />
+                        <span>Assessment History</span>
+                      </Link>
+                    </div>
+
+                    <div className="pt-1 border-t border-slate-100">
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          logout();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => openAuthModal('login')}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Sign In</span>
+              </button>
+            )}
+
+            {/* Backend status indicator */}
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
               <span
                 className={`w-2 h-2 rounded-full ${
                   isBackendOnline ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
                 }`}
               />
-              <span>{isBackendOnline ? 'Backend Online' : 'Connecting API...'}</span>
+              <span className="hidden xl:inline">{isBackendOnline ? 'Online' : 'Connecting...'}</span>
             </div>
 
+            {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              className="xl:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
               aria-label="Toggle Navigation"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -143,7 +232,7 @@ export default function Navbar({ isBackendOnline }) {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-4 space-y-1 shadow-lg animate-fadeIn">
+        <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-4 space-y-1 shadow-lg animate-fadeIn max-h-[80vh] overflow-y-auto">
           {navLinks.map((item) => {
             const Icon = item.icon;
             return (
@@ -152,14 +241,12 @@ export default function Navbar({ isBackendOnline }) {
                 to={item.to}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`
                 }
               >
-                <Icon className="w-5 h-5 text-blue-600" />
+                <Icon className="w-4 h-4 text-blue-600" />
                 <span>{item.label}</span>
               </NavLink>
             );
@@ -169,9 +256,9 @@ export default function Navbar({ isBackendOnline }) {
             <NavLink
               to="/worker"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-bold text-blue-700 bg-blue-50"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-blue-700 bg-blue-50"
             >
-              <HardHat className="w-5 h-5 text-blue-600" />
+              <HardHat className="w-4 h-4 text-blue-600" />
               <span>Worker Portal</span>
             </NavLink>
           )}
@@ -180,9 +267,9 @@ export default function Navbar({ isBackendOnline }) {
             <NavLink
               to="/admin"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-bold text-purple-700 bg-purple-50"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-purple-700 bg-purple-50"
             >
-              <Shield className="w-5 h-5 text-purple-600" />
+              <Shield className="w-4 h-4 text-purple-600" />
               <span>Admin Portal</span>
             </NavLink>
           )}

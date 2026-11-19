@@ -13,6 +13,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from flask import Flask, jsonify
 from flask_cors import CORS
 from backend.config import Config
+from backend.database import init_db
 from backend.models.model_loader import get_model_loader
 from backend.routes import (
     admin_bp,
@@ -23,6 +24,7 @@ from backend.routes import (
     location_bp,
     model_bp,
     prediction_bp,
+    user_bp,
     worker_bp,
 )
 from backend.utils.response import error_response, success_response
@@ -46,6 +48,13 @@ def create_app(config_class=Config):
         supports_credentials=True,
     )
 
+    # Initialize SQLite / PostgreSQL Database
+    try:
+        init_db(app)
+        logger.info("Database initialized.")
+    except Exception as exc:
+        logger.error("Error initializing database: %s", exc)
+
     # Initialize model loader singleton during application startup
     try:
         loader = get_model_loader()
@@ -64,6 +73,7 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_bp)
     app.register_blueprint(worker_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(user_bp)
 
     # Root route for quick verification
     @app.route("/", methods=["GET"])

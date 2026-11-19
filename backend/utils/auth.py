@@ -156,8 +156,45 @@ def require_role(allowed_roles: Union[str, List[str]]):
 
             # Attach authenticated user identity to request context
             request.current_user = payload
+            request.user_id = payload.get("user_id") or payload.get("sub")
             return f(*args, **kwargs)
 
         return wrapper
 
     return decorator
+
+
+def token_required(f):
+    """Decorator to require valid JWT authentication for any authenticated user."""
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return error_response(
+                message="Missing or invalid Authorization header. Expected 'Bearer <token>'.",
+                code="UNAUTHORIZED",
+                status_code=401,
+            )
+
+        token = auth_header[7:].strip()
+        if not token:
+            return error_response(
+                message="Bearer token is empty.",
+                code="UNAUTHORIZED",
+                status_code=401,
+            )
+
+        try:
+            payload = decode_jwt(token)
+        except ValueError as e:
+            return error_response(
+                message=f"Authentication failed: {str(e)}",
+                code="INVALID_TOKEN",
+                status_code=401,
+            )
+
+        request.current_user = payload
+        request.user_id = payload.get("user_id") or payload.get("sub")
+        return f(*args, **kwargs)
+
+    return wrapper

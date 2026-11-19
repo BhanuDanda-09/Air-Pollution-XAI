@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Compass, AlertCircle, RefreshCw, Stethoscope, ChevronDown, ChevronUp } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Compass, AlertCircle, RefreshCw, Stethoscope, ChevronDown, ChevronUp, Bookmark, Check } from 'lucide-react';
 import LocationPicker from '../components/LocationPicker';
 import HealthProfileSelector from '../components/HealthProfileSelector';
 import LivabilityScoreCard from '../components/LivabilityScoreCard';
 import LiveAssessmentResult from '../components/LiveAssessmentResult';
 import ColdStartNotice from '../components/ColdStartNotice';
 import locationService from '../services/locationService';
+import userService from '../services/userService';
+import { useAuth } from '../context/AuthContext';
 
 const DEFAULT_PROFILE = {
   age_group: 'adult',
@@ -16,22 +19,49 @@ const DEFAULT_PROFILE = {
 };
 
 export default function LiveAssessmentPage() {
-  const [latitude, setLatitude] = useState(28.6315); // Connaught Place, New Delhi default
-  const [longitude, setLongitude] = useState(77.2167);
-  const [healthProfile, setHealthProfile] = useState(DEFAULT_PROFILE);
+  const [searchParams] = useSearchParams();
+  const { isAuthenticated, healthProfile: userProfile } = useAuth();
+
+  const initialLat = searchParams.get('lat') ? parseFloat(searchParams.get('lat')) : 28.6315;
+  const initialLon = searchParams.get('lon') ? parseFloat(searchParams.get('lon')) : 77.2167;
+  const initialName = searchParams.get('name') || '';
+
+  const [latitude, setLatitude] = useState(initialLat);
+  const [longitude, setLongitude] = useState(initialLon);
+  const [healthProfile, setHealthProfile] = useState(userProfile || DEFAULT_PROFILE);
   const [showHealthProfile, setShowHealthProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [assessmentData, setAssessmentData] = useState(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Sync profile if user logs in or profile loads
+  useEffect(() => {
+    if (userProfile) {
+      setHealthProfile(userProfile);
+    }
+  }, [userProfile]);
 
   const fetchAssessment = async (lat = latitude, lon = longitude, profile = healthProfile) => {
     setIsLoading(true);
     setError(null);
     try {
       const response = await locationService.assessLocation(lat, lon, profile);
-      // Backend returns either direct fields or data payload
       const result = response.data || response;
       setAssessmentData(result);
+
+      // Record assessment to user history in the background if authenticated
+      if (isAuthenticated && result) {
+        userService.recordHistory({
+          latitude: lat,
+          longitude: lon,
+          place_name: initialName || result.location_name || 'Delhi-NCR Location',
+          score: result.livability?.score,
+          verdict: result.livability?.verdict?.label || 'Good to go',
+          pm25_reference: result.reference_air_quality?.reference_pm25,
+          pm25_model: result.model_prediction?.pm25,
+        });
+      }
     } catch (err) {
       console.error('Location assessment failed:', err);
       setError(
@@ -42,19 +72,36 @@ export default function LiveAssessmentPage() {
     }
   };
 
-  // Perform initial assessment for default location on page mount
+  // Perform initial assessment for specified coordinates or default location
   useEffect(() => {
-    fetchAssessment(28.6315, 77.2167, DEFAULT_PROFILE);
-  }, []);
+    fetchAssessment(initialLat, initialLon, healthProfile);
+  }, [initialLat, initialLon]);
 
   const handleLocationChange = (newLat, newLon) => {
     setLatitude(newLat);
     setLongitude(newLon);
+    setSaveSuccess(false);
   };
 
   const handleProfileChange = (updatedProfile) => {
     setHealthProfile(updatedProfile);
     fetchAssessment(latitude, longitude, updatedProfile);
+  };
+
+  const handleQuickSaveLocation = async () => {
+    if (!isAuthenticated) return;
+    try {
+      await userService.addSavedLocation({
+        label: 'Saved Place',
+        name: initialName || `Coordinates (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`,
+        latitude,
+        longitude,
+      });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      console.warn('Failed to quick-save location:', err);
+    }
   };
 
   return (
@@ -65,9 +112,9 @@ export default function LiveAssessmentPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-800 rounded-full">
-                Phase 1 & 2 Live Intelligence
+                Phase 1, 2 & 3 Live Intelligence
               </span>
-              <span className="text-xs text-slate-500 font-medium">Open-Meteo, CAMS & Livability Synthesis</span>
+              <span className="text-xs text-slate-500 font-medium">Open-Meteo, CAMS, Persistence & Livability</span>
             </div>
             <h1 className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
               Real-World Air Quality Assessment
@@ -79,6 +126,27 @@ export default function LiveAssessmentPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={handleQuickSaveLocation}
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold border border-blue-200 transition-colors"
+                title="Bookmark this spot to Saved Places"
+              >
+                {saveSuccess ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Saved!</span>
+                  </>
+                ) : (
+                  <>
+                    <Bookmark className="w-3.5 h-3.5" />
+                    <span>Bookmark Place</span>
+                  </>
+                )}
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => setShowHealthProfile(!showHealthProfile)}
