@@ -515,3 +515,128 @@ The application implements a 3-tier Role-Based Access Control model:
 3. **Session Invalidation on 401:** The centralized Axios interceptor immediately clears user credentials and logs out real sessions upon encountering a `401 Unauthorized` token expiry response.
 4. **Backend Enforcement (403 Forbidden):** The Flask backend enforces `@require_role` on `/api/admin/*` and `/api/worker/*`, returning HTTP 403 Forbidden with structured error payloads whenever a citizen token attempts unauthorized access.
 
+---
+
+## Decision Product: Real-World Livability & Exposure Scoring
+
+Moving beyond raw statistical PM2.5 prediction, the platform implements a multi-factor decision engine answering: **"Should I live in / go to this place, given its air quality?"**
+
+### 1. Livability Scoring Engine (`LivabilityService`)
+Transforms continuous satellite and meteorological observations into an actionable index ($0\text{--}100$):
+* **PM2.5 Exposure Subscore ($0\text{--}60\text{ pts}$):** Continuous linear piecewise mapping anchored strictly on Copernicus Atmosphere Monitoring Service (CAMS) regional model data ($10\text{--}250\,\mu\text{g/m}^3$).
+* **Atmospheric Comfort Subscore ($0\text{--}20\text{ pts}$):** Derived from ambient temperature, humidity comfort bands, and thermal heat index.
+* **Forecast Stability Subscore ($0\text{--}20\text{ pts}$):** 24-hour diurnal trend evaluation penalizing deteriorating air masses and rewarding improving ventilation.
+* **4 Decision Tiers & Clear Guidance:**
+  * **$80\text{--}100$ (Good to Go):** Clean ambient air; optimal for all outdoor exercises and residential living.
+  * **$60\text{--}79$ (Take Precautions):** Moderate particulate loading; sensitive groups should limit intense outdoor workouts.
+  * **$40\text{--}59$ (Avoid Prolonged Outdoor Activity):** Unhealthy aerosol concentrations; N95 respirators advised, close residential windows.
+  * **$0\text{--}39$ (Not Recommended / High Exposure Alert):** Severe hazardous smog episode; stay indoors with HEPA air purifiers active.
+
+### 2. Tailored Health Profile Sensitivity Shifts
+Accounts for biological vulnerability by shifting subscore boundaries dynamically:
+* **Senior Citizens ($65+$) & Children:** $+8\text{--}10\text{ sensitivity shift}$.
+* **Asthma & Respiratory Conditions:** $+10\text{ shift}$ (prompts immediate bronchodilator readiness).
+* **Cardiovascular & Heart Ailments:** $+10\text{ shift}$ (flags elevated arterial inflammation risks).
+* **Pregnancy:** $+10\text{ shift}$ (emphasizes fetal developmental protection).
+* **Outdoor Workers:** $+8\text{ shift}$ (shift-based hourly mask rotation and hydration advice).
+
+---
+
+## Head-to-Head Location Comparison Engine
+
+Assists citizens, commuters, and prospective home buyers in choosing between alternative destinations:
+* **Endpoint:** `POST /api/location/compare-livability`
+* **Features:**
+  * Concurrently retrieves live meteorology, CAMS regional reference PM2.5, and XGBoost predictions for two geographic coordinate pairs.
+  * Determines the winning location with computed score difference and absolute PM2.5 delta.
+  * Generates comparative decision verdicts (e.g. *"Connaught Place is 18 points cleaner than Noida Sector 62"*).
+  * Direct comparison of 7-day forecast trends and optimal outdoor windows for both destinations.
+  * 1-Click presets for popular Delhi-NCR hubs (Connaught Place, Cyber City Gurgaon, Noida Sector 62, Anand Vihar) and authenticated Saved Places.
+
+---
+
+## Empirical Emission Source Apportionment Engine
+
+Fulfills the second core half of the capstone project title: *"Explainable AI-Based Air Pollution Prediction and Source Attribution"*.
+
+### Methodology:
+Derives empirical source propensity scores across 5 characteristic Delhi-NCR airshed source categories, grounded in published source apportionment literature from **IIT Kanpur (2015)** and **TERI (2018)**:
+1. **Vehicular Exhaust & Urban Traffic (Local Boundary Trapping):** Weighted by temperature drops (planetary boundary layer height compression) and high barometric pressure (anticyclonic trapping).
+2. **Agricultural Stubble & Biomass Burning:** Weighted by North-Westerly wind alignment ($280^\circ\text{--}345^\circ$) transporting smoke from Punjab & Haryana agricultural fires during post-monsoon/winter conditions.
+3. **Secondary Inorganic Aerosols (SIA):** Weighted by ambient relative humidity ($>60\%$) accelerating aqueous heterogeneous gas-to-particle conversion (sulfate, nitrate, ammonium) and solar irradiance.
+4. **Industrial Stacks & Point Sources:** Weighted by East / South-East wind alignments ($80^\circ\text{--}160^\circ$) from Ghaziabad, Sahibabad, Noida, and Faridabad manufacturing corridors.
+5. **Road Dust & Construction Minerals:** Weighted by dry aridity ($\text{RH} < 45\%$), high surface heating, and westerly desert wind pathways.
+
+### UI Visualizations (`SourceAttributionBreakdown.jsx`):
+* Interactive segmented distribution bar showing relative percentage shares.
+* Expandable sector cards explaining specific meteorological driving factors (e.g. *"Direct North-Westerly transport corridor alignment (WD: 310° from Punjab/Haryana fires)"*).
+* Transparent scientific framing distinguishing meteorological proxy heuristics from chemical filter receptor assays.
+
+---
+
+## User Persistence, Saved Places & Safety Alerts
+
+* **Database Layer:** Flask-SQLAlchemy supporting local SQLite (`instance/air_pollution.db`) and production PostgreSQL via standard `DATABASE_URL`.
+* **User Accounts:** Secure registration & login with bcrypt password hashing and JWT access ($60\text{ min}$) + refresh ($7\text{ days}$) token rotation.
+* **Saved Places Bookmarks:** Tag locations (`Home`, `Work`, `Campus`) with real-time pollution metrics, livability scores, and 1-click comparison shortcuts.
+* **Assessment History:** Personal search, filter, and pagination of historical assessments with CSV export and printable medical consultation reports.
+* **Live Safety Alerts:** Configurable PM2.5 thresholds with an interactive notification bell in the Navbar alerting users when saved locations exceed safety limits.
+
+---
+
+## Progressive Web App (PWA) & Performance Architecture
+
+* **Web App Manifest (`manifest.json`):** Standalone display mode, `#0f172a` slate theme, and high-DPI vector icons ([pwa-192x192.svg](file:///c:/Users/danda/OneDrive/Desktop/Air-Pollution-XAI/frontend/public/pwa-192x192.svg) and [pwa-512x512.svg](file:///c:/Users/danda/OneDrive/Desktop/Air-Pollution-XAI/frontend/public/pwa-512x512.svg)).
+* **Offline Service Worker (`sw.js`):** Stale-while-revalidate caching for static assets and network-first proxying for real-time API queries.
+* **Install Prompts:** Listens to `beforeinstallprompt` event and surfaces an **Install App** button in both desktop header and mobile drawer.
+* **Vite Rollup Code Splitting:** Separated vendor bundles (`vendor-react`, `vendor-charts`, `vendor-icons`), dropping initial bundle transfer from $638\,\text{kB}$ to $268\,\text{kB}$ ($68\,\text{kB}$ gzip).
+* **External API Resilience:** Configured custom User-Agent headers, optional `OPEN_METEO_API_KEY` support, and graceful HTTP 429 rate-limit fallback utilizing nearby cached readings or regional baseline meteorology.
+
+---
+
+## Complete REST API Reference
+
+| Endpoint | Method | Role / Auth | Description |
+|:---|:---:|:---:|:---|
+| `/api/health` | `GET` | Public | System status, version, and model availability audit |
+| `/api/predict` | `POST` | Public | Predict PM2.5 with a specific model (`xgboost`, `random_forest`, `mlp`) |
+| `/api/compare` | `POST` | Public | Multi-model side-by-side inference benchmark |
+| `/api/explain` | `POST` | Public | SHAP local feature attributions and empirical source apportionment |
+| `/api/location/assess` | `POST` | Public | Real-time weather, CAMS PM2.5, SHAP, and validity assessment |
+| `/api/location/livability` | `POST` | Public | Comprehensive livability score ($0\text{--}100$), decision tier, and advice |
+| `/api/location/compare-livability` | `POST` | Public | Head-to-head livability and exposure comparison between two places |
+| `/api/auth/register` | `POST` | Public | Register new citizen account with email & password |
+| `/api/auth/login` | `POST` | Public | Authenticate user and receive JWT access & refresh tokens |
+| `/api/auth/refresh` | `POST` | Authenticated | Rotate expired access token using refresh token |
+| `/api/auth/me` | `GET` | Authenticated | Retrieve current user profile and role |
+| `/api/user/profile` | `GET`, `PUT` | Authenticated | Retrieve or update persistent health risk profile |
+| `/api/user/locations` | `GET`, `POST` | Authenticated | List or bookmark saved locations (`Home`, `Work`, etc.) |
+| `/api/user/locations/<id>` | `DELETE` | Authenticated | Remove a saved location bookmark |
+| `/api/user/history` | `GET`, `POST` | Authenticated | Retrieve paginated assessment history or record new assessment |
+| `/api/user/history/<id>` | `DELETE` | Authenticated | Remove an assessment history entry |
+| `/api/user/alerts` | `GET`, `PUT` | Authenticated | Retrieve active threshold breaches or update alert preference |
+| `/api/worker/field-tasks` | `GET` | `worker`, `admin` | Field maintenance task board and sensor calibration schedule |
+| `/api/worker/shift-advisories` | `GET` | `worker`, `admin` | Shift safety guidelines and exposure mitigation advisories |
+| `/api/admin/metrics` | `GET` | `admin` | Server uptime, memory footprint, cache stats, and request counts |
+| `/api/admin/system-status` | `GET` | `admin` | Active model health, memory residency, and cache invalidation |
+
+---
+
+## Test Verification & Quality Assurance
+
+* **Backend Unit & Integration Tests:** **84 passing tests in 7.09s** (`pytest backend/tests/ -v`)
+  * Data validation, boundary checks, and error responses: 13 tests
+  * Model inference and comparison parity: 11 tests
+  * SHAP additivity, TreeExplainer, and KernelExplainer: 4 tests
+  * Live location, weather conversion, rate limiting, and 429 fallback: 13 tests
+  * Livability engine, health profile tightening, and location comparison: 11 tests
+  * Role-Based Access Control and token validation: 12 tests
+  * User authentication, database persistence, and saved places CRUD: 8 tests
+  * End-to-end integration and CORS verification: 4 tests
+* **Frontend Unit Tests:** **13 passing test suites** (`npm test --prefix frontend`)
+  * Input parameter validation and clamping guards
+  * Demo mode security, role switcher gating, and 401 interceptor separation
+  * Authentication service and session persistence
+  * Livability and location comparison service methods
+* **Frontend Production Build:** Built cleanly in $4.34\text{s}$ with zero warnings via Vite and Rollup.
+
