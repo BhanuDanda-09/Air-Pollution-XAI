@@ -67,6 +67,22 @@ export const userService = {
       return null;
     }
   },
+
+  /**
+   * Retrieve active alert threshold and live threshold violations across saved places.
+   */
+  async getAlerts() {
+    const res = await api.get('/api/user/alerts');
+    return res;
+  },
+
+  /**
+   * Update user alert preferences (pm25_threshold, is_email_enabled).
+   */
+  async updateAlerts(preferences) {
+    const res = await api.put('/api/user/alerts', preferences);
+    return res?.preference;
+  },
 };
 
 export default userService;

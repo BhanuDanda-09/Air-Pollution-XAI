@@ -15,6 +15,9 @@ import {
   AlertCircle,
   ExternalLink,
   ShieldCheck,
+  Bell,
+  Sliders,
+  Check,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import userService from '../services/userService';
@@ -35,6 +38,12 @@ export default function SavedPlacesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Alert threshold state
+  const [threshold, setThreshold] = useState(100);
+  const [activeAlerts, setActiveAlerts] = useState([]);
+  const [thresholdSaved, setThresholdSaved] = useState(false);
+  const [thresholdLoading, setThresholdLoading] = useState(false);
+
   // Form state
   const [showAddForm, setShowAddForm] = useState(false);
   const [label, setLabel] = useState('Home');
@@ -47,6 +56,7 @@ export default function SavedPlacesPage() {
   useEffect(() => {
     if (isAuthenticated) {
       loadLocations();
+      loadAlerts();
     } else {
       setLoading(false);
     }
@@ -62,6 +72,37 @@ export default function SavedPlacesPage() {
       setError(err?.message || 'Failed to load saved locations.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAlerts = async () => {
+    try {
+      const res = await userService.getAlerts();
+      if (res) {
+        if (res.preference?.pm25_threshold) {
+          setThreshold(res.preference.pm25_threshold);
+        }
+        if (res.active_alerts) {
+          setActiveAlerts(res.active_alerts);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch alerts:', err);
+    }
+  };
+
+  const handleUpdateThreshold = async (e) => {
+    e.preventDefault();
+    setThresholdLoading(true);
+    try {
+      await userService.updateAlerts({ pm25_threshold: parseFloat(threshold) });
+      setThresholdSaved(true);
+      setTimeout(() => setThresholdSaved(false), 3000);
+      await loadAlerts();
+    } catch (err) {
+      setError(err?.message || 'Failed to update alert threshold.');
+    } finally {
+      setThresholdLoading(false);
     }
   };
 
@@ -308,6 +349,46 @@ export default function SavedPlacesPage() {
         </form>
       )}
 
+      {/* Threshold Alert Settings Bar */}
+      <form
+        onSubmit={handleUpdateThreshold}
+        className="p-4 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-amber-50 text-amber-700 shrink-0">
+            <Bell className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="font-bold text-slate-800">Safety Threshold Alert</div>
+            <p className="text-slate-500 text-[11px]">
+              Alerts you in navigation whenever live PM2.5 at any saved place exceeds this level.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="relative">
+            <input
+              type="number"
+              min="10"
+              max="500"
+              value={threshold}
+              onChange={(e) => setThreshold(e.target.value)}
+              className="w-24 pl-3 pr-8 py-1.5 rounded-xl border border-slate-200 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 font-medium">µg/m³</span>
+          </div>
+
+          <button
+            type="submit"
+            disabled={thresholdLoading}
+            className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold transition-all disabled:opacity-50"
+          >
+            {thresholdSaved ? 'Saved!' : thresholdLoading ? 'Saving...' : 'Update'}
+          </button>
+        </div>
+      </form>
+
       {/* Places Grid */}
       {loading ? (
         <div className="py-12 text-center text-slate-400">
@@ -360,6 +441,19 @@ export default function SavedPlacesPage() {
                       {loc.latitude.toFixed(4)}°N, {loc.longitude.toFixed(4)}°E
                     </span>
                   </div>
+
+                  {activeAlerts.some((a) => a.location_id === loc.id) && (
+                    <div className="mt-3 p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-semibold flex items-center gap-1.5">
+                      <Bell className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                      <span>
+                        PM2.5:{' '}
+                        {Math.round(
+                          activeAlerts.find((a) => a.location_id === loc.id)?.current_pm25 || 0
+                        )}{' '}
+                        µg/m³ (Exceeds {threshold} µg/m³)
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-100">

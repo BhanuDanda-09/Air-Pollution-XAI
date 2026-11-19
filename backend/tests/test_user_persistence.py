@@ -149,3 +149,48 @@ def test_unauthenticated_endpoints_rejected(client):
     assert client.post("/api/user/locations", json={"name": "Test"}).status_code == 401
     assert client.get("/api/user/history").status_code == 401
     assert client.post("/api/user/history", json={"latitude": 28.5, "longitude": 77.1}).status_code == 401
+    assert client.get("/api/user/alerts").status_code == 401
+    assert client.put("/api/user/alerts", json={"pm25_threshold": 90.0}).status_code == 401
+
+
+def test_alert_preferences_lifecycle(client, registered_auth):
+    """Test retrieving and updating user alert thresholds."""
+    headers = registered_auth["headers"]
+
+    # Default alert threshold
+    get_resp = client.get("/api/user/alerts", headers=headers)
+    assert get_resp.status_code == 200
+    body = get_resp.get_json()
+    assert body["preference"]["pm25_threshold"] == 100.0
+    assert "active_alerts" in body
+
+    # Update alert threshold
+    put_resp = client.put(
+        "/api/user/alerts",
+        headers=headers,
+        json={"pm25_threshold": 75.0, "is_email_enabled": True},
+    )
+    assert put_resp.status_code == 200
+    updated = put_resp.get_json()["preference"]
+    assert updated["pm25_threshold"] == 75.0
+    assert updated["is_email_enabled"] is True
+
+
+def test_alert_threshold_validation(client, registered_auth):
+    """Test boundary validation for alert threshold."""
+    headers = registered_auth["headers"]
+
+    # Threshold too low (< 10)
+    resp_low = client.put("/api/user/alerts", headers=headers, json={"pm25_threshold": 5.0})
+    assert resp_low.status_code == 400
+    assert resp_low.get_json()["error"]["code"] == "INVALID_THRESHOLD"
+
+    # Threshold too high (> 500)
+    resp_high = client.put("/api/user/alerts", headers=headers, json={"pm25_threshold": 999.0})
+    assert resp_high.status_code == 400
+    assert resp_high.get_json()["error"]["code"] == "INVALID_THRESHOLD"
+
+    # Non-numeric
+    resp_str = client.put("/api/user/alerts", headers=headers, json={"pm25_threshold": "low"})
+    assert resp_str.status_code == 400
+    assert resp_str.get_json()["error"]["code"] == "INVALID_THRESHOLD"

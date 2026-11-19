@@ -13,6 +13,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
+  Download,
+  Printer,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import userService from '../services/userService';
@@ -93,6 +96,46 @@ export default function HistoryPage() {
     );
   };
 
+  const exportToCSV = () => {
+    if (history.length === 0) return;
+    const headers = [
+      'Timestamp',
+      'Place Name',
+      'Latitude',
+      'Longitude',
+      'Reference PM2.5 (ug/m3)',
+      'Model Estimate PM2.5 (ug/m3)',
+      'Livability Score',
+      'Verdict',
+    ];
+    const rows = history.map((e) => [
+      `"${e.timestamp || ''}"`,
+      `"${(e.place_name || '').replace(/"/g, '""')}"`,
+      e.latitude,
+      e.longitude,
+      e.pm25_reference != null ? e.pm25_reference : '',
+      e.pm25_model != null ? e.pm25_model : '',
+      e.score != null ? e.score : '',
+      `"${e.verdict || ''}"`,
+    ]);
+    const csvContent =
+      'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute(
+      'download',
+      `air_pollution_exposure_history_${new Date().toISOString().slice(0, 10)}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="max-w-4xl mx-auto py-8">
@@ -157,14 +200,37 @@ export default function HistoryPage() {
           </p>
         </div>
 
-        <button
-          onClick={loadHistory}
-          disabled={loading}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors self-start sm:self-auto"
-        >
-          <RotateCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>Refresh</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          {history.length > 0 && (
+            <>
+              <button
+                onClick={exportToCSV}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold border border-blue-200 transition-colors"
+                title="Download exposure history as CSV"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Export CSV</span>
+              </button>
+              <button
+                onClick={handlePrint}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-colors"
+                title="Print Medical Consultation Summary"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Report</span>
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={loadHistory}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+          >
+            <RotateCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </div>
 
       {error && (

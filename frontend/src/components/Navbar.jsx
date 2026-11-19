@@ -18,10 +18,15 @@ import {
   User as UserIcon,
   LogOut,
   LogIn,
+  Bell,
+  BellRing,
+  AlertTriangle,
+  CheckCircle2,
 } from 'lucide-react';
 import RoleSwitcher from './RoleSwitcher';
 import { hasRoleAccess } from '../services/demoAuth';
 import { useAuth } from '../context/AuthContext';
+import userService from '../services/userService';
 
 export default function Navbar({ isBackendOnline }) {
   const navigate = useNavigate();
@@ -29,8 +34,11 @@ export default function Navbar({ isBackendOnline }) {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [alertsDropdownOpen, setAlertsDropdownOpen] = useState(false);
+  const [alertsData, setAlertsData] = useState({ active_alerts: [], preference: { pm25_threshold: 100 } });
   const [roleUpdated, setRoleUpdated] = useState(0);
   const dropdownRef = useRef(null);
+  const alertsRef = useRef(null);
 
   useEffect(() => {
     const onRoleChanged = () => setRoleUpdated((prev) => prev + 1);
@@ -38,11 +46,31 @@ export default function Navbar({ isBackendOnline }) {
     return () => window.removeEventListener('auth:role-changed', onRoleChanged);
   }, []);
 
-  // Close dropdown when clicking outside
+  // Fetch alerts for authenticated user
+  useEffect(() => {
+    if (isAuthenticated) {
+      userService
+        .getAlerts()
+        .then((res) => {
+          if (res) {
+            setAlertsData({
+              active_alerts: res.active_alerts || [],
+              preference: res.preference || { pm25_threshold: 100 },
+            });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isAuthenticated]);
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setUserDropdownOpen(false);
+      }
+      if (alertsRef.current && !alertsRef.current.contains(e.target)) {
+        setAlertsDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -143,7 +171,92 @@ export default function Navbar({ isBackendOnline }) {
 
             {/* User Account / Auth Actions */}
             {isAuthenticated ? (
-              <div className="relative" ref={dropdownRef}>
+              <>
+                {/* Alert Notification Bell */}
+                <div className="relative" ref={alertsRef}>
+                  <button
+                    onClick={() => setAlertsDropdownOpen(!alertsDropdownOpen)}
+                    className="relative p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
+                    title="Air Quality Threshold Alerts"
+                  >
+                    {alertsData.active_alerts.length > 0 ? (
+                      <BellRing className="w-4 h-4 text-amber-600 animate-pulse" />
+                    ) : (
+                      <Bell className="w-4 h-4 text-slate-500" />
+                    )}
+                    {alertsData.active_alerts.length > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-bold text-[10px] flex items-center justify-center shadow-xs">
+                        {alertsData.active_alerts.length}
+                      </span>
+                    )}
+                  </button>
+
+                  {alertsDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 py-3 z-50 animate-fadeIn">
+                      <div className="px-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <Bell className="w-4 h-4 text-blue-600" />
+                          <span className="text-xs font-bold text-navy-900">Saved Place Alerts</span>
+                        </div>
+                        <span className="text-[11px] text-slate-400">
+                          Threshold: {alertsData.preference.pm25_threshold} µg/m³
+                        </span>
+                      </div>
+
+                      <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                        {alertsData.active_alerts.length === 0 ? (
+                          <div className="p-4 text-center">
+                            <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-1.5" />
+                            <p className="text-xs font-semibold text-slate-800">Air Quality Safe</p>
+                            <p className="text-[11px] text-slate-500 mt-0.5">
+                              All your saved locations are currently below your {alertsData.preference.pm25_threshold} µg/m³ safety threshold.
+                            </p>
+                          </div>
+                        ) : (
+                          alertsData.active_alerts.map((alert) => (
+                            <div key={alert.location_id} className="p-3 hover:bg-slate-50/80 transition-colors">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex items-center gap-1.5">
+                                  <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                                  <span className="text-xs font-bold text-navy-900 truncate max-w-[170px]">
+                                    {alert.name}
+                                  </span>
+                                </div>
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                  +{alert.exceeded_by} µg/m³
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between mt-2 pt-1 text-[11px]">
+                                <span className="text-slate-500">
+                                  Current: <strong className="text-rose-600 font-semibold">{Math.round(alert.current_pm25)} µg/m³</strong>
+                                </span>
+                                <Link
+                                  to={`/live-assessment?lat=${alert.latitude}&lon=${alert.longitude}&name=${encodeURIComponent(alert.name)}`}
+                                  onClick={() => setAlertsDropdownOpen(false)}
+                                  className="text-blue-600 hover:text-blue-800 font-semibold"
+                                >
+                                  View Live →
+                                </Link>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+
+                      <div className="px-4 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                        <Link
+                          to="/saved-places"
+                          onClick={() => setAlertsDropdownOpen(false)}
+                          className="text-blue-600 hover:underline font-medium"
+                        >
+                          Manage Saved Places
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-all"
@@ -198,7 +311,8 @@ export default function Navbar({ isBackendOnline }) {
                   </div>
                 )}
               </div>
-            ) : (
+            </>
+          ) : (
               <button
                 onClick={() => openAuthModal('login')}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all"
