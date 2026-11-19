@@ -1,9 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Wind, Compass, MapPin, BarChart3, Activity, GitCompare, Sparkles, Info, Menu, X, ShieldAlert } from 'lucide-react';
+import {
+  Wind,
+  Compass,
+  MapPin,
+  BarChart3,
+  Activity,
+  GitCompare,
+  Sparkles,
+  Info,
+  Menu,
+  X,
+  Shield,
+  HardHat,
+} from 'lucide-react';
+import RoleSwitcher from './RoleSwitcher';
+import { hasRoleAccess, isDemoModeEnabled } from '../services/demoAuth';
 
 export default function Navbar({ isBackendOnline }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [roleUpdated, setRoleUpdated] = useState(0);
+
+  useEffect(() => {
+    const onRoleChanged = () => setRoleUpdated((prev) => prev + 1);
+    window.addEventListener('auth:role-changed', onRoleChanged);
+    return () => window.removeEventListener('auth:role-changed', onRoleChanged);
+  }, []);
 
   const navLinks = [
     { to: '/', label: 'Home', icon: Wind },
@@ -15,6 +37,10 @@ export default function Navbar({ isBackendOnline }) {
     { to: '/explainability', label: 'Explainability', icon: Sparkles },
     { to: '/about', label: 'About', icon: Info },
   ];
+
+  // Dynamic role-based routes for Worker and Admin
+  const canAccessWorker = hasRoleAccess('worker');
+  const canAccessAdmin = hasRoleAccess('admin');
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
@@ -57,10 +83,44 @@ export default function Navbar({ isBackendOnline }) {
                 </NavLink>
               );
             })}
+            {canAccessWorker && (
+              <NavLink
+                to="/worker"
+                className={({ isActive }) =>
+                  `flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                    isActive
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'text-blue-700 bg-blue-50/70 hover:bg-blue-100'
+                  }`
+                }
+              >
+                <HardHat className="w-3.5 h-3.5" />
+                <span>Worker</span>
+              </NavLink>
+            )}
+
+            {canAccessAdmin && (
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                    isActive
+                      ? 'bg-purple-100 text-purple-800'
+                      : 'text-purple-700 bg-purple-50/70 hover:bg-purple-100'
+                  }`
+                }
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span>Admin</span>
+              </NavLink>
+            )}
           </nav>
 
-          {/* Status Indicator & Mobile Toggle */}
+          {/* Status Indicator, Role Switcher & Mobile Toggle */}
           <div className="flex items-center gap-3">
+            {/* Demo Role Switcher (strictly gated behind VITE_ENABLE_DEMO_MODE) */}
+            <RoleSwitcher />
+
             <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
               <span
                 className={`w-2 h-2 rounded-full ${
@@ -104,6 +164,28 @@ export default function Navbar({ isBackendOnline }) {
               </NavLink>
             );
           })}
+
+          {canAccessWorker && (
+            <NavLink
+              to="/worker"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-bold text-blue-700 bg-blue-50"
+            >
+              <HardHat className="w-5 h-5 text-blue-600" />
+              <span>Worker Portal</span>
+            </NavLink>
+          )}
+
+          {canAccessAdmin && (
+            <NavLink
+              to="/admin"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-bold text-purple-700 bg-purple-50"
+            >
+              <Shield className="w-5 h-5 text-purple-600" />
+              <span>Admin Portal</span>
+            </NavLink>
+          )}
         </div>
       )}
     </header>

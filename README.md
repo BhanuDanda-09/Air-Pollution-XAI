@@ -493,6 +493,25 @@ The complete pipeline was verified against the standard capstone environmental t
 - **Render Web Service:**
   - `PORT`: Automatically set by Render
   - `FLASK_ENV`: `production`
-  - `ALLOWED_ORIGINS`: `https://<your-vercel-app>.vercel.app` (restricts CORS to frontend)
+  - `SECRET_KEY`: Cryptographic signing key for HS256 JWT tokens
+  - `ALLOWED_ORIGINS`: `https://air-pollution-xai.vercel.app` (restricts CORS to frontend)
+  - `ENABLE_DEMO_MODE`: `false` (defaults to disabled in production)
 - **Vercel Frontend:**
-  - `VITE_API_URL`: `https://<your-render-service>.onrender.com`
+  - `VITE_API_URL`: `https://air-pollution-xai.onrender.com`
+  - `VITE_ENABLE_DEMO_MODE`: `false` (production default; set to `true` only in development/viva presentation)
+
+---
+
+## Role-Based Access Control (RBAC) & Hardened Demo Mode
+
+The application implements a 3-tier Role-Based Access Control model:
+- **`citizen` (Default):** Public user access to Prediction, Live Assessment, Livability Scores, and Model Comparison.
+- **`worker`:** Access to Field Worker Task Boards, sensor maintenance windows, and shift safety advisories.
+- **`admin`:** Full administrative access to system health telemetry, active models, and cache invalidation.
+
+### Security Hardening Guarantees:
+1. **Production Gating:** When `VITE_ENABLE_DEMO_MODE=false`, all demo persona switchers, DEMO MODE banners, and one-click elevation buttons on `403 Unauthorized` are completely stripped from rendering.
+2. **Anti-Tampering Route Guard:** Route guards strictly inspect the environment flag. Manually setting `demo_role` or `demo_jwt_*` keys in `localStorage` fails to grant elevated worker or admin access when the flag is disabled.
+3. **Session Invalidation on 401:** The centralized Axios interceptor immediately clears user credentials and logs out real sessions upon encountering a `401 Unauthorized` token expiry response.
+4. **Backend Enforcement (403 Forbidden):** The Flask backend enforces `@require_role` on `/api/admin/*` and `/api/worker/*`, returning HTTP 403 Forbidden with structured error payloads whenever a citizen token attempts unauthorized access.
+

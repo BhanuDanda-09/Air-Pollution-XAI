@@ -14,6 +14,12 @@ Built with **React 18**, **Vite**, **Tailwind CSS**, **Chart.js**, and **Lucide 
 - **Indicative CPCB Health Bands:** Automatic classification into official CPCB 24-hr concentration ranges (*Good, Satisfactory, Moderate, Poor, Very Poor, Severe*) with health statements and regulatory disclaimers.
 - **Model Comparison Suite:** Compares Random Forest, tuned XGBoost, and Deep Learning (MLP) on user inputs while highlighting held-out test benchmarks ($R^2=0.7455$ for XGBoost).
 - **Explainable AI (SHAP) Visualizer:** Interactive horizontal bar charts illustrating exact local feature contributions ($\mu\text{g/m}^3$) pushing predictions higher or lower relative to the model baseline.
+- **Real-World Live Assessment & Livability Decision Engine:** Synthesizes live satellite meteorology, CAMS reference data, 24-hr forecasts, and health risk profiles into actionable verdicts (`Good to go`, `Take precautions`, `Avoid outdoor activity`, `Not recommended`).
+- **Role-Based Access Control (RBAC) & Hardened Evaluator Demo Mode:**
+  - Standard user roles: `citizen` (public), `worker` (field operations), `admin` (system diagnostics).
+  - Gated behind `VITE_ENABLE_DEMO_MODE`:
+    - Development: `VITE_ENABLE_DEMO_MODE=true` enables the top **DEMO MODE** banner, one-click persona switchers, and evaluator tools.
+    - Production: `VITE_ENABLE_DEMO_MODE=false` (default) ensures all demo code, persona buttons, and mock switchers are completely disabled and tree-shaken. Manual `localStorage` tampering cannot grant unauthorized access.
 - **Telemetry & Status Monitoring:** Live status indicators querying `/api/health` and `/api/models`.
 - **Zero Hallucination:** Directly parses actual JSON payloads from the Flask API without simulating or faking predictions.
 
@@ -102,6 +108,17 @@ VITE_API_URL=http://127.0.0.1:5000
 npm run dev
 ```
 Open your browser at `http://localhost:3000`.
+
+### 3.4 Environment Variables
+
+Create `.env` (or configure in Vercel project settings):
+
+| Variable | Dev Default | Production Default | Description |
+|:---|:---:|:---:|:---|
+| `VITE_API_URL` | `http://127.0.0.1:5000` | `https://air-pollution-xai.onrender.com` | Target backend REST API URL |
+| `VITE_ENABLE_DEMO_MODE` | `true` | `false` | Enables evaluator demo persona switchers & DEMO MODE banner |
+
+> **Security Rule:** When `VITE_ENABLE_DEMO_MODE` is `false` (default for production), all demo persona switchers, one-click elevation buttons, and mock store fallbacks are completely disabled and tree-shaken. Manual `localStorage` tampering with demo keys is rejected by route guards.
 
 ### 3.5 Running Unit Tests
 ```bash

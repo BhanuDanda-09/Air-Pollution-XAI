@@ -49,6 +49,11 @@ class Config:
     else:
         CORS_ALLOWED_ORIGINS = DEFAULT_ALLOWED_ORIGINS
 
+    # Security & Role-Based Access Control (RBAC) Settings
+    SECRET_KEY = os.getenv("SECRET_KEY", "air-pollution-xai-capstone-secret-key-2026")
+    JWT_EXPIRY_SECONDS = int(os.getenv("JWT_EXPIRY_SECONDS", 3600))
+    ENABLE_DEMO_MODE = os.getenv("ENABLE_DEMO_MODE", "false").lower() in ("1", "true", "yes")
+
     # Real-world Live Assessment & Geographic Validation Settings
     DELHI_NCR_BOUNDS = {
         "lat_min": 28.1,

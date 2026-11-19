@@ -2,8 +2,10 @@ import axios from 'axios';
 
 // Centralized API configuration using Vite environment variables with production fallback
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? 'https://air-pollution-xai.onrender.com' : 'http://127.0.0.1:5000');
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) ||
+  (typeof import.meta !== 'undefined' && import.meta.env?.PROD
+    ? 'https://air-pollution-xai.onrender.com'
+    : 'http://127.0.0.1:5000');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,10 +15,42 @@ const api = axios.create({
   },
 });
 
-// Response interceptor for consistent error extraction
+// Request interceptor: attach Authorization header if token exists
+api.interceptors.request.use(
+  (config) => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor for consistent error extraction and auth management
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    // 401 Unauthorized handling: distinct logic for real vs. demo sessions
+    if (error.response?.status === 401 && typeof window !== 'undefined' && window.localStorage) {
+      const isDemoSession = Boolean(localStorage.getItem('demo_role'));
+      if (!isDemoSession) {
+        // Real session: log out user and clear real credentials
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+        window.dispatchEvent(
+          new CustomEvent('auth:logout', { detail: { reason: 'session_expired' } })
+        );
+      } else {
+        // Demo session: do not wipe real user session, notify demo handler
+        window.dispatchEvent(
+          new CustomEvent('auth:demo-401', { detail: { error: error.response?.data } })
+        );
+      }
+    }
+
     let customMessage = 'An unexpected network error occurred. Please check backend connectivity.';
     let errorCode = 'NETWORK_ERROR';
     let errorDetails = null;
