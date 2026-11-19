@@ -2,6 +2,7 @@ import React from 'react';
 import usePrediction from '../hooks/usePrediction';
 import PredictionForm from '../components/PredictionForm';
 import SHAPExplanation from '../components/SHAPExplanation';
+import SourceAttributionBreakdown from '../components/SourceAttributionBreakdown';
 import ErrorMessage from '../components/ErrorMessage';
 import { Sparkles, HelpCircle, ShieldAlert, Cpu } from 'lucide-react';
 
@@ -75,10 +76,13 @@ export default function Explainability() {
         errors={validationErrors}
       />
 
-      {/* SHAP Explanation Output */}
+      {/* SHAP Explanation Output & Source Attribution */}
       {explanationResult && (
-        <section id="explanation-result">
+        <section id="explanation-result" className="space-y-6">
           <SHAPExplanation explanationData={explanationResult} />
+          {explanationResult.source_attribution && (
+            <SourceAttributionBreakdown attributionData={explanationResult.source_attribution} />
+          )}
         </section>
       )}
     </div>

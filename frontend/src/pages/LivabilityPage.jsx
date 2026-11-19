@@ -22,6 +22,7 @@ import LocationPicker from '../components/LocationPicker';
 import HealthProfileSelector from '../components/HealthProfileSelector';
 import LivabilityScoreCard from '../components/LivabilityScoreCard';
 import PersonaAdviceSection from '../components/PersonaAdviceSection';
+import SourceAttributionBreakdown from '../components/SourceAttributionBreakdown';
 import ColdStartNotice from '../components/ColdStartNotice';
 import livabilityService from '../services/livabilityService';
 import userService from '../services/userService';
@@ -271,6 +272,10 @@ export default function LivabilityPage() {
           />
 
           {assessmentData?.livability && <LivabilityScoreCard livabilityData={assessmentData.livability} />}
+
+          {assessmentData?.source_attribution && (
+            <SourceAttributionBreakdown attributionData={assessmentData.source_attribution} />
+          )}
 
           {assessmentData?.livability?.persona_guidance && (
             <PersonaAdviceSection personaGuidance={assessmentData.livability.persona_guidance} />

@@ -4,6 +4,7 @@ from flask import Blueprint, request
 from backend.config import Config
 from backend.routes.location_routes import get_client_ip, location_limiter
 from backend.services.air_quality_service import AirQualityService
+from backend.services.explanation_service import ExplanationService
 from backend.services.livability_service import LivabilityService
 from backend.services.prediction_service import PredictionService
 from backend.services.weather_service import WeatherService
@@ -57,6 +58,7 @@ def _assess_single_coordinates(lat: float, lon: float, health_profile: dict = No
             "has_out_of_training_range_inputs": weather_info["has_out_of_training_range_inputs"],
             "input_out_of_training_range_warnings": weather_info["input_out_of_training_range_warnings"],
         },
+        "source_attribution": ExplanationService.attribute_sources(features),
         "reference_air_quality": reference_info,
     }
 

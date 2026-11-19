@@ -213,6 +213,7 @@ def assess_location():
             "input_out_of_training_range_warnings": weather_info["input_out_of_training_range_warnings"],
         },
         "shap_attributions": shap_data,
+        "source_attribution": ExplanationService.attribute_sources(features),
         "scientific_disclaimers": {
             "regional_limitation": (
                 "This model was trained exclusively on historical Delhi meteorological monitoring data. "

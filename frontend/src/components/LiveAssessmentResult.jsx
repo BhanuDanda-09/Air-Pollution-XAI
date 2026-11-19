@@ -1,4 +1,5 @@
 import React from 'react';
+import SourceAttributionBreakdown from './SourceAttributionBreakdown';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -377,6 +378,11 @@ export default function LiveAssessmentResult({ assessmentData }) {
             })}
           </div>
         </div>
+      )}
+
+      {/* 6. Emission Source Apportionment Breakdown */}
+      {assessmentData?.source_attribution && (
+        <SourceAttributionBreakdown attributionData={assessmentData.source_attribution} />
       )}
     </div>
   );
