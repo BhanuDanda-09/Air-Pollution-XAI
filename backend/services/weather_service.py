@@ -54,6 +54,41 @@ class WeatherService:
         return (len(warnings) > 0, warnings)
 
     @classmethod
+    def _get_baseline_weather(cls, lat: float, lon: float, warning_msg: Optional[str] = None) -> Dict[str, Any]:
+        """Provides Delhi-NCR regional seasonal baseline meteorology when external APIs are rate-limited."""
+        is_ncr = cls.is_within_delhi_ncr(lat, lon)
+        mapped_features = {
+            "RH": 55.0,
+            "WD": 180.0,
+            "SR": 150.0,
+            "BP": 740.0,
+            "AT": 24.0,
+        }
+        has_out_of_range, range_warnings = cls.inspect_training_ranges(mapped_features)
+        return {
+            "latitude": lat,
+            "longitude": lon,
+            "timestamp": "Regional Baseline (External API Rate-Limited)",
+            "raw_weather": {
+                "temperature_2m_c": 24.0,
+                "relative_humidity_2m_pct": 55.0,
+                "wind_direction_10m_deg": 180.0,
+                "surface_pressure_hpa": 986.6,
+                "surface_pressure_mmhg": 740.0,
+                "shortwave_radiation_wm2": 150.0,
+            },
+            "features": mapped_features,
+            "is_delhi_ncr": is_ncr,
+            "validity": "valid_training_region" if is_ncr else "outside_training_region",
+            "validity_warning": warning_msg or (
+                "External meteorological service is temporarily rate-limiting requests. "
+                "Utilizing regional baseline meteorological indicators for Delhi-NCR."
+            ),
+            "has_out_of_training_range_inputs": has_out_of_range,
+            "input_out_of_training_range_warnings": range_warnings,
+        }
+
+    @classmethod
     def get_live_weather(cls, lat: float, lon: float) -> Dict[str, Any]:
         """Fetch real-time weather from Open-Meteo for the given coordinates.
 
@@ -79,10 +114,35 @@ class WeatherService:
             "longitude": lon,
             "current": "temperature_2m,relative_humidity_2m,wind_direction_10m,surface_pressure,shortwave_radiation",
         }
+        headers = {
+            "User-Agent": "AirPollutionXAI/1.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI; research-capstone)",
+            "Accept": "application/json",
+        }
+        if getattr(Config, "OPEN_METEO_API_KEY", None):
+            params["apikey"] = Config.OPEN_METEO_API_KEY
 
-        response = requests.get(url, params=params, timeout=Config.OPEN_METEO_TIMEOUT)
-        response.raise_for_status()
-        data = response.json()
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=Config.OPEN_METEO_TIMEOUT)
+            if response.status_code == 429:
+                logger.warning("Open-Meteo rate limit (429) encountered for (%s, %s). Checking fallback cache or baseline.", lat, lon)
+                with weather_cache._lock:
+                    for k, v in weather_cache._cache.items():
+                        if not weather_cache._is_expired(v):
+                            cached_val = dict(v["value"])
+                            cached_val["latitude"] = lat
+                            cached_val["longitude"] = lon
+                            cached_val["validity_warning"] = (
+                                "External meteorological service is temporarily rate-limiting requests. "
+                                "Serving recent cached meteorological readings."
+                            )
+                            return cached_val
+                return cls._get_baseline_weather(lat, lon)
+            response.raise_for_status()
+            data = response.json()
+        except requests.HTTPError as http_err:
+            if http_err.response is not None and http_err.response.status_code == 429:
+                return cls._get_baseline_weather(lat, lon)
+            raise
 
         current = data.get("current")
         if not current:

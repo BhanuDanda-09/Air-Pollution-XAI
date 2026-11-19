@@ -50,7 +50,14 @@ class AirQualityService:
                 "hourly": "pm2_5",
                 "forecast_days": 7,
             }
-            response = requests.get(url, params=params, timeout=Config.OPEN_METEO_TIMEOUT)
+            headers = {
+                "User-Agent": "AirPollutionXAI/1.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI; research-capstone)",
+                "Accept": "application/json",
+            }
+            if getattr(Config, "OPEN_METEO_API_KEY", None):
+                params["apikey"] = Config.OPEN_METEO_API_KEY
+
+            response = requests.get(url, params=params, headers=headers, timeout=Config.OPEN_METEO_TIMEOUT)
             response.raise_for_status()
             data = response.json()
             current = data.get("current", {})

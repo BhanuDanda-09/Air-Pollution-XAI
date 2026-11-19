@@ -64,6 +64,7 @@ class Config:
     OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
     OPEN_METEO_AIR_QUALITY_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
     OPEN_METEO_TIMEOUT = 6.0  # 6-second timeout (satisfies 5-8s constraint)
+    OPEN_METEO_API_KEY = os.getenv("OPEN_METEO_API_KEY", None)
     LOCATION_CACHE_TTL = 600   # 10 minutes cache validity
     LOCATION_CACHE_MAXSIZE = 256
     LOCATION_RATE_LIMIT_MAX = 30  # Max requests per minute per IP

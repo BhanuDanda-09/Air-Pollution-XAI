@@ -289,6 +289,41 @@ def test_weather_api_failure_returns_502(mock_get, client):
     assert body["error"]["code"] == "WEATHER_SERVICE_ERROR"
 
 
+def mock_weather_429_response(*args, **kwargs):
+    """Simulate external weather API returning HTTP 429 Too Many Requests while CAMS returns valid data."""
+    url = args[0] if args else kwargs.get("url", "")
+    mock_resp = MagicMock()
+    if "forecast" in url:
+        mock_resp.status_code = 429
+        return mock_resp
+
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "current": {
+            "time": "2026-11-16T12:00",
+            "pm2_5": 115.4,
+            "european_aqi": 75,
+            "us_aqi": 182,
+        },
+        "hourly": {
+            "time": ["2026-11-16T12:00"],
+            "pm2_5": [115.4],
+        },
+    }
+    return mock_resp
+
+
+@patch("requests.get", side_effect=mock_weather_429_response)
+def test_weather_api_429_rate_limit_fallback(mock_get, client):
+    """Verify that if Open-Meteo returns 429 rate limit, weather service falls back gracefully."""
+    res = client.post("/api/location/assess", json={"lat": 28.6139, "lon": 77.2090})
+    assert res.status_code == 200
+    body = res.get_json()
+    assert body["success"] is True
+    assert body["meteorological_inputs"]["features"]["AT"] == 24.0
+    assert "rate-limiting" in body["location"]["validity_warning"].lower()
+
+
 def test_location_assess_validation_errors(client):
     """Verify request validation for missing, invalid, or out-of-bounds coordinates."""
     # Empty body
