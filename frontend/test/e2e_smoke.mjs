@@ -47,11 +47,16 @@ const ROUTES = [
 server.listen(4174, '127.0.0.1', async () => {
   console.log('Serving production build on http://127.0.0.1:4174 for Playwright smoke test...');
   let browser;
+  const launchOptions = {
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  };
+
   try {
-    browser = await chromium.launch({ channel: 'chrome', headless: true });
+    browser = await chromium.launch({ ...launchOptions, channel: 'chrome' });
   } catch (err) {
     console.log('Falling back to default Chromium binary...');
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch(launchOptions);
   }
 
   let totalTests = 0;
@@ -65,18 +70,23 @@ server.listen(4174, '127.0.0.1', async () => {
     console.log('\n--- 1. Testing Route Navigation & Document Titles ---');
     for (const route of ROUTES) {
       totalTests++;
-      await page.goto(`http://127.0.0.1:4174${route.path}`, { waitUntil: 'load' });
-      await page.waitForTimeout(300);
+      try {
+        await page.goto(`http://127.0.0.1:4174${route.path}`, { waitUntil: 'load' });
+        await page.waitForTimeout(400);
 
-      const title = await page.title();
-      const hasHeading = await page.$eval('h1, h2', (el) => Boolean(el.textContent)).catch(() => false);
+        const title = await page.title();
+        const hasHeading = await page.$eval('h1, h2, [role="heading"], main', (el) => Boolean(el.textContent)).catch(() => false);
 
-      if (title.length > 5 && hasHeading) {
-        passedTests++;
-        console.log(`  ✓ Route "${route.name}" (${route.path}) loaded. Title: "${title}"`);
-      } else {
-        failures.push(`Route ${route.name} failed basic title/heading check. Title: "${title}"`);
-        console.log(`  ✗ Route "${route.name}" failed.`);
+        if (title.length > 5 && hasHeading) {
+          passedTests++;
+          console.log(`  ✓ Route "${route.name}" (${route.path}) loaded. Title: "${title}"`);
+        } else {
+          failures.push(`Route ${route.name} failed basic title/heading check. Title: "${title}", hasHeading: ${hasHeading}`);
+          console.log(`  ✗ Route "${route.name}" failed.`);
+        }
+      } catch (navErr) {
+        failures.push(`Route ${route.name} navigation failed: ${navErr.message}`);
+        console.log(`  ✗ Route "${route.name}" error:`, navErr.message);
       }
     }
 

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, X, Sparkles } from 'lucide-react';
 
 export default function ServiceWorkerToast() {
   const [waitingWorker, setWaitingWorker] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const isUpdatingRef = useRef(false);
 
   useEffect(() => {
     // Listen for custom SW update event dispatched by main.jsx
@@ -18,7 +19,7 @@ export default function ServiceWorkerToast() {
 
     window.addEventListener('sw-update-available', handleUpdateAvailable);
 
-    // Also check directly on mount if navigator.serviceWorker has a waiting worker
+    // Check directly on mount if navigator.serviceWorker has an update waiting
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistration().then((reg) => {
         if (reg && reg.waiting) {
@@ -27,14 +28,19 @@ export default function ServiceWorkerToast() {
         }
       });
 
-      // Reload page once new service worker has taken control
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          refreshing = true;
+      // Reload page ONLY when update was explicitly initiated by user
+      const onControllerChange = () => {
+        if (isUpdatingRef.current) {
           window.location.reload();
         }
-      });
+      };
+
+      navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+
+      return () => {
+        window.removeEventListener('sw-update-available', handleUpdateAvailable);
+        navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+      };
     }
 
     return () => {
@@ -44,6 +50,7 @@ export default function ServiceWorkerToast() {
 
   const handleUpdate = () => {
     setIsUpdating(true);
+    isUpdatingRef.current = true;
     if (waitingWorker) {
       waitingWorker.postMessage({ type: 'SKIP_WAITING' });
     } else {
@@ -59,7 +66,7 @@ export default function ServiceWorkerToast() {
     <div
       role="alert"
       aria-live="polite"
-      className="fixed bottom-5 right-5 z-50 max-w-sm p-4 bg-slate-900 dark:bg-slate-800 text-white rounded-xl shadow-2xl border border-blue-500/30 flex items-start gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300"
+      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-5 sm:max-w-sm z-50 p-4 bg-slate-900 dark:bg-slate-800 text-white rounded-xl shadow-2xl border border-blue-500/30 flex items-start gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300"
     >
       <div className="p-2 bg-blue-600/20 text-blue-400 rounded-lg shrink-0 mt-0.5">
         <Sparkles className="w-5 h-5 text-blue-400" />
