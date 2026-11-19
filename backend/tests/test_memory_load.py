@@ -5,19 +5,27 @@ and that assessment requests do not cause cumulative memory leaks.
 """
 
 import os
-import psutil
 import pytest
+try:
+    import psutil
+except ImportError:
+    psutil = None
 from backend.app import create_app
 
 
 def get_current_memory_mb() -> float:
     """Return current process resident memory (RSS) in megabytes."""
+    if psutil is None:
+        return 0.0
     process = psutil.Process(os.getpid())
     return process.memory_info().rss / (1024 * 1024)
 
 
 def test_memory_under_assessment_load():
     """Load test assessment endpoints and verify RSS stability under load."""
+    if psutil is None:
+        pytest.skip("psutil is not installed; skipping memory load test")
+
     app = create_app()
     app.config["TESTING"] = True
     client = app.test_client()
