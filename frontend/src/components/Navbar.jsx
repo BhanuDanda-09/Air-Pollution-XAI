@@ -22,6 +22,7 @@ import {
   BellRing,
   AlertTriangle,
   CheckCircle2,
+  Download,
 } from 'lucide-react';
 import RoleSwitcher from './RoleSwitcher';
 import { hasRoleAccess } from '../services/demoAuth';
@@ -37,8 +38,30 @@ export default function Navbar({ isBackendOnline }) {
   const [alertsDropdownOpen, setAlertsDropdownOpen] = useState(false);
   const [alertsData, setAlertsData] = useState({ active_alerts: [], preference: { pm25_threshold: 100 } });
   const [roleUpdated, setRoleUpdated] = useState(0);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isInstallable, setIsInstallable] = useState(false);
   const dropdownRef = useRef(null);
   const alertsRef = useRef(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setIsInstallable(false);
+    }
+    setDeferredPrompt(null);
+  };
 
   useEffect(() => {
     const onRoleChanged = () => setRoleUpdated((prev) => prev + 1);
@@ -322,6 +345,18 @@ export default function Navbar({ isBackendOnline }) {
               </button>
             )}
 
+            {/* Install PWA Prompt Button */}
+            {isInstallable && (
+              <button
+                onClick={handleInstallClick}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold border border-blue-200 transition-all shadow-xs"
+                title="Install AirXAI App to your Home Screen"
+              >
+                <Download className="w-3.5 h-3.5 text-blue-600" />
+                <span className="hidden sm:inline">Install</span>
+              </button>
+            )}
+
             {/* Backend status indicator */}
             <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
               <span
@@ -386,6 +421,19 @@ export default function Navbar({ isBackendOnline }) {
               <Shield className="w-4 h-4 text-purple-600" />
               <span>Admin Portal</span>
             </NavLink>
+          )}
+
+          {isInstallable && (
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleInstallClick();
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-blue-700 bg-blue-50 border border-blue-200 mt-2"
+            >
+              <Download className="w-4 h-4 text-blue-600" />
+              <span>Install Web App</span>
+            </button>
           )}
         </div>
       )}

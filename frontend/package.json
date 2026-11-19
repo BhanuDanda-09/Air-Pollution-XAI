@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node test/validation.test.js && node test/demo_security.test.js && node test/auth_user.test.js"
+    "test": "node test/validation.test.js && node test/demo_security.test.js && node test/auth_user.test.js && node test/livability.test.js"
   },
   "dependencies": {
     "axios": "^1.7.9",

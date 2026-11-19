@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="112" fill="#0f172a"/>
+  <!-- Decorative background glow -->
+  <circle cx="256" cy="256" r="170" fill="#38bdf8" fill-opacity="0.08"/>
+  <!-- Air/Wind flowing streams -->
+  <path d="M112 176h176a48 48 0 1 0-48-48" stroke="#38bdf8" stroke-width="36" stroke-linecap="round"/>
+  <path d="M96 256h256a56 56 0 1 1-56 56" stroke="#0ea5e9" stroke-width="36" stroke-linecap="round"/>
+  <path d="M128 352h128a40 40 0 1 0-40-40" stroke="#10b981" stroke-width="36" stroke-linecap="round"/>
+</svg>
