@@ -1,5 +1,9 @@
 import { useEffect } from 'react';
 
+const BASE_URL = 'https://air-pollution-xai.vercel.app';
+const OG_IMAGE_URL = `${BASE_URL}/og-image.png`;
+const OG_IMAGE_ALT = 'Pollution XAI - Live Air Quality Assessment & Explainable PM2.5 Intelligence';
+
 const PAGE_META = {
   '/': {
     title: 'Pollution XAI | Is The Air Safe Where You Are?',
@@ -47,27 +51,62 @@ const PAGE_META = {
   },
 };
 
+function setOrCreateMeta(selector, attribute, value) {
+  let el = document.querySelector(selector);
+  if (!el) {
+    el = document.createElement('meta');
+    const [attrName, attrVal] = selector.replace('meta[', '').replace(']', '').split('=');
+    el.setAttribute(attrName, attrVal.replace(/['"]/g, ''));
+    document.head.appendChild(el);
+  }
+  el.setAttribute(attribute, value);
+}
+
+function setOrCreateLink(rel, href) {
+  let link = document.querySelector(`link[rel="${rel}"]`);
+  if (!link) {
+    link = document.createElement('link');
+    link.setAttribute('rel', rel);
+    document.head.appendChild(link);
+  }
+  link.setAttribute('href', href);
+}
+
 export function usePageMeta(pathname) {
   useEffect(() => {
-    const meta = PAGE_META[pathname] || {
+    // Normalize path (handle trailing slashes or subpaths)
+    const normalizedPath = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+    const meta = PAGE_META[normalizedPath] || {
       title: 'Pollution XAI | Explainable Air Quality Intelligence',
       description: 'Real-time air quality diagnostics and explainable AI for Delhi-NCR.',
     };
 
+    const currentUrl = `${BASE_URL}${normalizedPath === '/' ? '' : normalizedPath}`;
+
+    // 1. Ensure <title>, og:title, and twitter:title are IDENTICAL
     document.title = meta.title;
+    setOrCreateMeta('meta[property="og:title"]', 'content', meta.title);
+    setOrCreateMeta('meta[name="twitter:title"]', 'content', meta.title);
 
-    // Update meta description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) {
-      metaDesc.setAttribute('content', meta.description);
-    }
+    // 2. Ensure meta description, og:description, and twitter:description are IDENTICAL
+    setOrCreateMeta('meta[name="description"]', 'content', meta.description);
+    setOrCreateMeta('meta[property="og:description"]', 'content', meta.description);
+    setOrCreateMeta('meta[name="twitter:description"]', 'content', meta.description);
 
-    // Update Open Graph tags
-    let ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute('content', meta.title);
+    // 3. Update canonical link and URLs
+    setOrCreateLink('canonical', currentUrl || BASE_URL);
+    setOrCreateMeta('meta[property="og:url"]', 'content', currentUrl || BASE_URL);
+    setOrCreateMeta('meta[name="twitter:url"]', 'content', currentUrl || BASE_URL);
 
-    let ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute('content', meta.description);
+    // 4. Set og:image and twitter:image (1200x630 branded card)
+    setOrCreateMeta('meta[property="og:image"]', 'content', OG_IMAGE_URL);
+    setOrCreateMeta('meta[property="og:image:width"]', 'content', '1200');
+    setOrCreateMeta('meta[property="og:image:height"]', 'content', '630');
+    setOrCreateMeta('meta[property="og:image:alt"]', 'content', OG_IMAGE_ALT);
+
+    setOrCreateMeta('meta[name="twitter:card"]', 'content', 'summary_large_image');
+    setOrCreateMeta('meta[name="twitter:image"]', 'content', OG_IMAGE_URL);
+    setOrCreateMeta('meta[name="twitter:image:alt"]', 'content', OG_IMAGE_ALT);
   }, [pathname]);
 }
 

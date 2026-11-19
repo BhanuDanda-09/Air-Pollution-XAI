@@ -134,4 +134,66 @@ Before approving the final `git push` to `origin/main`, the following production
 - [x] **Accessible Mobile Drawer:** 44px tap targets, focus trapping, and active-route background highlighting.
 - [x] **Render Cold-Start Protection:** Dedicated `/health` endpoint created for UptimeRobot / cron-job.org 10-minute pingers.
 - [x] **Strict Production Security:** Demo personas gated behind `VITE_ENABLE_DEMO_MODE=false`; security headers configured in `vercel.json`.
-- [x] **Git Remote Safeguard:** Working directory clean; **no push executed** pending final user confirmation.
+- [x] **Branded Open Graph & Twitter Cards:** 1200x630 branded image `og-image.png` deployed with alt text, identical `<title>`, `og:title`, and `twitter:title`.
+- [x] **Dynamic Per-Route Metadata & Canonical Links:** Synced across all 11 routes in `usePageMeta.js`.
+- [x] **PWA Installability & Asset Suite:** `manifest.json`, theme-color `#0f172a`, `apple-touch-icon.png`, and 192/512 PNG icons validated.
+- [x] **Hardened Service Worker & Update Toast:** `sw.js` prevents stale API and build caching; `ServiceWorkerToast.jsx` provides refresh flow.
+- [x] **Production Build Playwright Verification:** 44 screenshots captured across all 11 routes at 360px and 1920px in light and dark modes.
+- [x] **Git Remote Safeguard:** Verified build and test suites pass locally; ready for staging and production sync.
+
+---
+
+## 7. Production Visual Screenshot Gallery & Head Metadata Audit
+
+Following the head metadata synchronization, Open Graph branding, and service worker hardening, an automated Playwright audit was executed directly against the **production build** (`http://127.0.0.1:4174`, served from `frontend/dist`).
+
+### 7.1 Head Metadata & Open Graph Audit Results
+
+| Tag Specification | Audit Requirement | Production Implementation | Verification Result |
+|:---|:---|:---|:---:|
+| **Branded Social Share Image** | 1200x630 PNG in `/public` with alt text | `og-image.png` (1200x630, branded dark gradient, XAI badge, metric pills) + `og:image:alt` | **PASS (100%)** |
+| **Title Parity Enforcement** | `<title> === og:title === twitter:title` | Centralized `usePageMeta.js` synchronizes all three elements synchronously per route | **PASS (11/11 routes)** |
+| **Canonical Link** | Dynamic `<link rel="canonical" href="...">` | Injected into `<head>` matching absolute route URL (`https://air-pollution-xai.vercel.app{path}`) | **PASS (11/11 routes)** |
+| **PWA Installability** | Valid manifest, theme color, touch & home icons | `manifest.json`, `theme-color: #0f172a`, `apple-touch-icon.png` (180x180), `pwa-192x192.png`, `pwa-512x512.png` | **PASS (100%)** |
+| **Service Worker Freshness** | Zero stale API cache, zero stale build cache | Network-first navigation (`request.mode === 'navigate'`), bypass for `/api/`, `onrender.com`, `open-meteo.com` | **PASS (`air-xai-v2`)** |
+| **Update Available Toast** | User notification on new build detection | `ServiceWorkerToast.jsx` (`role="alert"`) with instant "Refresh Now" (`SKIP_WAITING`) trigger | **PASS (Functional)** |
+
+---
+
+### 7.2 Production Route Visual Gallery (360px Mobile & 1920px Desktop)
+
+All 44 screenshots were captured on the optimized Vite production bundle across both Light and Dark color schemes:
+
+| Route Path | Exact Document & OG Title | 360px Mobile (Light / Dark) | 1920px Desktop (Light / Dark) | Layout & Overflow Status |
+|:---|:---|:---:|:---:|:---:|
+| **Home (`/`)** | `Pollution XAI \| Is The Air Safe Where You Are?` | [360px Light](audit_screenshots/prod_home_360px_light.png) <br> [360px Dark](audit_screenshots/prod_home_360px_dark.png) | [1920px Light](audit_screenshots/prod_home_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_home_1920px_dark.png) | 0px Overflow (Pass) |
+| **Live Assessment (`/live-assessment`)** | `Live Air Quality Assessment \| Pollution XAI` | [360px Light](audit_screenshots/prod_live-assessment_360px_light.png) <br> [360px Dark](audit_screenshots/prod_live-assessment_360px_dark.png) | [1920px Light](audit_screenshots/prod_live-assessment_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_live-assessment_1920px_dark.png) | 0px Overflow (Pass) |
+| **Livability (`/livability`)** | `Residential Livability Index & Comparison \| Pollution XAI` | [360px Light](audit_screenshots/prod_livability_360px_light.png) <br> [360px Dark](audit_screenshots/prod_livability_360px_dark.png) | [1920px Light](audit_screenshots/prod_livability_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_livability_1920px_dark.png) | 0px Overflow (Pass) |
+| **Saved Places (`/saved-places`)** | `Saved Places & Custom PM2.5 Alerts \| Pollution XAI` | [360px Light](audit_screenshots/prod_saved-places_360px_light.png) <br> [360px Dark](audit_screenshots/prod_saved-places_360px_dark.png) | [1920px Light](audit_screenshots/prod_saved-places_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_saved-places_1920px_dark.png) | 0px Overflow (Pass) |
+| **History (`/history`)** | `Personal Exposure & Assessment History \| Pollution XAI` | [360px Light](audit_screenshots/prod_history_360px_light.png) <br> [360px Dark](audit_screenshots/prod_history_360px_dark.png) | [1920px Light](audit_screenshots/prod_history_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_history_1920px_dark.png) | 0px Overflow (Pass) |
+| **Dashboard (`/dashboard`)** | `Model Telemetry & System Dashboard \| Pollution XAI` | [360px Light](audit_screenshots/prod_dashboard_360px_light.png) <br> [360px Dark](audit_screenshots/prod_dashboard_360px_dark.png) | [1920px Light](audit_screenshots/prod_dashboard_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_dashboard_1920px_dark.png) | 0px Overflow (Pass) |
+| **Prediction (`/prediction`)** | `Surface Meteorology PM2.5 Prediction \| Pollution XAI` | [360px Light](audit_screenshots/prod_prediction_360px_light.png) <br> [360px Dark](audit_screenshots/prod_prediction_360px_dark.png) | [1920px Light](audit_screenshots/prod_prediction_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_prediction_1920px_dark.png) | 0px Overflow (Pass) |
+| **Comparison (`/comparison`)** | `Multi-Model Performance Benchmarking \| Pollution XAI` | [360px Light](audit_screenshots/prod_comparison_360px_light.png) <br> [360px Dark](audit_screenshots/prod_comparison_360px_dark.png) | [1920px Light](audit_screenshots/prod_comparison_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_comparison_1920px_dark.png) | 0px Overflow (Pass) |
+| **Explainability (`/explainability`)** | `Explainable AI & SHAP Local Attributions \| Pollution XAI` | [360px Light](audit_screenshots/prod_explainability_360px_light.png) <br> [360px Dark](audit_screenshots/prod_explainability_360px_dark.png) | [1920px Light](audit_screenshots/prod_explainability_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_explainability_1920px_dark.png) | 0px Overflow (Pass) |
+| **About (`/about`)** | `About the Capstone Project \| Pollution XAI` | [360px Light](audit_screenshots/prod_about_360px_light.png) <br> [360px Dark](audit_screenshots/prod_about_360px_dark.png) | [1920px Light](audit_screenshots/prod_about_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_about_1920px_dark.png) | 0px Overflow (Pass) |
+| **404 Page (`/404`)** | `404 Page Not Found \| Pollution XAI` | [360px Light](audit_screenshots/prod_404_360px_light.png) <br> [360px Dark](audit_screenshots/prod_404_360px_dark.png) | [1920px Light](audit_screenshots/prod_404_1920px_light.png) <br> [1920px Dark](audit_screenshots/prod_404_1920px_dark.png) | 0px Overflow (Pass) |
+
+---
+
+### 7.3 Service Worker & Progressive Web App Technical Verification
+
+1. **Stale Cache Elimination:**
+   - Previous versions of service workers caching `index.html` via Stale-While-Revalidate often prevented users from seeing new Vite bundle deployments until multiple reloads.
+   - The hardened `air-xai-v2` service worker enforces **Network-First** for navigation mode (`request.mode === 'navigate'`). It fetches the latest production HTML from the network, only falling back to the precached shell if completely offline.
+   - All dynamic API calls matching `/api/`, `onrender.com`, `open-meteo.com`, or `openstreetmap.org` bypass the service worker cache entirely (`fetch(event.request)`).
+
+2. **User-Controlled Service Worker Activation:**
+   - Instead of aggressively calling `self.skipWaiting()` which can break in-flight module loads across lazy chunks, the worker installs in the background and waits until the user approves or refreshes.
+   - `ServiceWorkerToast.jsx` listens for new worker discovery and presents a non-intrusive floating card:
+     ```html
+     <div role="alert" aria-live="assertive" class="fixed bottom-4 right-4 z-50 ...">
+       <p class="font-medium text-sm">Update Available</p>
+       <button class="bg-primary text-white ...">Refresh Now</button>
+     </div>
+     ```
+   - Clicking "Refresh Now" sends `{ type: 'SKIP_WAITING' }` to the waiting worker, which calls `self.skipWaiting()`. The client listens to `navigator.serviceWorker.oncontrollerchange` to reload the tab cleanly.

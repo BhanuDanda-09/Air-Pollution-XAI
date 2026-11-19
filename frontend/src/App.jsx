@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import AuthModal from './components/AuthModal';
+import ServiceWorkerToast from './components/ServiceWorkerToast';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import DemoBanner from './components/DemoBanner';
@@ -57,6 +58,7 @@ export default function App() {
             <DemoBanner />
             <Navbar isBackendOnline={isBackendOnline} />
             <AuthModal />
+            <ServiceWorkerToast />
 
             <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
               <Suspense fallback={<PageSkeleton variant="generic" className="py-6" />}>
