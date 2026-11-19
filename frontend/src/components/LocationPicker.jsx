@@ -315,22 +315,24 @@ export default function LocationPicker({
         </div>
       </div>
 
-      {/* Interactive OpenStreetMap Picker (Lazy Loaded) */}
+      {/* Interactive OpenStreetMap Picker (Lazy Loaded with overflow protection) */}
       {showMap && (
-        <Suspense
-          fallback={
-            <div className="mt-4 h-64 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-400 text-xs">
-              <Loader2 className="w-4 h-4 animate-spin text-blue-500 mr-2" />
-              Loading Map View...
-            </div>
-          }
-        >
-          <MapPicker
-            latitude={latitude}
-            longitude={longitude}
-            onLocationChange={onLocationChange}
-          />
-        </Suspense>
+        <div className="overflow-hidden rounded-2xl w-full max-w-full">
+          <Suspense
+            fallback={
+              <div className="mt-4 h-64 flex items-center justify-center bg-slate-50 border border-slate-200 rounded-xl text-slate-400 text-xs">
+                <Loader2 className="w-4 h-4 animate-spin text-blue-500 mr-2" />
+                Loading Map View...
+              </div>
+            }
+          >
+            <MapPicker
+              latitude={latitude}
+              longitude={longitude}
+              onLocationChange={onLocationChange}
+            />
+          </Suspense>
+        </div>
       )}
     </div>
   );

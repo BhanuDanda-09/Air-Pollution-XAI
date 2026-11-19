@@ -4,6 +4,7 @@ import {
   MapPin,
   Plus,
   Trash2,
+  Edit2,
   Navigation,
   Compass,
   Home,
@@ -18,9 +19,15 @@ import {
   Bell,
   Sliders,
   Check,
+  Search,
+  X,
+  RotateCw,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import userService from '../services/userService';
+import PageSkeleton from '../components/PageSkeleton';
+import ColdStartNotice from '../components/ColdStartNotice';
+import ErrorMessage from '../components/ErrorMessage';
 
 const LABEL_ICONS = {
   Home: Home,
@@ -38,6 +45,9 @@ export default function SavedPlacesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Search filter
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Alert threshold state
   const [threshold, setThreshold] = useState(100);
   const [activeAlerts, setActiveAlerts] = useState([]);
@@ -52,6 +62,16 @@ export default function SavedPlacesPage() {
   const [longitude, setLongitude] = useState('');
   const [gpsLoading, setGpsLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+
+  // Edit state
+  const [editingLocation, setEditingLocation] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editLabel, setEditLabel] = useState('Home');
+  const [editLoading, setEditLoading] = useState(false);
+
+  // Delete confirmation state
+  const [locationToDelete, setLocationToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -155,12 +175,42 @@ export default function SavedPlacesPage() {
     }
   };
 
-  const handleDeleteLocation = async (id) => {
+  const openEditModal = (loc) => {
+    setEditingLocation(loc);
+    setEditName(loc.name);
+    setEditLabel(loc.label || 'Home');
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editingLocation || !editName.trim()) return;
+
+    setEditLoading(true);
     try {
-      await userService.deleteSavedLocation(id);
-      setLocations((prev) => prev.filter((loc) => loc.id !== id));
+      await userService.updateSavedLocation(editingLocation.id, {
+        name: editName.trim(),
+        label: editLabel,
+      });
+      setEditingLocation(null);
+      await loadLocations();
+    } catch (err) {
+      setError(err?.message || 'Failed to update place.');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const confirmDeleteLocation = async () => {
+    if (!locationToDelete) return;
+    setDeleteLoading(true);
+    try {
+      await userService.deleteSavedLocation(locationToDelete.id);
+      setLocations((prev) => prev.filter((loc) => loc.id !== locationToDelete.id));
+      setLocationToDelete(null);
     } catch (err) {
       setError(err?.message || 'Failed to remove location.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -172,201 +222,218 @@ export default function SavedPlacesPage() {
     navigate(`/livability?lat=${loc.latitude}&lon=${loc.longitude}&name=${encodeURIComponent(loc.name)}`);
   };
 
+  const filteredLocations = locations.filter((loc) => {
+    const q = searchQuery.toLowerCase();
+    return loc.name?.toLowerCase().includes(q) || loc.label?.toLowerCase().includes(q);
+  });
+
   if (!isAuthenticated) {
     return (
       <div className="max-w-4xl mx-auto py-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden text-center p-8 md:p-12">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-5 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden text-center p-8 md:p-12">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-5 shadow-sm">
             <Bookmark className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight">
-            Saved Places & Quick Assessment
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 dark:text-white tracking-tight">
+            Saved Places & Custom Alerts
           </h1>
-          <p className="mt-3 text-slate-600 max-w-lg mx-auto text-sm leading-relaxed">
-            Bookmark your frequent destinations—such as Home, Workplace, School, or Outdoor Jogging spots—for instant 1-click exposure assessments.
+          <p className="mt-3 text-slate-600 dark:text-slate-400 max-w-lg mx-auto text-sm leading-relaxed">
+            Bookmark your frequent Delhi-NCR spots (Home, Office, University, Gym) to monitor localized air quality, receive automated PM2.5 threshold warnings, and run 1-click livability assessments.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto my-8 text-left">
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <div className="font-semibold text-slate-900 text-xs sm:text-sm mb-1">Instant 1-Click</div>
-              <p className="text-xs text-slate-500">Check live air quality and forecast without re-typing coordinates.</p>
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700">
+              <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs sm:text-sm mb-1">
+                1-Click Diagnostics
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Instant assessment for your regular coordinates without re-entering lat/lon.
+              </p>
             </div>
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <div className="font-semibold text-slate-900 text-xs sm:text-sm mb-1">Personalized Verdicts</div>
-              <p className="text-xs text-slate-500">Evaluates conditions against your customized health profile.</p>
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700">
+              <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs sm:text-sm mb-1">
+                Personalized Alerts
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Set a custom PM2.5 limit (e.g. 100 µg/m³) and get warned whenever safe thresholds are breached.
+              </p>
             </div>
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <div className="font-semibold text-slate-900 text-xs sm:text-sm mb-1">Cross-Device Sync</div>
-              <p className="text-xs text-slate-500">Access your bookmarked places from phone, tablet, or desktop.</p>
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700">
+              <div className="font-semibold text-slate-900 dark:text-slate-100 text-xs sm:text-sm mb-1">
+                Persistent Sync
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Bookmarks sync across your browser and mobile PWA via secure authentication.
+              </p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              onClick={() => openAuthModal('register')}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-500/20 transition-all"
-            >
-              Sign In or Register
-            </button>
-            <button
-              onClick={() => navigate('/live-assessment')}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-all"
-            >
-              Continue Guest Assessment
-            </button>
-          </div>
+          <button
+            onClick={() => openAuthModal('register')}
+            className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-500/20 transition-all"
+          >
+            Sign In or Register
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6 py-2">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 tracking-tight">Saved Places</h1>
-            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-              {locations.length} {locations.length === 1 ? 'place' : 'places'}
-            </span>
-          </div>
-          <p className="mt-1 text-sm text-slate-600">
-            One-click shortcuts to assess air quality, livability scores, and forecasts for your regular spots.
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 dark:text-white tracking-tight">
+            Saved Places
+          </h1>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+            Bookmark your frequent locations for 1-click diagnostics and automated PM2.5 threshold alerts.
           </p>
         </div>
 
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-500/20 transition-all self-start sm:self-auto"
+          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md shadow-blue-500/20 transition-all"
         >
-          <Plus className="w-4 h-4" />
-          <span>{showAddForm ? 'Close Form' : 'Add New Place'}</span>
+          {showAddForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          <span>{showAddForm ? 'Cancel' : 'Add New Place'}</span>
         </button>
       </div>
 
+      <ColdStartNotice isLoading={loading} />
+
       {error && (
-        <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm">
-          <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
-          <div className="flex-1 font-medium">{error}</div>
-        </div>
+        <ErrorMessage
+          title="Saved Places Notice"
+          message={error}
+          onRetry={loadLocations}
+        />
       )}
 
-      {/* Add New Place Form */}
+      {/* Add New Place Accordion Form */}
       {showAddForm && (
         <form
           onSubmit={handleAddLocation}
-          className="p-5 sm:p-6 bg-white rounded-2xl shadow-sm border border-blue-200 bg-gradient-to-b from-blue-50/30 to-white animate-fadeIn"
+          className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-900/60 shadow-md space-y-4 animate-fadeIn"
         >
-          <h2 className="text-base font-bold text-navy-900 mb-4 flex items-center gap-2">
-            <Bookmark className="w-4 h-4 text-blue-600" />
-            <span>Add a Favorite Place</span>
-          </h2>
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <Bookmark className="w-4 h-4 text-blue-600" />
+              <span>Bookmark a Location</span>
+            </h3>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Delhi-NCR region recommended</span>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Label</label>
+              <label htmlFor="place-name" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Place Name / Description
+              </label>
+              <input
+                id="place-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. My Apartment, Sector 62 Noida"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="place-label" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Category Label
+              </label>
               <select
+                id="place-label"
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="Home">Home</option>
-                <option value="Work">Work</option>
-                <option value="Campus">Campus / School</option>
+                <option value="Work">Work / Office</option>
+                <option value="Campus">University / School</option>
                 <option value="Gym">Gym / Sports</option>
                 <option value="Other">Other</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Place Name</label>
+              <label htmlFor="place-lat" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Latitude (°N)
+              </label>
               <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Cyber City, Gurugram"
-                className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Latitude</label>
-              <input
+                id="place-lat"
                 type="number"
-                step="any"
-                required
+                step="0.0001"
                 value={latitude}
                 onChange={(e) => setLatitude(e.target.value)}
-                placeholder="28.4595"
-                className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="28.6139"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Longitude</label>
+              <label htmlFor="place-lon" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Longitude (°E)
+              </label>
               <input
+                id="place-lon"
                 type="number"
-                step="any"
-                required
+                step="0.0001"
                 value={longitude}
                 onChange={(e) => setLongitude(e.target.value)}
-                placeholder="77.0266"
-                className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="77.2090"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                required
               />
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
               onClick={handleGetCurrentLocation}
               disabled={gpsLoading}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 transition-colors"
             >
-              <Navigation className={`w-3.5 h-3.5 ${gpsLoading ? 'animate-spin' : ''}`} />
-              <span>{gpsLoading ? 'Detecting GPS...' : 'Use My Current GPS'}</span>
+              <Navigation className="w-3.5 h-3.5 text-blue-600" />
+              <span>{gpsLoading ? 'Acquiring GPS...' : 'Use My Current GPS'}</span>
             </button>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setShowAddForm(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitLoading}
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-all"
-              >
-                {submitLoading ? 'Saving...' : 'Save Place'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={submitLoading}
+              className="w-full sm:w-auto px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm transition-all disabled:opacity-50"
+            >
+              {submitLoading ? 'Saving Location...' : 'Save Place'}
+            </button>
           </div>
         </form>
       )}
 
-      {/* Threshold Alert Settings Bar */}
+      {/* Alert Threshold Banner */}
       <form
         onSubmit={handleUpdateThreshold}
-        className="p-4 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+        className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-amber-50 text-amber-700 shrink-0">
+        <div className="flex items-start gap-3">
+          <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 shrink-0">
             <Bell className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-bold text-slate-800">Safety Threshold Alert</div>
-            <p className="text-slate-500 text-[11px]">
-              Alerts you in navigation whenever live PM2.5 at any saved place exceeds this level.
+            <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+              PM2.5 Pollution Alert Threshold
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Highlights your saved locations in amber/rose whenever live Copernicus CAMS PM2.5 exceeds this limit.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-auto">
+        <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
           <div className="relative">
             <input
               type="number"
@@ -374,99 +441,140 @@ export default function SavedPlacesPage() {
               max="500"
               value={threshold}
               onChange={(e) => setThreshold(e.target.value)}
-              className="w-24 pl-3 pr-8 py-1.5 rounded-xl border border-slate-200 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-24 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-bold text-right pr-12 focus:ring-2 focus:ring-blue-500 outline-none"
+              aria-label="PM2.5 threshold value in micrograms per cubic meter"
             />
-            <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 font-medium">µg/m³</span>
+            <span className="absolute right-2.5 top-2 text-[11px] text-slate-400 font-medium pointer-events-none">
+              µg/m³
+            </span>
           </div>
 
           <button
             type="submit"
             disabled={thresholdLoading}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold transition-all disabled:opacity-50"
+            className="px-3.5 py-1.5 rounded-xl bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-semibold text-xs transition-all disabled:opacity-50"
           >
             {thresholdSaved ? 'Saved!' : thresholdLoading ? 'Saving...' : 'Update'}
           </button>
         </div>
       </form>
 
+      {/* Filter / Search Bar */}
+      {locations.length > 0 && (
+        <div className="relative">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Filter saved places by name or category..."
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 outline-none transition-colors"
+            aria-label="Filter saved places"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-slate-600"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Places Grid */}
       {loading ? (
-        <div className="py-12 text-center text-slate-400">
-          <div className="inline-block w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-2" />
-          <p className="text-xs">Loading saved places...</p>
-        </div>
+        <PageSkeleton variant="table" />
       ) : locations.length === 0 ? (
-        <div className="p-8 text-center bg-white rounded-2xl border border-slate-200">
-          <Bookmark className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-800">No saved places yet</h3>
-          <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
-            Click "Add New Place" to bookmark your home, office, or university campus for fast 1-click air assessments.
+        <div className="p-10 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto">
+            <Bookmark className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">No saved places yet</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+            Click <strong>"Add New Place"</strong> above to bookmark your residence, office, or gym for fast 1-click air assessments and threshold alerts.
+          </p>
+        </div>
+      ) : filteredLocations.length === 0 ? (
+        <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            No saved places matched "<strong>{searchQuery}</strong>".
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {locations.map((loc) => {
+          {filteredLocations.map((loc) => {
             const Icon = LABEL_ICONS[loc.label] || Bookmark;
+            const hasAlert = activeAlerts.some((a) => a.location_id === loc.id);
+            const alertInfo = activeAlerts.find((a) => a.location_id === loc.id);
+
             return (
               <div
                 key={loc.id}
-                className="p-5 bg-white rounded-2xl shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group"
+                className="p-5 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700/80 hover:shadow-md transition-all flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                         <Icon className="w-4 h-4" />
                       </div>
-                      <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="px-2 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                         {loc.label}
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteLocation(loc.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                      title="Remove place"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => openEditModal(loc)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors"
+                        title="Edit place name or label"
+                        aria-label={`Edit ${loc.name}`}
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setLocationToDelete(loc)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors"
+                        title="Remove place"
+                        aria-label={`Remove ${loc.name}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
-                  <h3 className="font-bold text-base text-navy-900 group-hover:text-blue-700 transition-colors">
+                  <h3 className="font-bold text-base text-navy-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {loc.name}
                   </h3>
-                  <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-500">
+                  <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-500 dark:text-slate-400">
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
                     <span>
                       {loc.latitude.toFixed(4)}°N, {loc.longitude.toFixed(4)}°E
                     </span>
                   </div>
 
-                  {activeAlerts.some((a) => a.location_id === loc.id) && (
-                    <div className="mt-3 p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-semibold flex items-center gap-1.5">
-                      <Bell className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                  {hasAlert && (
+                    <div className="mt-3 p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/80 text-rose-800 dark:text-rose-300 text-[11px] font-semibold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                       <span>
-                        PM2.5:{' '}
-                        {Math.round(
-                          activeAlerts.find((a) => a.location_id === loc.id)?.current_pm25 || 0
-                        )}{' '}
-                        µg/m³ (Exceeds {threshold} µg/m³)
+                        PM2.5: {Math.round(alertInfo?.current_pm25 || 0)} µg/m³ (Exceeds {threshold} µg/m³)
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-100">
+                <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
                   <button
                     onClick={() => navigateToAssess(loc)}
-                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition-colors"
+                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-semibold transition-colors"
                   >
                     <MapPin className="w-3.5 h-3.5" />
                     <span>Live Assess</span>
                   </button>
                   <button
                     onClick={() => navigateToLivability(loc)}
-                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors"
                   >
                     <Compass className="w-3.5 h-3.5" />
                     <span>Verdict</span>
@@ -475,6 +583,121 @@ export default function SavedPlacesPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Edit Place Modal */}
+      {editingLocation && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Edit saved place"
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                <Edit2 className="w-4 h-4 text-blue-600" />
+                <span>Edit Saved Place</span>
+              </h3>
+              <button
+                onClick={() => setEditingLocation(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Place Name
+                </label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Category
+                </label>
+                <select
+                  value={editLabel}
+                  onChange={(e) => setEditLabel(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-blue-500 outline-none"
+                >
+                  <option value="Home">Home</option>
+                  <option value="Work">Work / Office</option>
+                  <option value="Campus">University / School</option>
+                  <option value="Gym">Gym / Sports</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setEditingLocation(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editLoading}
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold disabled:opacity-50"
+                >
+                  {editLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {locationToDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirm deletion"
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Delete this saved place?</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                Are you sure you want to remove <strong>"{locationToDelete.name}"</strong>? This will also disable active threshold alerts for these coordinates.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setLocationToDelete(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold"
+              >
+                Keep Place
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteLocation}
+                disabled={deleteLoading}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm disabled:opacity-50"
+              >
+                {deleteLoading ? 'Removing...' : 'Confirm Remove'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

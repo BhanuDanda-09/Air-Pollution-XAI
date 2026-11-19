@@ -75,7 +75,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp)
     app.register_blueprint(user_bp)
 
-    # Root route for quick verification
+    # Root route and uptime pinger endpoint
     @app.route("/", methods=["GET"])
     def index():
         return success_response(
@@ -95,6 +95,18 @@ def create_app(config_class=Config):
             },
             message="Air Pollution XAI REST API Backend is online.",
         )
+
+    @app.route("/health", methods=["GET"])
+    def root_health():
+        """Direct health check alias for external uptime monitors (e.g. UptimeRobot, cron-job.org)."""
+        loader = get_model_loader()
+        status = loader.get_status()
+        is_healthy = status.get("xgboost", False) or status.get("random_forest", False)
+        return jsonify({
+            "status": "healthy" if is_healthy else "degraded",
+            "uptime_pinger_compatible": True,
+            "version": "1.0.0",
+        }), 200 if is_healthy else 503
 
     # Error Handlers
     @app.errorhandler(404)

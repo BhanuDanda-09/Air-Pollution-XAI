@@ -216,6 +216,43 @@ def delete_saved_location(location_id: int):
         )
 
 
+@user_bp.route("/locations/<int:location_id>", methods=["PUT"])
+@token_required
+def update_saved_location(location_id: int):
+    """Update a saved location's name or label."""
+    uid = _resolve_user_id()
+    if uid is None:
+        return error_response(message="Saved location not found.", code="NOT_FOUND", status_code=404)
+
+    loc = SavedLocation.query.filter_by(id=location_id, user_id=uid).first()
+    if not loc:
+        return error_response(
+            message="Saved location not found.",
+            code="NOT_FOUND",
+            status_code=404,
+        )
+
+    payload = request.get_json(silent=True) or {}
+    if "name" in payload and str(payload["name"]).strip():
+        loc.name = str(payload["name"]).strip()
+    if "label" in payload and str(payload["label"]).strip():
+        loc.label = str(payload["label"]).strip()
+
+    try:
+        db.session.commit()
+        return success_response(
+            data={"location": loc.to_dict()},
+            message="Location updated successfully.",
+        )
+    except Exception as exc:
+        db.session.rollback()
+        return error_response(
+            message=f"Failed to update location: {str(exc)}",
+            code="DATABASE_ERROR",
+            status_code=500,
+        )
+
+
 # ---------------------------------------------------------------------------
 # 3. Assessment History Log
 # ---------------------------------------------------------------------------
@@ -289,6 +326,56 @@ def record_assessment():
         db.session.rollback()
         return error_response(
             message=f"Failed to record history: {str(exc)}",
+            code="DATABASE_ERROR",
+            status_code=500,
+        )
+
+
+@user_bp.route("/history/<int:history_id>", methods=["DELETE"])
+@token_required
+def delete_assessment_history_entry(history_id: int):
+    """Delete a single assessment history record."""
+    uid = _resolve_user_id()
+    if uid is None:
+        return error_response(message="History record not found.", code="NOT_FOUND", status_code=404)
+
+    record = AssessmentHistory.query.filter_by(id=history_id, user_id=uid).first()
+    if not record:
+        return error_response(
+            message="History record not found.",
+            code="NOT_FOUND",
+            status_code=404,
+        )
+
+    try:
+        db.session.delete(record)
+        db.session.commit()
+        return success_response(data={"deleted_id": history_id}, message="Assessment history record removed.")
+    except Exception as exc:
+        db.session.rollback()
+        return error_response(
+            message=f"Failed to delete history: {str(exc)}",
+            code="DATABASE_ERROR",
+            status_code=500,
+        )
+
+
+@user_bp.route("/history", methods=["DELETE"])
+@token_required
+def clear_assessment_history():
+    """Clear all assessment history records for the user."""
+    uid = _resolve_user_id()
+    if uid is None:
+        return success_response(data={"deleted_count": 0}, message="History cleared.")
+
+    try:
+        deleted_count = AssessmentHistory.query.filter_by(user_id=uid).delete()
+        db.session.commit()
+        return success_response(data={"deleted_count": deleted_count}, message="All history records cleared.")
+    except Exception as exc:
+        db.session.rollback()
+        return error_response(
+            message=f"Failed to clear history: {str(exc)}",
             code="DATABASE_ERROR",
             status_code=500,
         )

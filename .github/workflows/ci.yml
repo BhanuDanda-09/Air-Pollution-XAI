@@ -29,7 +29,7 @@ jobs:
           pytest backend/tests/ -v
 
   frontend-check:
-    name: Frontend Tests and Build (Node.js 20)
+    name: Frontend Tests, Build & Playwright Smoke (Node.js 20)
     runs-on: ubuntu-latest
 
     steps:
@@ -57,3 +57,13 @@ jobs:
         run: |
           cd frontend
           npm run build
+
+      - name: Install Playwright Chromium
+        run: |
+          cd frontend
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E smoke tests
+        run: |
+          cd frontend
+          node test/e2e_smoke.mjs

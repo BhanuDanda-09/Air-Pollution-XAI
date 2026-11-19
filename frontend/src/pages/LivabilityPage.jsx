@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import {
   Home,
   Compass,
@@ -235,6 +235,23 @@ export default function LivabilityPage() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Purpose Clarity Banner */}
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-2xl text-xs text-emerald-950">
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+              Livability & Comparison
+            </span>
+            <span>Personal 0–100 score, health sensitivity shifts, and head-to-head place comparison.</span>
+          </div>
+          <Link
+            to={`/live-assessment?lat=${latitude}&lon=${longitude}`}
+            className="inline-flex items-center gap-1 font-bold text-emerald-800 hover:text-emerald-950 shrink-0"
+          >
+            <span>Need Raw Meteorological Telemetry & SHAP? Go to Live Assessment</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </div>
 

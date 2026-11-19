@@ -47,11 +47,35 @@ export const userService = {
   },
 
   /**
+   * Update a saved location (rename / label change).
+   */
+  async updateSavedLocation(locationId, { name, label }) {
+    const res = await api.put(`/api/user/locations/${locationId}`, { name, label });
+    return res?.location;
+  },
+
+  /**
    * Fetch historical assessments for the user.
    */
   async getHistory(limit = 20) {
     const res = await api.get(`/api/user/history?limit=${limit}`);
     return res?.history || [];
+  },
+
+  /**
+   * Delete a single history record.
+   */
+  async deleteHistoryEntry(historyId) {
+    const res = await api.delete(`/api/user/history/${historyId}`);
+    return res?.deleted_id;
+  },
+
+  /**
+   * Clear all history records for the user.
+   */
+  async clearHistory() {
+    const res = await api.delete('/api/user/history');
+    return res?.deleted_count;
   },
 
   /**

@@ -147,7 +147,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
   const vStyle = getVerdictStyle(currentVerdict);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="region" aria-live="polite" aria-label="Livability score and outdoor recommendations">
       {/* 1. Master Score & Verdict Hero Banner */}
       <div className={`rounded-2xl p-6 sm:p-8 border shadow-sm relative overflow-hidden bg-white ${vStyle.cardBg}`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-200/80">

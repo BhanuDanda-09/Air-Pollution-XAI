@@ -40,7 +40,7 @@ export default function PredictionForm({
         e.preventDefault();
         onSubmit();
       }}
-      className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6"
+      className="bg-white rounded-2xl p-4 sm:p-8 border border-slate-200 shadow-sm space-y-6 overflow-hidden"
     >
       {/* Header & Model Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
@@ -60,7 +60,7 @@ export default function PredictionForm({
             <span>Evaluating All 3 Models</span>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
             <label htmlFor="model-select" className="text-xs font-semibold text-slate-600 whitespace-nowrap">
               Model:
             </label>
@@ -69,11 +69,11 @@ export default function PredictionForm({
               value={selectedModel}
               onChange={(e) => onModelChange(e.target.value)}
               disabled={loading}
-              className="text-xs font-semibold bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full sm:w-auto max-w-full sm:max-w-xs text-xs font-semibold bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 disabled:opacity-50 truncate"
             >
-              <option value="xgboost">XGBoost Regressor (Top Performer: R²=0.7455)</option>
-              <option value="random_forest">Random Forest Regressor (R²=0.7269)</option>
-              <option value="mlp">Multilayer Perceptron (MLP) (R²=0.5408)</option>
+              <option value="xgboost">XGBoost (Top Performer: R²=0.7455)</option>
+              <option value="random_forest">Random Forest (R²=0.7269)</option>
+              <option value="mlp">MLP Neural Net (R²=0.5408)</option>
             </select>
           </div>
         )}

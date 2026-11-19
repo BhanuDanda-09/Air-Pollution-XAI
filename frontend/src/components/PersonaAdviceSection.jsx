@@ -67,8 +67,8 @@ export default function PersonaAdviceSection({ personaGuidance }) {
         </p>
       </div>
 
-      {/* Persona Tab Selectors */}
-      <div className="flex flex-col sm:flex-row gap-2 mb-6">
+      {/* Persona Tab Selectors (Responsive Grid to prevent tablet horizontal overflow) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-6">
         {personas.map((p) => {
           const Icon = p.icon;
           const isSelected = activeTab === p.key;
@@ -77,7 +77,7 @@ export default function PersonaAdviceSection({ personaGuidance }) {
               key={p.key}
               type="button"
               onClick={() => setActiveTab(p.key)}
-              className={`flex-1 p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+              className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                 isSelected
                   ? 'border-blue-500 bg-blue-50/70 shadow-xs ring-1 ring-blue-500'
                   : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'

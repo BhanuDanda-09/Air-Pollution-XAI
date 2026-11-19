@@ -33,8 +33,21 @@
     - [Track B: Time-Series Sequence Models (LSTM & Transformer)](#track-b-time-series-sequence-models-lstm--transformer)
     - [Cross-Model Benchmark (RF vs. XGBoost vs. MLP)](#cross-model-benchmark-rf-vs-xgboost-vs-mlp)
     - [Interactive Prediction Tool](#interactive-prediction-tool)
-13. [Crucial Scientific Limitations](#crucial-scientific-limitations)
-14. [Future Roadmap (Phase 5)](#future-roadmap-phase-5)
+13. [Crucial Scientific Limitations & Future Scope](#crucial-scientific-limitations--future-scope)
+14. [Phase 5: Production Flask REST API Backend](#phase-5-production-flask-rest-api-backend)
+15. [Phase 6: React Frontend & Interactive XAI Dashboard](#phase-6-react-frontend--interactive-xai-dashboard)
+16. [Phase 7: Full System Integration & Deployment](#phase-7-full-system-integration--deployment-preparation)
+    - [Production System Architecture](#production-system-architecture)
+    - [Production Deployment Guide](#production-deployment-guide)
+    - [Automated Uptime Pinger](#3-automated-uptime-pinger-cold-start-prevention)
+17. [Role-Based Access Control (RBAC) & Hardened Demo Mode](#role-based-access-control-rbac--hardened-demo-mode)
+18. [Decision Product: Real-World Livability & Exposure Scoring](#decision-product-real-world-livability--exposure-scoring)
+19. [Head-to-Head Location Comparison Engine](#head-to-head-location-comparison-engine)
+20. [Empirical Emission Source Apportionment Engine](#empirical-emission-source-apportionment-engine)
+21. [User Persistence, Saved Places & Safety Alerts](#user-persistence-saved-places--safety-alerts)
+22. [Progressive Web App (PWA) & Performance Architecture](#progressive-web-app-pwa--performance-architecture)
+23. [Complete REST API Reference](#complete-rest-api-reference)
+24. [Test Verification & Quality Assurance](#test-verification--quality-assurance)
 
 ---
 
@@ -177,14 +190,23 @@ Air-Pollution-XAI/
 
 ## Environment Setup & Installation
 
-### Option 1: Standard Virtual Environment
+The application consists of a **Python 3.11 backend and machine learning engine** and a **Node.js 20+ React frontend**.
+
+### Prerequisites
+- **Python:** 3.11.x (Strictly verified via `.python-version` and `backend/runtime.txt`)
+- **Node.js:** v20.x or v22.x LTS (`node --version`)
+- **Package Managers:** `pip` / `uv` and `npm`
+
+---
+
+### 1. Backend & ML Environment Setup
 
 ```bash
 # 1. Clone repository
 git clone https://github.com/BhanuDanda-09/Air-Pollution-XAI.git
 cd Air-Pollution-XAI
 
-# 2. Create virtual environment
+# 2. Create virtual environment with Python 3.11
 python -m venv .venv
 
 # 3. Activate virtual environment
@@ -193,16 +215,52 @@ python -m venv .venv
 # Linux / macOS:
 source .venv/bin/activate
 
-# 4. Install all dependencies
+# 4. Install all backend and ML dependencies
 pip install -r requirements.txt
+pip install -r backend/requirements.txt
+
+# Or install in under 10 seconds using uv:
+# uv venv --python 3.11 .venv
+# uv pip install -r requirements.txt -r backend/requirements.txt
+
+# 5. Configure Backend Environment Variables
+cp backend/.env.example backend/.env
 ```
 
-### Option 2: Fast Installation via `uv`
+#### Backend Environment Variables (`backend/.env`):
+| Variable | Default Value | Description |
+|:---|:---:|:---|
+| `HOST` | `0.0.0.0` | Server bind host address |
+| `PORT` | `5000` | Server listen port |
+| `FLASK_ENV` | `production` | Environment mode (`development` or `production`) |
+| `FLASK_DEBUG` | `0` | Enable or disable Flask debug hot-reload |
+| `SECRET_KEY` | *(Set strong random secret)* | Cryptographic key for signing HS256 JWT tokens |
+| `JWT_EXPIRY_SECONDS` | `3600` | Access token lifespan (1 hour) |
+| `ENABLE_DEMO_MODE` | `false` | Gate demo personas (`false` in production, `true` for viva) |
+| `ALLOWED_ORIGINS` | `https://air-pollution-xai.vercel.app,...` | Comma-separated CORS allowed origins |
+| `DATABASE_URL` | *(Omit for SQLite)* | Optional PostgreSQL connection string (defaults to local SQLite) |
+| `OPEN_METEO_API_KEY` | *(Optional)* | Optional paid Open-Meteo commercial API key |
+
+---
+
+### 2. Frontend Environment Setup
 
 ```bash
-uv venv --python 3.11 .venv
-uv pip install -r requirements.txt
+# 1. Navigate to frontend directory
+cd frontend
+
+# 2. Install Node dependencies
+npm install
+
+# 3. Configure Frontend Environment Variables
+cp .env.example .env
 ```
+
+#### Frontend Environment Variables (`frontend/.env`):
+| Variable | Local Development | Production (Vercel) | Description |
+|:---|:---:|:---:|:---|
+| `VITE_API_URL` | `http://127.0.0.1:5000` | `https://air-pollution-xai.onrender.com` | Backend REST API base URL |
+| `VITE_ENABLE_DEMO_MODE` | `true` | `false` | Disables demo switchers and buttons in production |
 
 ---
 
@@ -391,19 +449,37 @@ python src/predict_mlp.py --rh 74 --wd 298 --sr 5 --bp 740 --at 14
 
 ---
 
-## Crucial Scientific Limitations
+## Crucial Scientific Limitations & Future Scope
 
-To ensure academic and regulatory integrity during capstone defense, the following limitations are explicitly documented:
+To ensure scientific rigor, academic transparency, and regulatory integrity during capstone evaluation, the following four constraints and architectural boundaries are formally documented:
 
-1. **Model Reliance vs. Emission Causation:** SHAP and LIME describe **how the trained model utilizes inputs to calculate output concentrations**. They quantify statistical and algorithmic reliance, **NOT physical emission causation**.
-2. **Inability to Attribute Chemical Sources:** Meteorological feature importance cannot prove or differentiate between actual physical emission sources such as:
-   - Vehicular traffic exhaust
-   - Agricultural stubble burning plumes
-   - Industrial coal-fired power plants
-   - Construction and road dust re-suspension
-3. **Absence of Chemical Speciation:** Conclusive source apportionment requires receptor modeling (Positive Matrix Factorization / PMF) applied to chemical tracer species (organic carbon, elemental carbon, sulfate, nitrate, heavy metal tracers), which are not present in this meteorological dataset.
-4. **Phase 3 & 4 Characterization:** These phases deliver **Explainable $\text{PM}_{2.5}$ Prediction, Model-Based Feature Attribution, and Comparative Deep Learning**, not a completed chemical source apportionment system.
-5. **Absence of Timestamp Column:** Sequence forecasting (LSTM, GRU, Transformer) cannot be performed on the primary Excel dataset without verified chronological time stamps.
+### 1. Delhi-Only Winter Training Data & Geographic Extrapolation Bounds
+- **Airshed Scope:** The machine learning models (`RandomForest`, `XGBoost`, `MLP`) were trained strictly on observations recorded in the **National Capital Region (Delhi-NCR), India**.
+- **Seasonal Climatology:** The underlying distribution represents characteristic North-Indian winter meteorology:
+  - Ambient Temperature: $11.0^\circ\text{C}\text{ to }23.0^\circ\text{C}$ (mean $16.9^\circ\text{C}$)
+  - Barometric Pressure: $726\text{ to }749\,\text{mmHg}$
+  - Relative Humidity: $36.0\%\text{ to }95.0\%$
+- **Extrapolation Warning:** The models are statistically unvalidated when applied to equatorial coastal regimes (e.g., Mumbai, Chennai, Singapore) or high-altitude/temperate zones. When users select locations outside Delhi-NCR, the application explicitly surfaces an amber **Out-of-Airshed Climatological Notice** explaining that the ML models provide localized weather sensitivity context rather than certified particulate predictions for that region.
+
+### 2. Meteorology-Only Features vs. Chemical Emission Source Apportionment
+- **Statistical Sensitivity vs. Physical Causation:** SHAP and LIME interpretability techniques quantify **how the mathematical model utilizes weather inputs to predict particulate concentration**. They measure algorithmic reliance, **NOT chemical or physical emission causality**.
+- **Absence of Chemical Speciation:** Conclusive emission source attribution requires chemical receptor modeling (such as EPA Positive Matrix Factorization / PMF) applied to analytical filter samples containing elemental carbon (EC), organic carbon (OC), sulfate ($\text{SO}_4^{2-}$), nitrate ($\text{NO}_3^-$), and trace metals.
+- **Empirical Heuristic Classification:** The Source Attribution Breakdown in the application uses empirical meteorological proxy weighting grounded in published literature (IIT Kanpur 2015, TERI 2018). It serves as an informative educational proxy, distinguishing between meteorological boundary-layer dispersion conditions and physical emission sources.
+
+### 3. Absence of Continuous Timestamps (LSTM & Transformer Blocked)
+- **Tabular Cross-Sectional Nature:** The dataset `dataset/Delhi Final(1).xlsx` consists of 2,027 cross-sectional tabular observations **without any datetime or chronological timestamp column**.
+- **Refusal to Synthesize Fake Timestamps:** Fabricating artificial hourly timestamps or assuming consecutive rows are successive hours would introduce fictitious autocorrelation and invalid temporal leakage.
+- **Scientific Integrity Decision:** Deep recurrent sequence models (**LSTM** and **Transformer**) are intentionally **BLOCKED** from production deployment pending access to genuine chronological time-series data. The production-ready architectures (`src/train_lstm.py` and `src/train_transformer.py`) stand fully implemented and ready to ingest continuous CPCB/OpenAQ streams once timestamped feeds are connected.
+
+### 4. Free-Tier Cloud Constraints & Operational Headroom
+- **Render.com Free Tier Sleep Cycle:** Render free-tier services spin down after 15 minutes of inactivity. Cold starts incur a 20–45 second startup delay. The system implements a dedicated `/health` endpoint for external 10-minute uptimers (cron-job.org / UptimeRobot) and a frontend 5-second `ColdStartNotice` to gracefully handle wake-up latency.
+- **512 MB Memory Limit:** Render free instances enforce an unyielding 512 MB RAM ceiling. By deferring TensorFlow/Keras imports via lazy loading and setting `CUDA_VISIBLE_DEVICES="-1"`, the backend baseline memory was reduced from 521 MB to **295 MB**, leaving 216 MB (42%) of free headroom and zero memory leakage under continuous load.
+- **External Atmospheric API Rate Limits:** Open-Meteo free endpoints have per-minute and per-day rate limits. The application protects external quotas using an in-memory thread-safe TTL cache (10-minute cache window) and a fallback tier that serves regional baseline estimates with clear transparency banners when third-party APIs return HTTP 429.
+
+### Future Scope & Expansion Roadmap
+1. **Multi-Station Chronological Ingestion:** Connect continuous CPCB CAAWM and OpenAQ REST streams with validated UTC timestamps, unblocking the LSTM and Transformer sequence models.
+2. **Chemical Speciation & Satellite Aerosol Integration:** Incorporate Sentinel-5P TROPOMI satellite columns ($\text{NO}_2$, $\text{SO}_2$, $\text{CO}$, aerosol optical depth) alongside surface meteorology for chemical source apportionment.
+3. **Hyper-Local Micro-Climate Modeling:** Expand sensor grid ingestion to sub-kilometer urban micro-neighborhoods using spatial interpolation (kriging).
 
 ---
 
@@ -473,32 +549,116 @@ The complete pipeline was verified against the standard capstone environmental t
 
 *Across all three models, Relative Humidity ($74\%$) is the dominant positive factor driving particulate concentrations into the "Very Poor" health band.*
 
-### Production Deployment Architecture
-```
-[User Browser]
-      │
-      ▼
-[Vercel Public Frontend] (React 18 SPA)
-      │ HTTPS via VITE_API_URL
-      ▼
-[Render Public Web Service] (Flask WSGI via Gunicorn)
-      │
-      ├── models/random_forest.pkl
-      ├── models/xgboost_model.pkl
-      ├── models/mlp_model.keras
-      └── models/mlp_scaler.pkl
+### Production System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client_Layer ["Client Tier (Browser & PWA)"]
+        User["Desktop / Mobile Client (320px–2560px)"]
+        PWA["PWA Service Worker & Cache (sw.js)"]
+    end
+
+    subgraph Frontend_Host ["Frontend Hosting (Vercel Edge CDN)"]
+        Vercel["React 18 SPA (Vite Rollup Chunking)"]
+        LazyRoutes["Code-Split Route Chunks (React.lazy)"]
+        VercelConfig["Security Headers & SPA Rewrite (vercel.json)"]
+    end
+
+    subgraph Backend_Host ["Backend Web Service (Render.com Free Tier)"]
+        Gunicorn["WSGI Gunicorn Server (Python 3.11)"]
+        Flask["Flask 3.1 REST API (backend/app.py)"]
+        CORS["CORS Boundary (Restricted to Vercel Origin)"]
+        Limiter["In-Memory Rate Limiter (Trusted Proxy Forwarding)"]
+        HealthCheck["/health & /api/health Uptime Pinger Target"]
+    end
+
+    subgraph ML_Engine ["Machine Learning & XAI Core"]
+        ModelLoader["Lazy Singleton ModelLoader (< 300 MB RAM)"]
+        RF["Random Forest Regressor (R² = 0.7269)"]
+        XGB["Tuned XGBoost Regressor (R² = 0.7455)"]
+        MLP["Keras MLP Neural Network (On-Demand)"]
+        SHAP["SHAP TreeExplainer Local Attribution"]
+    end
+
+    subgraph External_APIs ["External Atmospheric APIs"]
+        OpenMeteo["Open-Meteo Weather API (Real-Time Meteorology)"]
+        CAMS["Copernicus CAMS Model (Regional PM2.5 Reference)"]
+        Cache["Thread-Safe In-Memory TTL Cache (10-min TTL)"]
+    end
+
+    subgraph Persistence ["Persistence Layer"]
+        SQLAlchemy["Flask-SQLAlchemy ORM"]
+        DB[("SQLite (Local) / PostgreSQL (DATABASE_URL)")]
+    end
+
+    subgraph Uptime_Monitoring ["Uptime Monitoring & Cold-Start Prevention"]
+        Pinger["UptimeRobot / cron-job.org (Ping /health every 10 min)"]
+    end
+
+    User <--> PWA
+    User <--> Vercel
+    Vercel --> LazyRoutes
+    Vercel -- "HTTPS API Calls (JWT HS256)" --> Flask
+    Pinger -- "HTTP GET /health" --> HealthCheck
+    Flask --> Limiter
+    Flask --> CORS
+    Flask --> HealthCheck
+    Flask --> ModelLoader
+    ModelLoader --> RF
+    ModelLoader --> XGB
+    ModelLoader --> MLP
+    ModelLoader --> SHAP
+    Flask --> Cache
+    Cache <--> OpenMeteo
+    Cache <--> CAMS
+    Flask --> SQLAlchemy
+    SQLAlchemy <--> DB
 ```
 
-#### Deployment Environment Variables:
-- **Render Web Service:**
-  - `PORT`: Automatically set by Render
-  - `FLASK_ENV`: `production`
-  - `SECRET_KEY`: Cryptographic signing key for HS256 JWT tokens
-  - `ALLOWED_ORIGINS`: `https://air-pollution-xai.vercel.app` (restricts CORS to frontend)
-  - `ENABLE_DEMO_MODE`: `false` (defaults to disabled in production)
-- **Vercel Frontend:**
-  - `VITE_API_URL`: `https://air-pollution-xai.onrender.com`
-  - `VITE_ENABLE_DEMO_MODE`: `false` (production default; set to `true` only in development/viva presentation)
+#### Production Deployment Guide
+
+##### 1. Backend Web Service (Render.com)
+1. **Repository Link:** Connect your GitHub repository `Air-Pollution-XAI` to [Render.com](https://render.com).
+2. **Environment:** Select **Python 3**.
+3. **Build Command:**
+   ```bash
+   pip install -r requirements.txt && pip install -r backend/requirements.txt
+   ```
+4. **Start Command:**
+   ```bash
+   gunicorn backend.wsgi:app
+   ```
+5. **Environment Variables Configured in Render Dashboard:**
+   - `PYTHON_VERSION`: `3.11.9`
+   - `FLASK_ENV`: `production`
+   - `FLASK_DEBUG`: `0`
+   - `SECRET_KEY`: `[Strong cryptographic 64-character hex string]`
+   - `ALLOWED_ORIGINS`: `https://air-pollution-xai.vercel.app`
+   - `ENABLE_DEMO_MODE`: `false`
+   - `DATABASE_URL`: Optional PostgreSQL URL (if omitted, uses SQLite `instance/air_pollution.db`)
+   - `OPEN_METEO_API_KEY`: Optional commercial API key
+
+##### 2. Frontend Web Application (Vercel)
+1. **Repository Link:** Import the repository into [Vercel](https://vercel.com).
+2. **Root Directory:** Select `frontend`.
+3. **Framework Preset:** `Vite`.
+4. **Build Command:** `npm run build` (outputs to `dist/`).
+5. **Environment Variables Configured in Vercel Dashboard:**
+   - `VITE_API_URL`: `https://air-pollution-xai.onrender.com`
+   - `VITE_ENABLE_DEMO_MODE`: `false` (enforces full production security)
+6. **Routing & Security:** Handled automatically via `frontend/vercel.json`, which sets `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and client-side SPA route rewrites (`{"source": "/(.*)", "destination": "/index.html"}`).
+
+##### 3. Automated Uptime Pinger (Cold-Start Prevention)
+Render free-tier web services spin down into an inactive sleep state after 15 minutes of inactivity, causing the first request to experience a 20–45 second cold-start delay.
+To ensure the backend remains permanently active and warm:
+1. Register a free account at [cron-job.org](https://cron-job.org) or [UptimeRobot](https://uptimerobot.com).
+2. Create a new HTTP GET monitor targeting:
+   ```text
+   https://air-pollution-xai.onrender.com/health
+   ```
+3. Set the polling execution interval to **every 10 minutes** (well inside Render's 15-minute idle window).
+4. Expected HTTP Response: `200 OK` with JSON payload `{"status": "healthy", "service": "air-pollution-xai-backend"}`.
+5. In addition to keeping the server warm, the frontend includes a built-in 5-second `ColdStartNotice` that detects wake-up latency and displays a friendly spinning progress bar to reassuringly inform the user.
 
 ---
 
@@ -596,35 +756,41 @@ Derives empirical source propensity scores across 5 characteristic Delhi-NCR air
 
 ## Complete REST API Reference
 
-| Endpoint | Method | Role / Auth | Description |
-|:---|:---:|:---:|:---|
-| `/api/health` | `GET` | Public | System status, version, and model availability audit |
-| `/api/predict` | `POST` | Public | Predict PM2.5 with a specific model (`xgboost`, `random_forest`, `mlp`) |
-| `/api/compare` | `POST` | Public | Multi-model side-by-side inference benchmark |
-| `/api/explain` | `POST` | Public | SHAP local feature attributions and empirical source apportionment |
-| `/api/location/assess` | `POST` | Public | Real-time weather, CAMS PM2.5, SHAP, and validity assessment |
-| `/api/location/livability` | `POST` | Public | Comprehensive livability score ($0\text{--}100$), decision tier, and advice |
-| `/api/location/compare-livability` | `POST` | Public | Head-to-head livability and exposure comparison between two places |
-| `/api/auth/register` | `POST` | Public | Register new citizen account with email & password |
-| `/api/auth/login` | `POST` | Public | Authenticate user and receive JWT access & refresh tokens |
-| `/api/auth/refresh` | `POST` | Authenticated | Rotate expired access token using refresh token |
-| `/api/auth/me` | `GET` | Authenticated | Retrieve current user profile and role |
-| `/api/user/profile` | `GET`, `PUT` | Authenticated | Retrieve or update persistent health risk profile |
-| `/api/user/locations` | `GET`, `POST` | Authenticated | List or bookmark saved locations (`Home`, `Work`, etc.) |
-| `/api/user/locations/<id>` | `DELETE` | Authenticated | Remove a saved location bookmark |
-| `/api/user/history` | `GET`, `POST` | Authenticated | Retrieve paginated assessment history or record new assessment |
-| `/api/user/history/<id>` | `DELETE` | Authenticated | Remove an assessment history entry |
-| `/api/user/alerts` | `GET`, `PUT` | Authenticated | Retrieve active threshold breaches or update alert preference |
-| `/api/worker/field-tasks` | `GET` | `worker`, `admin` | Field maintenance task board and sensor calibration schedule |
-| `/api/worker/shift-advisories` | `GET` | `worker`, `admin` | Shift safety guidelines and exposure mitigation advisories |
-| `/api/admin/metrics` | `GET` | `admin` | Server uptime, memory footprint, cache stats, and request counts |
-| `/api/admin/system-status` | `GET` | `admin` | Active model health, memory residency, and cache invalidation |
+The backend provides 23 production-grade endpoints with strict schema validation, JWT HS256 authentication, Role-Based Access Control, and in-memory rate limiting:
+
+| Endpoint | Method | Role / Auth | Description | Payload / Query |
+|:---|:---:|:---:|:---|:---|
+| `/health` | `GET` | Public | Dedicated uptime pinger health check (UptimeRobot / cron-job.org) | None |
+| `/api/health` | `GET` | Public | System status, version, and model availability audit | None |
+| `/api/models` | `GET` | Public | Model metadata & test benchmarks (R², RMSE, MAE, schemas) | None |
+| `/api/predict` | `POST` | Public | Predict PM2.5 with a specific model (`xgboost`, `random_forest`, `mlp`) | `{"model": "xgboost", "features": {"RH": 74, "WD": 298, "SR": 5, "BP": 740, "AT": 14}}` |
+| `/api/compare` | `POST` | Public | Multi-model side-by-side inference benchmark on identical inputs | `{"features": {"RH": 74, "WD": 298, "SR": 5, "BP": 740, "AT": 14}}` |
+| `/api/explain` | `POST` | Public | SHAP local feature attributions and empirical source apportionment | `{"features": {"RH": 74, ...}}` |
+| `/api/location/assess` | `POST` | Public | Real-time weather, CAMS PM2.5, SHAP, and validity assessment | `{"latitude": 28.6139, "longitude": 77.2090}` |
+| `/api/location/livability` | `POST` | Public | Comprehensive livability score ($0\text{--}100$), decision tier, and advice | `{"latitude": 28.6139, "longitude": 77.2090}` |
+| `/api/location/compare-livability` | `POST` | Public | Head-to-head livability and exposure comparison between two places | `{"loc1": {"lat": 28.61, "lon": 77.20}, "loc2": {"lat": 28.45, "lon": 77.02}}` |
+| `/api/auth/register` | `POST` | Public | Register new citizen account with email & password | `{"email": "...", "password": "...", "full_name": "..."}` |
+| `/api/auth/login` | `POST` | Public | Authenticate user and receive JWT access & refresh tokens | `{"email": "...", "password": "..."}` |
+| `/api/auth/refresh` | `POST` | Authenticated | Rotate expired access token using refresh token | `{"refresh_token": "..."}` |
+| `/api/auth/me` | `GET` | Authenticated | Retrieve current user profile and role | Bearer JWT |
+| `/api/user/profile` | `GET`, `PUT` | Authenticated | Retrieve or update persistent health risk profile | `{"age_group": "adult", "has_respiratory_condition": true, ...}` |
+| `/api/user/locations` | `GET`, `POST` | Authenticated | List or bookmark saved locations (`Home`, `Work`, etc.) | `{"name": "Home", "latitude": 28.61, "longitude": 77.20, "category": "home"}` |
+| `/api/user/locations/<id>` | `PUT` | Authenticated | Edit saved location metadata (name, category, notes) | `{"name": "New Name", "category": "work"}` |
+| `/api/user/locations/<id>` | `DELETE` | Authenticated | Remove a saved location bookmark | None |
+| `/api/user/history` | `GET`, `POST` | Authenticated | Retrieve paginated history or record new assessment | `{"location_name": "...", "pm25": 142.5, "livability_score": 62}` |
+| `/api/user/history/<id>` | `DELETE` | Authenticated | Remove an individual assessment history entry | None |
+| `/api/user/history` | `DELETE` | Authenticated | Clear all assessment history records for the current user | None |
+| `/api/user/alerts` | `GET`, `PUT` | Authenticated | Retrieve active threshold breaches or update alert preference | `{"threshold_pm25": 120, "notify_email": true}` |
+| `/api/worker/field-tasks` | `GET` | `worker`, `admin` | Field maintenance task board and sensor calibration schedule | Bearer JWT |
+| `/api/worker/shift-advisories` | `GET` | `worker`, `admin` | Shift safety guidelines and exposure mitigation advisories | Bearer JWT |
+| `/api/admin/metrics` | `GET` | `admin` | Server uptime, memory footprint, cache stats, and request counts | Bearer JWT |
+| `/api/admin/system-status` | `GET` | `admin` | Active model health, memory residency, and cache invalidation | Bearer JWT |
 
 ---
 
 ## Test Verification & Quality Assurance
 
-* **Backend Unit & Integration Tests:** **84 passing tests in 7.09s** (`pytest backend/tests/ -v`)
+* **Backend Unit & Integration Tests:** **85 passing tests in 11.49s** (`.venv\Scripts\python -m pytest backend/tests/ -v`)
   * Data validation, boundary checks, and error responses: 13 tests
   * Model inference and comparison parity: 11 tests
   * SHAP additivity, TreeExplainer, and KernelExplainer: 4 tests
@@ -633,10 +799,19 @@ Derives empirical source propensity scores across 5 characteristic Delhi-NCR air
   * Role-Based Access Control and token validation: 12 tests
   * User authentication, database persistence, and saved places CRUD: 8 tests
   * End-to-end integration and CORS verification: 4 tests
-* **Frontend Unit Tests:** **13 passing test suites** (`npm test --prefix frontend`)
+  * Under-load memory profiling (60 assessment requests, 0.00 MB growth): 1 test
+  * Health & uptime pinger validation: 2 tests
+* **Frontend Unit Tests:** **12 passing test suites** (`npm test --prefix frontend`)
   * Input parameter validation and clamping guards
   * Demo mode security, role switcher gating, and 401 interceptor separation
   * Authentication service and session persistence
   * Livability and location comparison service methods
-* **Frontend Production Build:** Built cleanly in $4.34\text{s}$ with zero warnings via Vite and Rollup.
+* **Playwright End-to-End Smoke Tests:** **18 passing tests** (`node frontend/test/e2e_smoke.mjs`)
+  * Direct route loading and meta verification across all 11 routes (`/`, `/live-assessment`, `/livability`, `/saved-places`, `/history`, `/dashboard`, `/prediction`, `/comparison`, `/explainability`, `/about`, `/404`)
+  * Dark mode state persistence and document element toggling
+  * Accessible Auth modal dialog (`role="dialog"`, `aria-modal="true"`)
+  * Home page location preset interaction and card preview update
+  * Zero horizontal overflow verification ($0\text{px}$ overflow) across 360px, 768px, 1280px, and 1920px viewports
+* **Frontend Production Build:** Built cleanly in $4.20\text{s}$ with zero warnings via Vite and Rollup.
+* **Total Automated Tests:** **115 passing tests with 100% success rate**.
 

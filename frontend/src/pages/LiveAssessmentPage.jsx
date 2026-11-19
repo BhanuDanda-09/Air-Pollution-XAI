@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Compass, AlertCircle, RefreshCw, Stethoscope, ChevronDown, ChevronUp, Bookmark, Check } from 'lucide-react';
+import { useSearchParams, Link } from 'react-router-dom';
+import {
+  Compass,
+  AlertCircle,
+  RefreshCw,
+  Stethoscope,
+  ChevronDown,
+  ChevronUp,
+  Bookmark,
+  Check,
+  ArrowRight,
+  Activity,
+} from 'lucide-react';
 import LocationPicker from '../components/LocationPicker';
 import HealthProfileSelector from '../components/HealthProfileSelector';
 import LivabilityScoreCard from '../components/LivabilityScoreCard';
@@ -167,6 +178,23 @@ export default function LiveAssessmentPage() {
               Refresh Assessment
             </button>
           </div>
+        </div>
+
+        {/* Purpose Clarity Banner */}
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-blue-50/80 border border-blue-200 rounded-2xl text-xs text-blue-900">
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+              Scientific Diagnostic
+            </span>
+            <span>Deep physical weather telemetry, satellite CAMS reference PM2.5, and SHAP source attributions.</span>
+          </div>
+          <Link
+            to={`/livability?lat=${latitude}&lon=${longitude}`}
+            className="inline-flex items-center gap-1 font-bold text-blue-700 hover:text-blue-900 shrink-0"
+          >
+            <span>Need Lifestyle Advice or Comparison? Go to Livability</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       </div>
 

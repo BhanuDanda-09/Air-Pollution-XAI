@@ -26,16 +26,20 @@ export default function ColdStartNotice({ isLoading, thresholdMs = 5000 }) {
   if (!isLoading || !showNotice) return null;
 
   return (
-    <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-3 animate-fadeIn shadow-xs my-3">
-      <div className="p-2 rounded-lg bg-amber-100 text-amber-700 shrink-0">
+    <div
+      role="status"
+      aria-live="polite"
+      className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-3 animate-fadeIn shadow-xs my-3 transition-all"
+    >
+      <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 shrink-0">
         <Server className="w-4 h-4 animate-pulse" />
       </div>
       <div className="flex-1">
-        <p className="font-bold flex items-center gap-1.5 text-amber-950">
-          <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" />
+        <p className="font-bold flex items-center gap-1.5 text-amber-950 dark:text-amber-100">
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600 dark:text-amber-400" />
           Server waking up, please wait...
         </p>
-        <p className="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
+        <p className="text-[11px] text-amber-800 dark:text-amber-300/90 mt-0.5 leading-relaxed">
           The backend runs on Render free tier and spins down when idle. Cold start typically takes 20–45 seconds. Your request is in progress.
         </p>
       </div>

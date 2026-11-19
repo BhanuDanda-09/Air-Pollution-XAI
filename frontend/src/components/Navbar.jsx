@@ -1,48 +1,59 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import {
   Wind,
   Compass,
   MapPin,
+  Bookmark,
   BarChart3,
   Activity,
   GitCompare,
   Sparkles,
+  History,
   Info,
-  Menu,
-  X,
+  ChevronDown,
   Shield,
   HardHat,
-  Bookmark,
-  History,
-  User as UserIcon,
-  LogOut,
-  LogIn,
   Bell,
   BellRing,
   AlertTriangle,
   CheckCircle2,
   Download,
+  LogIn,
+  LogOut,
+  User as UserIcon,
+  Menu,
+  X,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import RoleSwitcher from './RoleSwitcher';
 import { hasRoleAccess } from '../services/demoAuth';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import userService from '../services/userService';
 
 export default function Navbar({ isBackendOnline }) {
-  const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated, logout, openAuthModal } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [insightsDropdownOpen, setInsightsDropdownOpen] = useState(false);
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [alertsDropdownOpen, setAlertsDropdownOpen] = useState(false);
   const [alertsData, setAlertsData] = useState({ active_alerts: [], preference: { pm25_threshold: 100 } });
-  const [roleUpdated, setRoleUpdated] = useState(0);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isInstallable, setIsInstallable] = useState(false);
-  const dropdownRef = useRef(null);
-  const alertsRef = useRef(null);
 
+  const insightsRef = useRef(null);
+  const moreRef = useRef(null);
+  const userRef = useRef(null);
+  const alertsRef = useRef(null);
+  const drawerRef = useRef(null);
+
+  // PWA beforeinstallprompt handler
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
@@ -61,12 +72,32 @@ export default function Navbar({ isBackendOnline }) {
       setIsInstallable(false);
     }
     setDeferredPrompt(null);
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
   };
 
+  // Close all menus on route change
   useEffect(() => {
-    const onRoleChanged = () => setRoleUpdated((prev) => prev + 1);
-    window.addEventListener('auth:role-changed', onRoleChanged);
-    return () => window.removeEventListener('auth:role-changed', onRoleChanged);
+    setMobileMenuOpen(false);
+    setInsightsDropdownOpen(false);
+    setMoreDropdownOpen(false);
+    setUserDropdownOpen(false);
+    setAlertsDropdownOpen(false);
+  }, [location.pathname]);
+
+  // Handle escape key to close menus
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+        setInsightsDropdownOpen(false);
+        setMoreDropdownOpen(false);
+        setUserDropdownOpen(false);
+        setAlertsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // Fetch alerts for authenticated user
@@ -86,10 +117,16 @@ export default function Navbar({ isBackendOnline }) {
     }
   }, [isAuthenticated]);
 
-  // Close dropdowns when clicking outside
+  // Click outside listener for desktop dropdowns
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      if (insightsRef.current && !insightsRef.current.contains(e.target)) {
+        setInsightsDropdownOpen(false);
+      }
+      if (moreRef.current && !moreRef.current.contains(e.target)) {
+        setMoreDropdownOpen(false);
+      }
+      if (userRef.current && !userRef.current.contains(e.target)) {
         setUserDropdownOpen(false);
       }
       if (alertsRef.current && !alertsRef.current.contains(e.target)) {
@@ -100,232 +137,373 @@ export default function Navbar({ isBackendOnline }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const navLinks = [
+  // Primary navigation links (Clean & concise labels, whitespace-nowrap)
+  const primaryLinks = [
     { to: '/', label: 'Home', icon: Wind },
-    { to: '/livability', label: 'Livability Verdict', icon: Compass },
     { to: '/live-assessment', label: 'Live Assessment', icon: MapPin },
+    { to: '/livability', label: 'Livability', icon: Compass },
     { to: '/saved-places', label: 'Saved Places', icon: Bookmark },
-    { to: '/history', label: 'History', icon: History },
-    { to: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-    { to: '/prediction', label: 'Prediction', icon: Activity },
-    { to: '/comparison', label: 'Comparison', icon: GitCompare },
-    { to: '/explainability', label: 'Explainability', icon: Sparkles },
-    { to: '/about', label: 'About', icon: Info },
   ];
 
-  // Dynamic role-based routes for Worker and Admin
+  // Secondary Tools (Grouped in Insights dropdown)
+  const insightLinks = [
+    { to: '/dashboard', label: 'Dashboard', icon: BarChart3, desc: 'City-wide air quality metrics' },
+    { to: '/prediction', label: 'Model Prediction', icon: Activity, desc: 'Meteorological PM2.5 estimator' },
+    { to: '/comparison', label: 'Model Comparison', icon: GitCompare, desc: 'XGBoost, RF, MLP benchmarks' },
+    { to: '/explainability', label: 'Explainability', icon: Sparkles, desc: 'SHAP force & waterfall plots' },
+  ];
+
+  // More links (History, About, Documentation)
+  const moreLinks = [
+    { to: '/history', label: 'History', icon: History, desc: 'Past personal exposure audits' },
+    { to: '/about', label: 'About', icon: Info, desc: 'Scientific methodology & data' },
+  ];
+
+  const isInsightsActive = ['/dashboard', '/prediction', '/comparison', '/explainability'].includes(
+    location.pathname
+  );
+  const isMoreActive = ['/history', '/about', '/worker', '/admin'].includes(location.pathname);
+
   const canAccessWorker = hasRoleAccess('worker');
   const canAccessAdmin = hasRoleAccess('admin');
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo & Brand */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-navy-800 to-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <Wind className="w-5 h-5 text-teal-300" />
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-colors shadow-xs">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-1 sm:gap-4">
+          {/* Logo & Brand - Guaranteed single-line (whitespace-nowrap) */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 sm:gap-2.5 shrink-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg pr-1"
+          >
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-500 flex items-center justify-center text-white shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform shrink-0">
+              <Wind className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-lg text-navy-800 tracking-tight">Air Pollution XAI</span>
-                <span className="px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 rounded">
-                  v1.0
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 hidden sm:block">Explainable PM2.5 Intelligence</p>
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              <span className="font-extrabold text-sm sm:text-lg text-navy-900 dark:text-white tracking-tight whitespace-nowrap">
+                Pollution <span className="text-blue-600 dark:text-blue-400">XAI</span>
+              </span>
+              <span className="hidden sm:inline-block text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/80 uppercase tracking-wider">
+                Delhi-NCR
+              </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden xl:flex items-center space-x-1">
-            {navLinks.map((item) => {
+          {/* Desktop Navigation (Consolidated 4 Primaries + Insights & More Dropdowns) */}
+          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-1.5 text-xs">
+            {primaryLinks.map((item) => {
               const Icon = item.icon;
               return (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    `flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700 font-semibold shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
+                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`
                   }
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <span className="whitespace-nowrap">{item.label}</span>
                 </NavLink>
               );
             })}
-            {canAccessWorker && (
-              <NavLink
-                to="/worker"
-                className={({ isActive }) =>
-                  `flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    isActive ? 'bg-blue-100 text-blue-800' : 'text-blue-700 bg-blue-50/70 hover:bg-blue-100'
-                  }`
-                }
+
+            {/* Insights Dropdown */}
+            <div className="relative" ref={insightsRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setInsightsDropdownOpen(!insightsDropdownOpen);
+                  setMoreDropdownOpen(false);
+                }}
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                  isInsightsActive
+                    ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+                aria-expanded={insightsDropdownOpen}
               >
-                <HardHat className="w-3.5 h-3.5" />
-                <span>Worker</span>
-              </NavLink>
-            )}
+                <span>Insights</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${insightsDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-            {canAccessAdmin && (
-              <NavLink
-                to="/admin"
-                className={({ isActive }) =>
-                  `flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    isActive ? 'bg-purple-100 text-purple-800' : 'text-purple-700 bg-purple-50/70 hover:bg-purple-100'
-                  }`
-                }
-              >
-                <Shield className="w-3.5 h-3.5" />
-                <span>Admin</span>
-              </NavLink>
-            )}
-          </nav>
-
-          {/* User Auth, Role Switcher & Status */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Demo Role Switcher (strictly gated behind VITE_ENABLE_DEMO_MODE) */}
-            <RoleSwitcher />
-
-            {/* User Account / Auth Actions */}
-            {isAuthenticated ? (
-              <>
-                {/* Alert Notification Bell */}
-                <div className="relative" ref={alertsRef}>
-                  <button
-                    onClick={() => setAlertsDropdownOpen(!alertsDropdownOpen)}
-                    className="relative p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors"
-                    title="Air Quality Threshold Alerts"
-                  >
-                    {alertsData.active_alerts.length > 0 ? (
-                      <BellRing className="w-4 h-4 text-amber-600 animate-pulse" />
-                    ) : (
-                      <Bell className="w-4 h-4 text-slate-500" />
-                    )}
-                    {alertsData.active_alerts.length > 0 && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-bold text-[10px] flex items-center justify-center shadow-xs">
-                        {alertsData.active_alerts.length}
-                      </span>
-                    )}
-                  </button>
-
-                  {alertsDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 py-3 z-50 animate-fadeIn">
-                      <div className="px-4 pb-2 border-b border-slate-100 flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <Bell className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs font-bold text-navy-900">Saved Place Alerts</span>
+              {insightsDropdownOpen && (
+                <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-fadeIn">
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                    Analytics & Explainable AI
+                  </div>
+                  {insightLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <NavLink
+                        key={link.to}
+                        to={link.to}
+                        onClick={() => setInsightsDropdownOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-start gap-2.5 px-3.5 py-2.5 text-xs transition-colors ${
+                            isActive
+                              ? 'bg-blue-50/80 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200'
+                          }`
+                        }
+                      >
+                        <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <div>
+                          <div className="font-semibold text-slate-800 dark:text-slate-100">{link.label}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">{link.desc}</div>
                         </div>
-                        <span className="text-[11px] text-slate-400">
-                          Threshold: {alertsData.preference.pm25_threshold} µg/m³
-                        </span>
-                      </div>
+                      </NavLink>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-                      <div className="max-h-64 overflow-y-auto divide-y divide-slate-100">
-                        {alertsData.active_alerts.length === 0 ? (
-                          <div className="p-4 text-center">
-                            <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-1.5" />
-                            <p className="text-xs font-semibold text-slate-800">Air Quality Safe</p>
-                            <p className="text-[11px] text-slate-500 mt-0.5">
-                              All your saved locations are currently below your {alertsData.preference.pm25_threshold} µg/m³ safety threshold.
-                            </p>
-                          </div>
-                        ) : (
-                          alertsData.active_alerts.map((alert) => (
-                            <div key={alert.location_id} className="p-3 hover:bg-slate-50/80 transition-colors">
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-1.5">
-                                  <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
-                                  <span className="text-xs font-bold text-navy-900 truncate max-w-[170px]">
-                                    {alert.name}
-                                  </span>
-                                </div>
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                  +{alert.exceeded_by} µg/m³
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between mt-2 pt-1 text-[11px]">
-                                <span className="text-slate-500">
-                                  Current: <strong className="text-rose-600 font-semibold">{Math.round(alert.current_pm25)} µg/m³</strong>
-                                </span>
-                                <Link
-                                  to={`/live-assessment?lat=${alert.latitude}&lon=${alert.longitude}&name=${encodeURIComponent(alert.name)}`}
-                                  onClick={() => setAlertsDropdownOpen(false)}
-                                  className="text-blue-600 hover:text-blue-800 font-semibold"
-                                >
-                                  View Live →
-                                </Link>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
+            {/* More Dropdown */}
+            <div className="relative" ref={moreRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setMoreDropdownOpen(!moreDropdownOpen);
+                  setInsightsDropdownOpen(false);
+                }}
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                  isMoreActive
+                    ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+                aria-expanded={moreDropdownOpen}
+              >
+                <span>More</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
 
-                      <div className="px-4 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                        <Link
-                          to="/saved-places"
-                          onClick={() => setAlertsDropdownOpen(false)}
-                          className="text-blue-600 hover:underline font-medium"
+              {moreDropdownOpen && (
+                <div className="absolute left-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-fadeIn">
+                  {moreLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <NavLink
+                        key={link.to}
+                        to={link.to}
+                        onClick={() => setMoreDropdownOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2.5 px-3.5 py-2.5 text-xs transition-colors ${
+                            isActive
+                              ? 'bg-blue-50/80 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200'
+                          }`
+                        }
+                      >
+                        <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                        <div>
+                          <div className="font-semibold text-slate-800 dark:text-slate-100">{link.label}</div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">{link.desc}</div>
+                        </div>
+                      </NavLink>
+                    );
+                  })}
+
+                  {(canAccessWorker || canAccessAdmin) && (
+                    <div className="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1">
+                      <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                        Portals
+                      </div>
+                      {canAccessWorker && (
+                        <NavLink
+                          to="/worker"
+                          onClick={() => setMoreDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40"
                         >
-                          Manage Saved Places
-                        </Link>
-                      </div>
+                          <HardHat className="w-4 h-4 text-blue-600 shrink-0" />
+                          <span>Worker Portal</span>
+                        </NavLink>
+                      )}
+                      {canAccessAdmin && (
+                        <NavLink
+                          to="/admin"
+                          onClick={() => setMoreDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3.5 py-2 text-xs text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40"
+                        >
+                          <Shield className="w-4 h-4 text-purple-600 shrink-0" />
+                          <span>Admin Portal</span>
+                        </NavLink>
+                      )}
                     </div>
                   )}
                 </div>
+              )}
+            </div>
+          </nav>
 
-                <div className="relative" ref={dropdownRef}>
+          {/* Right Section: Micro Dot Status, Theme Toggle, Alerts Bell, Auth Avatar, Mobile Trigger */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* Ultra-compact API Status Dot with Tooltip */}
+            <div className="relative group flex items-center px-0.5 sm:px-1 py-1">
+              <span
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  isBackendOnline
+                    ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]'
+                    : 'bg-rose-500 animate-ping'
+                }`}
+                aria-label={isBackendOnline ? 'API Operational' : 'Connecting to API...'}
+              />
+              <div className="absolute right-0 top-full mt-2 hidden group-hover:flex items-center px-2 py-1 text-[11px] font-medium text-white bg-slate-900 rounded-md shadow-md whitespace-nowrap z-50 pointer-events-none">
+                {isBackendOnline ? 'Backend API Online' : 'Connecting to API...'}
+              </div>
+            </div>
+
+            {/* Dark / Light Theme Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1.5 sm:p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+              aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+              title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-600" />
+              )}
+            </button>
+
+            {/* Alert Notification Bell (For Authenticated Users) */}
+            {isAuthenticated && (
+              <div className="relative" ref={alertsRef}>
                 <button
+                  type="button"
+                  onClick={() => setAlertsDropdownOpen(!alertsDropdownOpen)}
+                  className="relative p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+                  title="Air Quality Threshold Alerts"
+                  aria-label="View air quality alerts"
+                >
+                  {alertsData.active_alerts.length > 0 ? (
+                    <BellRing className="w-4 h-4 text-amber-600 dark:text-amber-400 animate-pulse" />
+                  ) : (
+                    <Bell className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                  )}
+                  {alertsData.active_alerts.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-[10px] font-bold text-white flex items-center justify-center">
+                      {alertsData.active_alerts.length}
+                    </span>
+                  )}
+                </button>
+
+                {alertsDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-4 z-50 animate-fadeIn">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                      <span className="font-bold text-sm text-slate-900 dark:text-white">Active Air Alerts</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Limit: {alertsData.preference.pm25_threshold} µg/m³
+                      </span>
+                    </div>
+
+                    <div className="py-2 max-h-60 overflow-y-auto space-y-2">
+                      {alertsData.active_alerts.length === 0 ? (
+                        <div className="text-center py-4 text-xs text-slate-500 dark:text-slate-400">
+                          <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-1" />
+                          All saved locations are below your threshold.
+                        </div>
+                      ) : (
+                        alertsData.active_alerts.map((alert) => (
+                          <div
+                            key={alert.location_id}
+                            className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs space-y-1"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-amber-900 dark:text-amber-200">{alert.name}</span>
+                              <span className="font-bold text-rose-600 dark:text-rose-400">
+                                {alert.current_pm25} µg/m³
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-amber-700 dark:text-amber-400">
+                              Exceeded threshold by +{alert.exceeded_by} µg/m³ ({alert.cpcb_band})
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                      <Link
+                        to="/saved-places"
+                        onClick={() => setAlertsDropdownOpen(false)}
+                        className="block text-center text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        Manage saved places & thresholds →
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* User Profile / Sign In */}
+            {isAuthenticated ? (
+              <div className="relative" ref={userRef}>
+                <button
+                  type="button"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-medium transition-all"
+                  className="flex items-center gap-1.5 p-1 sm:px-2.5 sm:py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                   aria-expanded={userDropdownOpen}
                 >
-                  <div className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
-                    {user?.name ? user.name[0] : (user?.email ? user.email[0] : 'U')}
+                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+                    {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
                   </div>
-                  <span className="hidden sm:inline-block max-w-[100px] truncate font-semibold">
-                    {user?.name || user?.email?.split('@')[0]}
+                  <span className="hidden sm:inline-block text-xs font-medium text-slate-800 dark:text-slate-200 max-w-[100px] truncate">
+                    {user?.name || 'Account'}
                   </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
                 </button>
 
                 {userDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fadeIn">
-                    <div className="px-4 py-2 border-b border-slate-100">
-                      <p className="text-xs font-bold text-navy-900 truncate">{user?.name || 'User Account'}</p>
-                      <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-fadeIn">
+                    <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
+                      <div className="font-bold text-xs text-slate-900 dark:text-white truncate">{user?.name}</div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user?.email}</div>
                     </div>
 
-                    <div className="py-1">
-                      <Link
-                        to="/saved-places"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        <Bookmark className="w-4 h-4 text-blue-600" />
-                        <span>Saved Places</span>
-                      </Link>
-                      <Link
-                        to="/history"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        <History className="w-4 h-4 text-indigo-600" />
-                        <span>Assessment History</span>
-                      </Link>
-                    </div>
+                    <Link
+                      to="/saved-places"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    >
+                      <Bookmark className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>My Saved Places</span>
+                    </Link>
 
-                    <div className="pt-1 border-t border-slate-100">
+                    <Link
+                      to="/history"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    >
+                      <History className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>Audit History</span>
+                    </Link>
+
+                    {isInstallable && (
                       <button
+                        type="button"
+                        onClick={handleInstallClick}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 font-semibold"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Install Web App</span>
+                      </button>
+                    )}
+
+                    <div className="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1">
+                      <button
+                        type="button"
                         onClick={() => {
-                          setUserDropdownOpen(false);
                           logout();
+                          setUserDropdownOpen(false);
                         }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 transition-colors"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Sign Out</span>
@@ -334,106 +512,180 @@ export default function Navbar({ isBackendOnline }) {
                   </div>
                 )}
               </div>
-            </>
-          ) : (
+            ) : (
               <button
+                type="button"
                 onClick={() => openAuthModal('login')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-sm shadow-blue-500/20 transition-all whitespace-nowrap"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Sign In</span>
+                <span>Sign In</span>
               </button>
             )}
 
-            {/* Install PWA Prompt Button */}
-            {isInstallable && (
-              <button
-                onClick={handleInstallClick}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold border border-blue-200 transition-all shadow-xs"
-                title="Install AirXAI App to your Home Screen"
-              >
-                <Download className="w-3.5 h-3.5 text-blue-600" />
-                <span className="hidden sm:inline">Install</span>
-              </button>
-            )}
-
-            {/* Backend status indicator */}
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  isBackendOnline ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
-                }`}
-              />
-              <span className="hidden xl:inline">{isBackendOnline ? 'Online' : 'Connecting...'}</span>
-            </div>
-
-            {/* Mobile menu toggle */}
+            {/* Mobile Hamburger Drawer Trigger */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              aria-label="Toggle Navigation"
+              className="lg:hidden min-w-[38px] min-h-[38px] sm:min-w-[44px] sm:min-h-[44px] flex items-center justify-center p-1.5 sm:p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label={mobileMenuOpen ? 'Close navigation drawer' : 'Open navigation drawer'}
+              aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Accessible Mobile Drawer Below lg (Focus trapped & 44px tap targets) */}
       {mobileMenuOpen && (
-        <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-4 space-y-1 shadow-lg animate-fadeIn max-h-[80vh] overflow-y-auto">
-          {navLinks.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`
-                }
-              >
-                <Icon className="w-4 h-4 text-blue-600" />
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          })}
-
-          {canAccessWorker && (
-            <NavLink
-              to="/worker"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-blue-700 bg-blue-50"
-            >
-              <HardHat className="w-4 h-4 text-blue-600" />
-              <span>Worker Portal</span>
-            </NavLink>
-          )}
-
-          {canAccessAdmin && (
-            <NavLink
-              to="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-purple-700 bg-purple-50"
-            >
-              <Shield className="w-4 h-4 text-purple-600" />
-              <span>Admin Portal</span>
-            </NavLink>
-          )}
-
-          {isInstallable && (
+        <div
+          ref={drawerRef}
+          className="lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 space-y-4 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile Navigation Menu"
+        >
+          {/* Quick Controls: Theme Toggle & Role Switcher */}
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Theme</span>
             <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                handleInstallClick();
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold text-blue-700 bg-blue-50 border border-blue-200 mt-2"
+              type="button"
+              onClick={toggleTheme}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200"
             >
-              <Download className="w-4 h-4 text-blue-600" />
-              <span>Install Web App</span>
+              {isDark ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Dark Mode</span>
+                </>
+              )}
             </button>
+          </div>
+
+          {/* Primary Links */}
+          <div className="space-y-1">
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Primary Navigation
+            </span>
+            {primaryLinks.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`
+                  }
+                >
+                  <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </div>
+
+          {/* Insights Section */}
+          <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Insights & AI Tools
+            </span>
+            {insightLinks.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`
+                  }
+                >
+                  <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <div>
+                    <div className="font-semibold">{item.label}</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400">{item.desc}</div>
+                  </div>
+                </NavLink>
+              );
+            })}
+          </div>
+
+          {/* Utilities Section */}
+          <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Utilities & Project
+            </span>
+            {moreLinks.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
+                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`
+                  }
+                >
+                  <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+
+            {canAccessWorker && (
+              <NavLink
+                to="/worker"
+                onClick={() => setMobileMenuOpen(false)}
+                className="min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40"
+              >
+                <HardHat className="w-4 h-4 text-blue-600" />
+                <span>Worker Portal</span>
+              </NavLink>
+            )}
+
+            {canAccessAdmin && (
+              <NavLink
+                to="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40"
+              >
+                <Shield className="w-4 h-4 text-purple-600" />
+                <span>Admin Portal</span>
+              </NavLink>
+            )}
+          </div>
+
+          {/* PWA Install Button (If Available) */}
+          {isInstallable && (
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={handleInstallClick}
+                className="w-full min-h-[44px] flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800"
+              >
+                <Download className="w-4 h-4 text-blue-600" />
+                <span>Install Pollution XAI App</span>
+              </button>
+            </div>
           )}
         </div>
       )}
