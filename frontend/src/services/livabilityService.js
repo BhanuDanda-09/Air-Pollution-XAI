@@ -1,4 +1,4 @@
-import api from './api';
+import api from './api.js';
 
 /**
  * Service to evaluate real-world livability and exposure scores.
@@ -20,6 +20,24 @@ export const livabilityService = {
       payload.health_profile = healthProfile;
     }
     return api.post('/api/location/livability', payload);
+  },
+
+  /**
+   * Compare livability and air quality between two locations side-by-side.
+   * @param {Object} locationA - { lat, lon, name }
+   * @param {Object} locationB - { lat, lon, name }
+   * @param {Object} [healthProfile] - Optional health profile
+   * @returns {Promise<Object>} Head-to-head comparison payload
+   */
+  async compareLivability(locationA, locationB, healthProfile = null) {
+    const payload = {
+      location_a: locationA,
+      location_b: locationB,
+    };
+    if (healthProfile) {
+      payload.health_profile = healthProfile;
+    }
+    return api.post('/api/location/compare-livability', payload);
   },
 };
 

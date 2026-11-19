@@ -269,3 +269,38 @@ def test_livability_forecast_failure_fallback(mock_get, client):
     livability = data["livability"]
     assert livability["score"] is not None
     assert livability["verdict"] == "Good to go"
+
+
+def test_compare_livability_validation(client):
+    """Test validation errors for side-by-side location comparison."""
+    # Missing location_b
+    res1 = client.post("/api/location/compare-livability", json={
+        "location_a": {"lat": 28.6, "lon": 77.2},
+    })
+    assert res1.status_code == 400
+
+    # Non-numeric coordinates
+    res2 = client.post("/api/location/compare-livability", json={
+        "location_a": {"lat": "north", "lon": 77.2},
+        "location_b": {"lat": 28.5, "lon": 77.1},
+    })
+    assert res2.status_code == 400
+
+
+@patch("requests.get", side_effect=make_mock_air_quality(45.0, with_hourly=True))
+def test_compare_livability_success(mock_get, client):
+    """Test comparing two locations returns winner determination and side-by-side metrics."""
+    res = client.post("/api/location/compare-livability", json={
+        "location_a": {"lat": 28.63, "lon": 77.22, "name": "Connaught Place"},
+        "location_b": {"lat": 28.46, "lon": 77.03, "name": "Cyber City"},
+        "health_profile": {"age_group": "adult"},
+    })
+    assert res.status_code == 200
+    data = res.get_json()
+    assert data["success"] is True
+    assert "winner" in data
+    assert "summary" in data
+    assert data["location_a"]["name"] == "Connaught Place"
+    assert data["location_b"]["name"] == "Cyber City"
+    assert data["location_a"]["score"] is not None
+    assert data["location_b"]["score"] is not None

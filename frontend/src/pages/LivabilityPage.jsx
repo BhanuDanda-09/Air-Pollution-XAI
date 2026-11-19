@@ -1,6 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Home, Compass, AlertCircle, RefreshCw, SlidersHorizontal, Bookmark, Check } from 'lucide-react';
+import {
+  Home,
+  Compass,
+  AlertCircle,
+  RefreshCw,
+  SlidersHorizontal,
+  Bookmark,
+  Check,
+  GitCompare,
+  ArrowRight,
+  Trophy,
+  Scale,
+  Clock,
+  MapPin,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+} from 'lucide-react';
 import LocationPicker from '../components/LocationPicker';
 import HealthProfileSelector from '../components/HealthProfileSelector';
 import LivabilityScoreCard from '../components/LivabilityScoreCard';
@@ -18,10 +35,22 @@ const DEFAULT_PROFILE = {
   is_outdoor_worker: false,
 };
 
+const LOCATION_PRESETS = [
+  { name: 'Connaught Place, Central Delhi', lat: 28.6315, lon: 77.2167 },
+  { name: 'Cyber City, Gurugram', lat: 28.4900, lon: 77.0800 },
+  { name: 'Noida Sector 62', lat: 28.6250, lon: 77.3650 },
+  { name: 'Anand Vihar, East Delhi', lat: 28.6470, lon: 77.3150 },
+  { name: 'Rohini, North Delhi', lat: 28.7350, lon: 77.1150 },
+  { name: 'Faridabad Sector 16', lat: 28.4100, lon: 77.3150 },
+];
+
 export default function LivabilityPage() {
   const [searchParams] = useSearchParams();
   const { isAuthenticated, healthProfile: userProfile } = useAuth();
 
+  const [activeTab, setActiveTab] = useState('single'); // 'single' | 'compare'
+
+  // Single location mode state
   const initialLat = searchParams.get('lat') ? parseFloat(searchParams.get('lat')) : 28.6315;
   const initialLon = searchParams.get('lon') ? parseFloat(searchParams.get('lon')) : 77.2167;
   const initialName = searchParams.get('name') || '';
@@ -34,12 +63,29 @@ export default function LivabilityPage() {
   const [assessmentData, setAssessmentData] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Sync profile if user logs in or profile loads
+  // Compare mode state
+  const [savedPlaces, setSavedPlaces] = useState([]);
+  const [locA, setLocA] = useState({ name: 'Connaught Place, Central Delhi', lat: 28.6315, lon: 77.2167 });
+  const [locB, setLocB] = useState({ name: 'Cyber City, Gurugram', lat: 28.4900, lon: 77.0800 });
+  const [comparisonData, setComparisonData] = useState(null);
+  const [compareLoading, setCompareLoading] = useState(false);
+  const [compareError, setCompareError] = useState(null);
+
   useEffect(() => {
     if (userProfile) {
       setHealthProfile(userProfile);
     }
   }, [userProfile]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      userService.getSavedLocations().then((places) => {
+        if (places && places.length > 0) {
+          setSavedPlaces(places);
+        }
+      });
+    }
+  }, [isAuthenticated]);
 
   const fetchLivability = async (lat = latitude, lon = longitude, profile = healthProfile) => {
     setIsLoading(true);
@@ -49,7 +95,6 @@ export default function LivabilityPage() {
       const result = response.data || response;
       setAssessmentData(result);
 
-      // Record assessment to user history in the background if authenticated
       if (isAuthenticated && result) {
         userService.recordHistory({
           latitude: lat,
@@ -75,6 +120,19 @@ export default function LivabilityPage() {
     fetchLivability(initialLat, initialLon, healthProfile);
   }, [initialLat, initialLon]);
 
+  const handleRunComparison = async () => {
+    setCompareLoading(true);
+    setCompareError(null);
+    try {
+      const res = await livabilityService.compareLivability(locA, locB, healthProfile);
+      setComparisonData(res);
+    } catch (err) {
+      setCompareError(err?.message || 'Failed to compute head-to-head comparison.');
+    } finally {
+      setCompareLoading(false);
+    }
+  };
+
   const handleLocationChange = (newLat, newLon) => {
     setLatitude(newLat);
     setLongitude(newLon);
@@ -83,7 +141,11 @@ export default function LivabilityPage() {
 
   const handleProfileChange = (updatedProfile) => {
     setHealthProfile(updatedProfile);
-    fetchLivability(latitude, longitude, updatedProfile);
+    if (activeTab === 'single') {
+      fetchLivability(latitude, longitude, updatedProfile);
+    } else {
+      handleRunComparison();
+    }
   };
 
   const handleQuickSaveLocation = async () => {
@@ -110,24 +172,21 @@ export default function LivabilityPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800 rounded-full">
-                Phase 2 Decision Synthesis
+                Decision Synthesis Engine
               </span>
-              <span className="text-xs text-slate-500 font-medium">
-                Livability & Exposure Assessment
-              </span>
+              <span className="text-xs text-slate-500 font-medium">Livability, Forecasts & Comparison</span>
             </div>
             <h1 className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
               Should I Live In / Go To This Place?
             </h1>
             <p className="text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
-              Synthesize real-world air pollution exposure into clear, actionable verdicts. The score is
-              driven primarily by regional Copernicus (CAMS) reference data and forecasts, with local surface
-              meteorological machine learning providing secondary atmospheric context.
+              Synthesize regional Copernicus (CAMS) reference data, local surface meteorological modeling, and 7-day
+              forecast trends into plain-language decision guidance.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-            {isAuthenticated && (
+            {isAuthenticated && activeTab === 'single' && (
               <button
                 type="button"
                 onClick={handleQuickSaveLocation}
@@ -148,65 +207,301 @@ export default function LivabilityPage() {
               </button>
             )}
 
-            <button
-              type="button"
-              onClick={() => fetchLivability(latitude, longitude, healthProfile)}
-              disabled={isLoading}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-semibold border border-slate-300 transition-colors disabled:opacity-50 cursor-pointer"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-              Re-evaluate Livability
-            </button>
+            {/* Mode Switcher Tabs */}
+            <div className="flex p-1 rounded-xl bg-slate-100 border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setActiveTab('single')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === 'single' ? 'bg-white text-navy-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5 text-blue-600" />
+                <span>Single Place</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('compare');
+                  if (!comparisonData) handleRunComparison();
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === 'compare' ? 'bg-white text-navy-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <GitCompare className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Compare Two Places</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Cold Start Notice (Render 5s Delay Indicator) */}
-      <ColdStartNotice isLoading={isLoading} />
+      <ColdStartNotice isLoading={isLoading || compareLoading} />
 
-      {/* Error Alert */}
-      {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-3 shadow-xs">
-          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <h4 className="font-bold">Evaluation Failed</h4>
-            <p className="mt-0.5 text-xs text-rose-700 leading-relaxed">{error}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => fetchLivability(latitude, longitude, healthProfile)}
-            className="text-xs underline font-semibold text-rose-900 hover:text-rose-950 cursor-pointer"
-          >
-            Retry
-          </button>
+      {/* Health Risk Profile Selector */}
+      <HealthProfileSelector value={healthProfile} onChange={handleProfileChange} />
+
+      {/* TAB 1: Single Location Mode */}
+      {activeTab === 'single' && (
+        <div className="space-y-6 animate-fadeIn">
+          {error && (
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-3 shadow-xs">
+              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="font-bold">Evaluation Failed</h4>
+                <p className="mt-0.5 text-xs text-rose-700 leading-relaxed">{error}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => fetchLivability(latitude, longitude, healthProfile)}
+                className="text-xs underline font-semibold text-rose-900 hover:text-rose-950 cursor-pointer"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          <LocationPicker
+            latitude={latitude}
+            longitude={longitude}
+            onLocationChange={handleLocationChange}
+            onAssess={() => fetchLivability(latitude, longitude, healthProfile)}
+            isLoading={isLoading}
+          />
+
+          {assessmentData?.livability && <LivabilityScoreCard livabilityData={assessmentData.livability} />}
+
+          {assessmentData?.livability?.persona_guidance && (
+            <PersonaAdviceSection personaGuidance={assessmentData.livability.persona_guidance} />
+          )}
         </div>
       )}
 
-      {/* Location Picker */}
-      <LocationPicker
-        latitude={latitude}
-        longitude={longitude}
-        onLocationChange={handleLocationChange}
-        onAssess={() => fetchLivability(latitude, longitude, healthProfile)}
-        isLoading={isLoading}
-      />
+      {/* TAB 2: Compare Two Locations Mode */}
+      {activeTab === 'compare' && (
+        <div className="space-y-6 animate-fadeIn">
+          {/* Comparison Selector Controls */}
+          <div className="p-5 sm:p-6 bg-white rounded-2xl shadow-sm border border-slate-200">
+            <h2 className="text-base font-bold text-navy-900 mb-4 flex items-center gap-2">
+              <Scale className="w-4 h-4 text-indigo-600" />
+              <span>Head-to-Head Livability Comparison: Where is it Safer?</span>
+            </h2>
 
-      {/* Health Risk Profile Selector */}
-      <HealthProfileSelector
-        value={healthProfile}
-        onChange={handleProfileChange}
-      />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Location A */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs uppercase tracking-wider text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
+                    Location A
+                  </span>
+                  <span className="text-[11px] text-slate-500">
+                    ({locA.lat.toFixed(2)}°, {locA.lon.toFixed(2)}°)
+                  </span>
+                </div>
 
-      {/* Master Livability Score & Verdict Card */}
-      {assessmentData?.livability && (
-        <LivabilityScoreCard livabilityData={assessmentData.livability} />
-      )}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Preset or Saved Place</label>
+                  <select
+                    onChange={(e) => {
+                      const val = JSON.parse(e.target.value);
+                      setLocA(val);
+                    }}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white"
+                  >
+                    <optgroup label="Popular NCR Hubs">
+                      {LOCATION_PRESETS.map((p, idx) => (
+                        <option key={idx} value={JSON.stringify(p)} selected={p.name === locA.name}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                    {savedPlaces.length > 0 && (
+                      <optgroup label="My Saved Places">
+                        {savedPlaces.map((sp) => (
+                          <option
+                            key={sp.id}
+                            value={JSON.stringify({ name: `${sp.label}: ${sp.name}`, lat: sp.latitude, lon: sp.longitude })}
+                          >
+                            ⭐ {sp.label}: {sp.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                </div>
+              </div>
 
-      {/* Persona-specific Guidance Cards */}
-      {assessmentData?.livability?.persona_guidance && (
-        <PersonaAdviceSection
-          personaGuidance={assessmentData.livability.persona_guidance}
-        />
+              {/* Location B */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+                    Location B
+                  </span>
+                  <span className="text-[11px] text-slate-500">
+                    ({locB.lat.toFixed(2)}°, {locB.lon.toFixed(2)}°)
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Preset or Saved Place</label>
+                  <select
+                    onChange={(e) => {
+                      const val = JSON.parse(e.target.value);
+                      setLocB(val);
+                    }}
+                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white"
+                  >
+                    <optgroup label="Popular NCR Hubs">
+                      {LOCATION_PRESETS.map((p, idx) => (
+                        <option key={idx} value={JSON.stringify(p)} selected={p.name === locB.name}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                    {savedPlaces.length > 0 && (
+                      <optgroup label="My Saved Places">
+                        {savedPlaces.map((sp) => (
+                          <option
+                            key={sp.id}
+                            value={JSON.stringify({ name: `${sp.label}: ${sp.name}`, lat: sp.latitude, lon: sp.longitude })}
+                          >
+                            ⭐ {sp.label}: {sp.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-slate-100 flex justify-end">
+              <button
+                type="button"
+                onClick={handleRunComparison}
+                disabled={compareLoading}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md shadow-indigo-500/20 flex items-center gap-2 transition-all disabled:opacity-50"
+              >
+                <GitCompare className={`w-3.5 h-3.5 ${compareLoading ? 'animate-spin' : ''}`} />
+                <span>{compareLoading ? 'Evaluating Both Spots...' : 'Compare Livability Now'}</span>
+              </button>
+            </div>
+          </div>
+
+          {compareError && (
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm">
+              {compareError}
+            </div>
+          )}
+
+          {/* Comparison Results */}
+          {comparisonData && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Winner Decision Banner */}
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-sm">
+                    <Trophy className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-navy-900 text-sm sm:text-base">Recommendation Verdict</h3>
+                    <p className="text-xs sm:text-sm text-emerald-900 mt-0.5 leading-relaxed font-medium">
+                      {comparisonData.summary}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Side-by-Side Comparison Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Card A */}
+                <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs uppercase tracking-wider text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
+                      Location A
+                    </span>
+                    {comparisonData.winner === 'location_a' && (
+                      <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                        <Trophy className="w-3.5 h-3.5" />
+                        <span>Recommended</span>
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="text-lg font-bold text-navy-900">{comparisonData.location_a.name}</h4>
+
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-navy-900">{comparisonData.location_a.score}</span>
+                    <span className="text-xs text-slate-500 font-semibold">/ 100 Score</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Verdict</span>
+                      <strong className="text-slate-800">{comparisonData.location_a.verdict.label}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Reference PM2.5 (CAMS)</span>
+                      <strong className="text-slate-800">
+                        {Math.round(comparisonData.location_a.pm25_reference || 0)} µg/m³
+                      </strong>
+                    </div>
+                    {comparisonData.location_a.best_time_today && (
+                      <div className="flex justify-between pt-1 border-t border-slate-200">
+                        <span className="text-slate-500">Best Time Today</span>
+                        <strong className="text-emerald-700">
+                          {comparisonData.location_a.best_time_today.time_window}
+                        </strong>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card B */}
+                <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+                      Location B
+                    </span>
+                    {comparisonData.winner === 'location_b' && (
+                      <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                        <Trophy className="w-3.5 h-3.5" />
+                        <span>Recommended</span>
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="text-lg font-bold text-navy-900">{comparisonData.location_b.name}</h4>
+
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-navy-900">{comparisonData.location_b.score}</span>
+                    <span className="text-xs text-slate-500 font-semibold">/ 100 Score</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Verdict</span>
+                      <strong className="text-slate-800">{comparisonData.location_b.verdict.label}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Reference PM2.5 (CAMS)</span>
+                      <strong className="text-slate-800">
+                        {Math.round(comparisonData.location_b.pm25_reference || 0)} µg/m³
+                      </strong>
+                    </div>
+                    {comparisonData.location_b.best_time_today && (
+                      <div className="flex justify-between pt-1 border-t border-slate-200">
+                        <span className="text-slate-500">Best Time Today</span>
+                        <strong className="text-emerald-700">
+                          {comparisonData.location_b.best_time_today.time_window}
+                        </strong>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
