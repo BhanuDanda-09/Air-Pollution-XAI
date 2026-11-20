@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 import DemoBanner from './components/DemoBanner';
 import ProtectedRoute from './components/ProtectedRoute';
 import PageSkeleton from './components/PageSkeleton';
+import ErrorBoundary from './components/ErrorBoundary';
 import usePageMeta from './hooks/usePageMeta';
 import predictionService from './services/predictionService';
 
@@ -61,42 +62,44 @@ export default function App() {
             <ServiceWorkerToast />
 
             <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              <Suspense fallback={<PageSkeleton variant="generic" className="py-6" />}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/livability" element={<LivabilityPage />} />
-                  <Route path="/live-assessment" element={<LiveAssessmentPage />} />
-                  <Route path="/saved-places" element={<SavedPlacesPage />} />
-                  <Route path="/history" element={<HistoryPage />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/prediction" element={<Prediction />} />
-                  <Route path="/comparison" element={<ModelComparisonPage />} />
-                  <Route path="/explainability" element={<Explainability />} />
-                  <Route path="/about" element={<About />} />
-                  <Route
-                    path="/admin"
-                    element={
-                      <ProtectedRoute requiredRole="admin">
-                        <AdminPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/worker"
-                    element={
-                      <ProtectedRoute requiredRole={['worker', 'admin']}>
-                        <WorkerPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route path="/unauthorized" element={<UnauthorizedPage />} />
-                  <Route path="/404" element={<NotFoundPage />} />
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </Suspense>
+              <ErrorBoundary>
+                <Suspense fallback={<PageSkeleton variant="generic" className="py-6" />}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/livability" element={<LivabilityPage />} />
+                    <Route path="/live-assessment" element={<LiveAssessmentPage />} />
+                    <Route path="/saved-places" element={<SavedPlacesPage />} />
+                    <Route path="/history" element={<HistoryPage />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/prediction" element={<Prediction />} />
+                    <Route path="/comparison" element={<ModelComparisonPage />} />
+                    <Route path="/explainability" element={<Explainability />} />
+                    <Route path="/about" element={<About />} />
+                    <Route
+                      path="/admin"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <AdminPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/worker"
+                      element={
+                        <ProtectedRoute requiredRole={['worker', 'admin']}>
+                          <WorkerPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                    <Route path="/404" element={<NotFoundPage />} />
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Routes>
+                </Suspense>
+              </ErrorBoundary>
             </main>
 
-            <Footer />
+            <Footer isBackendOnline={isBackendOnline} />
           </div>
         </Router>
       </ThemeProvider>

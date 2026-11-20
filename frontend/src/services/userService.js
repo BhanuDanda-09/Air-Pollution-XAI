@@ -22,7 +22,7 @@ export const userService = {
    */
   async getSavedLocations() {
     const res = await api.get('/api/user/locations');
-    return res?.locations || [];
+    return res?.locations || res?.data?.locations || [];
   },
 
   /**

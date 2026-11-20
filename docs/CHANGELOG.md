@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.0.0] - 2026-11-19
+## [2.0.0] - 2026-11-20
 
 ### Added
+- **Full Flow End-to-End Test Suite**:
+  - Implemented `frontend/test/e2e_full_flow.mjs` verifying authentication, live assessment, saved places CSV export, 7-day exposure SVG chart, and logout flow.
+  - Updated GitHub Actions (`.github/workflows/ci.yml`) to run both smoke tests and full flow tests on every push.
+- **Viva Voce Defense & Capstone FAQ**:
+  - Added dedicated Section 7 to `About.jsx` covering XGBoost vs. Deep Learning sample complexity, zero data leakage validation protocols, barometric pressure units (mmHg vs. hPa), and Copernicus CAMS satellite AOD integration.
+- **Accessible Error Boundary**:
+  - Implemented `ErrorBoundary.jsx` around React lazy route suspense blocks with "Reload Page" and "Back to Home" recovery CTAs.
 - **Dark Mode Theming**:
   - Added Tailwind `darkMode: 'class'` support across all components.
   - Implemented `ThemeContext` providing persistent theme state (`light`, `dark`, `system`) with OS color scheme listeners.

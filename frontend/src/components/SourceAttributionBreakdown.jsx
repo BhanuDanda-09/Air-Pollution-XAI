@@ -39,30 +39,30 @@ export default function SourceAttributionBreakdown({ attributionData }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6 animate-fadeIn">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xs space-y-6 animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Source Attribution</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Source Attribution</span>
+            <span className="text-slate-300 dark:text-slate-600">•</span>
+            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
               IIT-Kanpur / TERI Airshed Proxy
             </span>
           </div>
-          <h3 className="text-xl font-bold text-navy-800 mt-1 flex items-center gap-2">
-            <PieChart className="w-5 h-5 text-blue-600" />
+          <h3 className="text-xl font-bold text-navy-800 dark:text-white mt-1 flex items-center gap-2">
+            <PieChart className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <span>Emission Source Apportionment</span>
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Heuristic breakdown of regional pollution origin sectors based on surface wind vectors, temperature, and moisture.
           </p>
         </div>
 
         {/* Primary Driver Pill */}
         <div className="sm:text-right shrink-0">
-          <span className="text-xs text-slate-500">Leading Source:</span>
-          <div className="text-sm font-extrabold text-rose-600">
+          <span className="text-xs text-slate-500 dark:text-slate-400">Leading Source:</span>
+          <div className="text-sm font-extrabold text-rose-600 dark:text-rose-400">
             {primary_source} ({primary_percentage}%)
           </div>
         </div>
@@ -70,11 +70,11 @@ export default function SourceAttributionBreakdown({ attributionData }) {
 
       {/* Multi-color Segmented Distribution Bar */}
       <div className="space-y-2">
-        <div className="flex justify-between items-center text-xs font-semibold text-slate-700">
+        <div className="flex justify-between items-center text-xs font-semibold text-slate-700 dark:text-slate-200">
           <span>Estimated Source Sector Distribution</span>
-          <span className="text-slate-400 font-normal">Total: 100%</span>
+          <span className="text-slate-400 dark:text-slate-500 font-normal">Total: 100%</span>
         </div>
-        <div className="h-4 w-full rounded-full overflow-hidden flex shadow-inner bg-slate-100">
+        <div className="h-4 w-full rounded-full overflow-hidden flex shadow-inner bg-slate-100 dark:bg-slate-800">
           {sectors.map((s) => (
             <div
               key={s.id}
@@ -90,18 +90,18 @@ export default function SourceAttributionBreakdown({ attributionData }) {
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-[11px] text-slate-600">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-[11px] text-slate-600 dark:text-slate-400">
           {sectors.map((s) => (
             <button
               key={s.id}
               onClick={() => toggleSector(s.id)}
-              className={`inline-flex items-center gap-1.5 transition-colors ${
-                expandedSector === s.id ? 'font-bold text-slate-900' : 'hover:text-slate-900'
+              className={`inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                expandedSector === s.id ? 'font-bold text-slate-900 dark:text-white' : 'hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
               <span>{s.name}</span>
-              <span className="font-semibold text-slate-700">({s.percentage}%)</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300">({s.percentage}%)</span>
             </button>
           ))}
         </div>
@@ -109,11 +109,11 @@ export default function SourceAttributionBreakdown({ attributionData }) {
 
       {/* Narrative Synthesis Card */}
       {narrative_summary && (
-        <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-100 text-xs text-blue-950 flex items-start gap-3">
-          <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800 text-xs text-blue-950 dark:text-blue-200 flex items-start gap-3">
+          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <span className="font-bold text-blue-900">Meteorological Trajectory Synthesis:</span>
-            <p className="leading-relaxed text-blue-900/90">{narrative_summary}</p>
+            <span className="font-bold text-blue-900 dark:text-blue-100">Meteorological Trajectory Synthesis:</span>
+            <p className="leading-relaxed text-blue-900/90 dark:text-blue-200/90">{narrative_summary}</p>
           </div>
         </div>
       )}
@@ -126,10 +126,10 @@ export default function SourceAttributionBreakdown({ attributionData }) {
 
           const levelBadgeClass =
             sector.contribution_level === 'High'
-              ? 'bg-rose-50 text-rose-700 border-rose-200'
+              ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
               : sector.contribution_level === 'Moderate'
-              ? 'bg-amber-50 text-amber-700 border-amber-200'
-              : 'bg-slate-50 text-slate-600 border-slate-200';
+              ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+              : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700';
 
           return (
             <div
@@ -137,8 +137,8 @@ export default function SourceAttributionBreakdown({ attributionData }) {
               onClick={() => toggleSector(sector.id)}
               className={`p-4 rounded-xl border transition-all cursor-pointer ${
                 isExpanded
-                  ? 'border-blue-400 bg-blue-50/20 shadow-xs'
-                  : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                  ? 'border-blue-400 bg-blue-50/20 dark:bg-blue-950/30 shadow-xs'
+                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/50 dark:hover:bg-slate-800'
               }`}
             >
               <div className="flex items-center justify-between gap-2">
@@ -150,12 +150,12 @@ export default function SourceAttributionBreakdown({ attributionData }) {
                     <Icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-snug">
+                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug">
                       {sector.name}
                     </h4>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs font-black text-slate-800">{sector.percentage}%</span>
-                      <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold border ${levelBadgeClass}`}>
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-100">{sector.percentage}%</span>
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold border ${levelBadgeClass}`}>
                         {sector.contribution_level} Impact
                       </span>
                     </div>
@@ -164,7 +164,7 @@ export default function SourceAttributionBreakdown({ attributionData }) {
 
                 <button
                   type="button"
-                  className="p-1 rounded-md text-slate-400 hover:text-slate-600"
+                  className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                   aria-label="Toggle details"
                 >
                   {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -173,8 +173,8 @@ export default function SourceAttributionBreakdown({ attributionData }) {
 
               {/* Driving Factors Details */}
               {isExpanded && sector.driving_factors && sector.driving_factors.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 space-y-1.5 animate-fadeIn">
-                  <span className="font-semibold text-slate-700 text-[11px] uppercase tracking-wider">
+                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-xs text-slate-600 dark:text-slate-300 space-y-1.5 animate-fadeIn">
+                  <span className="font-semibold text-slate-700 dark:text-slate-200 text-[11px] uppercase tracking-wider">
                     Meteorological Driving Mechanisms:
                   </span>
                   <ul className="space-y-1 pl-1">
@@ -193,10 +193,10 @@ export default function SourceAttributionBreakdown({ attributionData }) {
       </div>
 
       {/* Scientific Methodology Footer */}
-      <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200 text-[11px] text-slate-500 flex items-start gap-2.5">
+      <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3.5 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-500 dark:text-slate-400 flex items-start gap-2.5">
         <Sparkles className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          <strong className="text-slate-700">Methodology & Source Attribution Distinction:</strong>{' '}
+          <strong className="text-slate-700 dark:text-slate-200">Methodology & Source Attribution Distinction:</strong>{' '}
           {scientific_methodology}
         </p>
       </div>

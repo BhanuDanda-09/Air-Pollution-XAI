@@ -22,6 +22,8 @@ import {
   Search,
   X,
   RotateCw,
+  FileSpreadsheet,
+  GitCompare,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import userService from '../services/userService';
@@ -222,6 +224,26 @@ export default function SavedPlacesPage() {
     navigate(`/livability?lat=${loc.latitude}&lon=${loc.longitude}&name=${encodeURIComponent(loc.name)}`);
   };
 
+  const handleExportCSV = () => {
+    if (locations.length === 0) return;
+    const headers = ['ID', 'Name', 'Category', 'Latitude', 'Longitude'];
+    const rows = locations.map((loc) => [
+      loc.id,
+      `"${(loc.name || '').replace(/"/g, '""')}"`,
+      loc.label || 'Home',
+      loc.latitude,
+      loc.longitude,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `pollution_xai_saved_places_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const filteredLocations = locations.filter((loc) => {
     const q = searchQuery.toLowerCase();
     return loc.name?.toLowerCase().includes(q) || loc.label?.toLowerCase().includes(q);
@@ -292,13 +314,26 @@ export default function SavedPlacesPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md shadow-blue-500/20 transition-all"
-        >
-          {showAddForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          <span>{showAddForm ? 'Cancel' : 'Add New Place'}</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          {locations.length > 0 && (
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs border border-slate-200 dark:border-slate-700 transition-all cursor-pointer"
+              title="Download saved places as CSV"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>Export CSV</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+          >
+            {showAddForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            <span>{showAddForm ? 'Cancel' : 'Add New Place'}</span>
+          </button>
+        </div>
       </div>
 
       <ColdStartNotice isLoading={loading} />
@@ -564,20 +599,30 @@ export default function SavedPlacesPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="grid grid-cols-3 gap-1.5 mt-5 pt-4 border-t border-slate-100 dark:border-slate-800">
                   <button
                     onClick={() => navigateToAssess(loc)}
-                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-semibold transition-colors"
+                    className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[11px] font-semibold transition-colors cursor-pointer"
+                    title="Run live meteorological assessment"
                   >
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>Live Assess</span>
+                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <span>Assess</span>
                   </button>
                   <button
                     onClick={() => navigateToLivability(loc)}
-                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors"
+                    className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] font-semibold transition-colors cursor-pointer"
+                    title="View residential livability score"
                   >
-                    <Compass className="w-3.5 h-3.5" />
+                    <Compass className="w-3.5 h-3.5 shrink-0" />
                     <span>Verdict</span>
+                  </button>
+                  <button
+                    onClick={() => navigate(`/livability?lat=${loc.latitude}&lon=${loc.longitude}&tab=compare`)}
+                    className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold transition-colors cursor-pointer"
+                    title="Compare this place with another"
+                  >
+                    <GitCompare className="w-3.5 h-3.5 shrink-0" />
+                    <span>Compare</span>
                   </button>
                 </div>
               </div>

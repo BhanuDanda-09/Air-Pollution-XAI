@@ -65,7 +65,8 @@ jobs:
           cd frontend
           npx playwright install --with-deps chromium
 
-      - name: Run Playwright E2E smoke tests
+      - name: Run Playwright E2E smoke and full flow tests
         run: |
           cd frontend
           node test/e2e_smoke.mjs
+          node test/e2e_full_flow.mjs

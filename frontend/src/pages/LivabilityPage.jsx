@@ -168,19 +168,19 @@ export default function LivabilityPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-800 rounded-full">
+              <span className="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 rounded-full">
                 Decision Synthesis Engine
               </span>
-              <span className="text-xs text-slate-500 font-medium">Livability, Forecasts & Comparison</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Livability, Forecasts & Comparison</span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white mt-2 tracking-tight">
               Should I Live In / Go To This Place?
             </h1>
-            <p className="text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-3xl leading-relaxed">
               Synthesize regional Copernicus (CAMS) reference data, local surface meteorological modeling, and 7-day
               forecast trends into plain-language decision guidance.
             </p>
@@ -191,12 +191,12 @@ export default function LivabilityPage() {
               <button
                 type="button"
                 onClick={handleQuickSaveLocation}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold border border-blue-200 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
                 title="Bookmark this spot to Saved Places"
               >
                 {saveSuccess ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Saved!</span>
                   </>
                 ) : (
@@ -209,15 +209,15 @@ export default function LivabilityPage() {
             )}
 
             {/* Mode Switcher Tabs */}
-            <div className="flex p-1 rounded-xl bg-slate-100 border border-slate-200">
+            <div className="flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
               <button
                 type="button"
                 onClick={() => setActiveTab('single')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  activeTab === 'single' ? 'bg-white text-navy-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'single' ? 'bg-white dark:bg-slate-900 text-navy-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <Compass className="w-3.5 h-3.5 text-blue-600" />
+                <Compass className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span>Single Place</span>
               </button>
               <button
@@ -226,11 +226,11 @@ export default function LivabilityPage() {
                   setActiveTab('compare');
                   if (!comparisonData) handleRunComparison();
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  activeTab === 'compare' ? 'bg-white text-navy-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'compare' ? 'bg-white dark:bg-slate-900 text-navy-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <GitCompare className="w-3.5 h-3.5 text-indigo-600" />
+                <GitCompare className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Compare Two Places</span>
               </button>
             </div>
@@ -238,16 +238,16 @@ export default function LivabilityPage() {
         </div>
 
         {/* Purpose Clarity Banner */}
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-2xl text-xs text-emerald-950">
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-xs text-emerald-950 dark:text-emerald-200">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+            <span className="font-extrabold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
               Livability & Comparison
             </span>
             <span>Personal 0–100 score, health sensitivity shifts, and head-to-head place comparison.</span>
           </div>
           <Link
             to={`/live-assessment?lat=${latitude}&lon=${longitude}`}
-            className="inline-flex items-center gap-1 font-bold text-emerald-800 hover:text-emerald-950 shrink-0"
+            className="inline-flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 dark:hover:text-white shrink-0"
           >
             <span>Need Raw Meteorological Telemetry & SHAP? Go to Live Assessment</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -304,32 +304,32 @@ export default function LivabilityPage() {
       {activeTab === 'compare' && (
         <div className="space-y-6 animate-fadeIn">
           {/* Comparison Selector Controls */}
-          <div className="p-5 sm:p-6 bg-white rounded-2xl shadow-sm border border-slate-200">
-            <h2 className="text-base font-bold text-navy-900 mb-4 flex items-center gap-2">
-              <Scale className="w-4 h-4 text-indigo-600" />
+          <div className="p-5 sm:p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+            <h2 className="text-base font-bold text-navy-900 dark:text-white mb-4 flex items-center gap-2">
+              <Scale className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span>Head-to-Head Livability Comparison: Where is it Safer?</span>
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {/* Location A */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs uppercase tracking-wider text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
+                  <span className="font-bold text-xs uppercase tracking-wider text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950/60 px-2 py-0.5 rounded">
                     Location A
                   </span>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                     ({locA.lat.toFixed(2)}°, {locA.lon.toFixed(2)}°)
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Preset or Saved Place</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Preset or Saved Place</label>
                   <select
                     onChange={(e) => {
                       const val = JSON.parse(e.target.value);
                       setLocA(val);
                     }}
-                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white"
+                    className="w-full max-w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 truncate focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   >
                     <optgroup label="Popular NCR Hubs">
                       {LOCATION_PRESETS.map((p, idx) => (
@@ -355,24 +355,24 @@ export default function LivabilityPage() {
               </div>
 
               {/* Location B */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+                  <span className="font-bold text-xs uppercase tracking-wider text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/60 px-2 py-0.5 rounded">
                     Location B
                   </span>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                     ({locB.lat.toFixed(2)}°, {locB.lon.toFixed(2)}°)
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">Preset or Saved Place</label>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">Preset or Saved Place</label>
                   <select
                     onChange={(e) => {
                       const val = JSON.parse(e.target.value);
                       setLocB(val);
                     }}
-                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white"
+                    className="w-full max-w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 truncate focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   >
                     <optgroup label="Popular NCR Hubs">
                       {LOCATION_PRESETS.map((p, idx) => (
@@ -398,12 +398,12 @@ export default function LivabilityPage() {
               </div>
             </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-100 flex justify-end">
+            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
               <button
                 type="button"
                 onClick={handleRunComparison}
                 disabled={compareLoading}
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md shadow-indigo-500/20 flex items-center gap-2 transition-all disabled:opacity-50"
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md shadow-indigo-500/20 flex items-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
               >
                 <GitCompare className={`w-3.5 h-3.5 ${compareLoading ? 'animate-spin' : ''}`} />
                 <span>{compareLoading ? 'Evaluating Both Spots...' : 'Compare Livability Now'}</span>
@@ -412,7 +412,7 @@ export default function LivabilityPage() {
           </div>
 
           {compareError && (
-            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm">
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-sm">
               {compareError}
             </div>
           )}
@@ -421,14 +421,14 @@ export default function LivabilityPage() {
           {comparisonData && (
             <div className="space-y-6 animate-fadeIn">
               {/* Winner Decision Banner */}
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 shadow-sm">
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-emerald-950/40 border border-emerald-200 dark:border-emerald-800 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-sm">
+                  <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow-sm shrink-0">
                     <Trophy className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-navy-900 text-sm sm:text-base">Recommendation Verdict</h3>
-                    <p className="text-xs sm:text-sm text-emerald-900 mt-0.5 leading-relaxed font-medium">
+                    <h3 className="font-bold text-navy-900 dark:text-white text-sm sm:text-base">Recommendation Verdict</h3>
+                    <p className="text-xs sm:text-sm text-emerald-900 dark:text-emerald-200 mt-0.5 leading-relaxed font-medium">
                       {comparisonData.summary}
                     </p>
                   </div>
@@ -436,42 +436,42 @@ export default function LivabilityPage() {
               </div>
 
               {/* Side-by-Side Comparison Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* Card A */}
-                <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <div className="p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs uppercase tracking-wider text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
+                    <span className="font-bold text-xs uppercase tracking-wider text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950/60 px-2 py-0.5 rounded">
                       Location A
                     </span>
                     {comparisonData.winner === 'location_a' && (
-                      <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                      <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full">
                         <Trophy className="w-3.5 h-3.5" />
                         <span>Recommended</span>
                       </span>
                     )}
                   </div>
-                  <h4 className="text-lg font-bold text-navy-900">{comparisonData.location_a.name}</h4>
+                  <h4 className="text-lg font-bold text-navy-900 dark:text-white">{comparisonData.location_a.name}</h4>
 
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-navy-900">{comparisonData.location_a.score}</span>
-                    <span className="text-xs text-slate-500 font-semibold">/ 100 Score</span>
+                    <span className="text-3xl font-black text-navy-900 dark:text-white">{comparisonData.location_a.score}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">/ 100 Score</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Verdict</span>
-                      <strong className="text-slate-800">{comparisonData.location_a.verdict.label}</strong>
+                      <span className="text-slate-500 dark:text-slate-400">Verdict</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{comparisonData.location_a.verdict.label}</strong>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Reference PM2.5 (CAMS)</span>
-                      <strong className="text-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Reference PM2.5 (CAMS)</span>
+                      <strong className="text-slate-800 dark:text-slate-200">
                         {Math.round(comparisonData.location_a.pm25_reference || 0)} µg/m³
                       </strong>
                     </div>
                     {comparisonData.location_a.best_time_today && (
-                      <div className="flex justify-between pt-1 border-t border-slate-200">
-                        <span className="text-slate-500">Best Time Today</span>
-                        <strong className="text-emerald-700">
+                      <div className="flex justify-between pt-1 border-t border-slate-200 dark:border-slate-700">
+                        <span className="text-slate-500 dark:text-slate-400">Best Time Today</span>
+                        <strong className="text-emerald-700 dark:text-emerald-400">
                           {comparisonData.location_a.best_time_today.time_window}
                         </strong>
                       </div>
@@ -480,40 +480,40 @@ export default function LivabilityPage() {
                 </div>
 
                 {/* Card B */}
-                <div className="p-6 bg-white rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <div className="p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs uppercase tracking-wider text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+                    <span className="font-bold text-xs uppercase tracking-wider text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/60 px-2 py-0.5 rounded">
                       Location B
                     </span>
                     {comparisonData.winner === 'location_b' && (
-                      <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                      <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full">
                         <Trophy className="w-3.5 h-3.5" />
                         <span>Recommended</span>
                       </span>
                     )}
                   </div>
-                  <h4 className="text-lg font-bold text-navy-900">{comparisonData.location_b.name}</h4>
+                  <h4 className="text-lg font-bold text-navy-900 dark:text-white">{comparisonData.location_b.name}</h4>
 
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-navy-900">{comparisonData.location_b.score}</span>
-                    <span className="text-xs text-slate-500 font-semibold">/ 100 Score</span>
+                    <span className="text-3xl font-black text-navy-900 dark:text-white">{comparisonData.location_b.score}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">/ 100 Score</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Verdict</span>
-                      <strong className="text-slate-800">{comparisonData.location_b.verdict.label}</strong>
+                      <span className="text-slate-500 dark:text-slate-400">Verdict</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{comparisonData.location_b.verdict.label}</strong>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Reference PM2.5 (CAMS)</span>
-                      <strong className="text-slate-800">
+                      <span className="text-slate-500 dark:text-slate-400">Reference PM2.5 (CAMS)</span>
+                      <strong className="text-slate-800 dark:text-slate-200">
                         {Math.round(comparisonData.location_b.pm25_reference || 0)} µg/m³
                       </strong>
                     </div>
                     {comparisonData.location_b.best_time_today && (
-                      <div className="flex justify-between pt-1 border-t border-slate-200">
-                        <span className="text-slate-500">Best Time Today</span>
-                        <strong className="text-emerald-700">
+                      <div className="flex justify-between pt-1 border-t border-slate-200 dark:border-slate-700">
+                        <span className="text-slate-500 dark:text-slate-400">Best Time Today</span>
+                        <strong className="text-emerald-700 dark:text-emerald-400">
                           {comparisonData.location_b.best_time_today.time_window}
                         </strong>
                       </div>

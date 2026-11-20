@@ -138,17 +138,17 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
 
   if (loadError) {
     return (
-      <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-center text-xs text-slate-500">
+      <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-center text-xs text-slate-500 dark:text-slate-400">
         Interactive map tiles could not be loaded. You can still input coordinates or select presets above.
       </div>
     );
   }
 
   return (
-    <div className="relative mt-4 rounded-xl overflow-hidden border border-slate-300 shadow-inner">
+    <div className="relative mt-4 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-700 shadow-inner">
       {!isLeafletLoaded && (
-        <div className="h-64 flex flex-col items-center justify-center bg-slate-100 text-slate-500 text-xs gap-2">
-          <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+        <div className="h-64 flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs gap-2">
+          <Loader2 className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
           <span>Loading OpenStreetMap tiles...</span>
         </div>
       )}
@@ -159,7 +159,7 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
         }`}
       />
       {isLeafletLoaded && (
-        <div className="absolute bottom-2 left-2 z-[1000] bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded text-[11px] text-slate-600 border border-slate-200 pointer-events-none flex items-center gap-1.5 shadow-xs">
+        <div className="absolute bottom-2 left-2 z-[1000] bg-white/90 dark:bg-slate-900/90 backdrop-blur-xs px-2.5 py-1 rounded text-[11px] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 pointer-events-none flex items-center gap-1.5 shadow-xs">
           <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block opacity-70" />
           <span>Dashed Blue: Delhi-NCR Validated Boundary. Click or drag pin anywhere.</span>
         </div>

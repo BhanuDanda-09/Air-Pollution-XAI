@@ -118,19 +118,19 @@ export default function LiveAssessmentPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-800">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-800 rounded-full">
+              <span className="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 rounded-full">
                 Phase 1, 2 & 3 Live Intelligence
               </span>
-              <span className="text-xs text-slate-500 font-medium">Open-Meteo, CAMS, Persistence & Livability</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Open-Meteo, CAMS, Persistence & Livability</span>
             </div>
-            <h1 className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white mt-2 tracking-tight">
               Real-World Air Quality Assessment
             </h1>
-            <p className="text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-3xl leading-relaxed">
               Assess live particulate air pollution (PM2.5) for any geographic coordinates using real-time
               satellite surface meteorology, calibrated XGBoost machine learning, and CAMS reference comparison.
             </p>
@@ -141,12 +141,12 @@ export default function LiveAssessmentPage() {
               <button
                 type="button"
                 onClick={handleQuickSaveLocation}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-semibold border border-blue-200 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
                 title="Bookmark this spot to Saved Places"
               >
                 {saveSuccess ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Saved!</span>
                   </>
                 ) : (
@@ -161,7 +161,7 @@ export default function LiveAssessmentPage() {
             <button
               type="button"
               onClick={() => setShowHealthProfile(!showHealthProfile)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold border border-slate-200 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
             >
               <Stethoscope className="w-3.5 h-3.5 text-rose-500" />
               <span>{showHealthProfile ? 'Hide Health Profile' : 'Personalize Health Risk'}</span>
@@ -172,7 +172,7 @@ export default function LiveAssessmentPage() {
               type="button"
               onClick={() => fetchAssessment(latitude, longitude, healthProfile)}
               disabled={isLoading}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-semibold border border-slate-300 transition-colors disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 transition-colors disabled:opacity-50 cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh Assessment
@@ -181,16 +181,16 @@ export default function LiveAssessmentPage() {
         </div>
 
         {/* Purpose Clarity Banner */}
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-blue-50/80 border border-blue-200 rounded-2xl text-xs text-blue-900">
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl text-xs text-blue-900 dark:text-blue-200">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+            <span className="font-extrabold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">
               Scientific Diagnostic
             </span>
             <span>Deep physical weather telemetry, satellite CAMS reference PM2.5, and SHAP source attributions.</span>
           </div>
           <Link
             to={`/livability?lat=${latitude}&lon=${longitude}`}
-            className="inline-flex items-center gap-1 font-bold text-blue-700 hover:text-blue-900 shrink-0"
+            className="inline-flex items-center gap-1 font-bold text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 shrink-0"
           >
             <span>Need Lifestyle Advice or Comparison? Go to Livability</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -203,16 +203,16 @@ export default function LiveAssessmentPage() {
 
       {/* Error Alert */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-3 shadow-xs">
-          <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-sm flex items-start gap-3 shadow-xs">
+          <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
           <div className="flex-1">
             <h4 className="font-bold">Assessment Failed</h4>
-            <p className="mt-0.5 text-xs text-rose-700 leading-relaxed">{error}</p>
+            <p className="mt-0.5 text-xs text-rose-700 dark:text-rose-300 leading-relaxed">{error}</p>
           </div>
           <button
             type="button"
             onClick={() => fetchAssessment(latitude, longitude, healthProfile)}
-            className="text-xs underline font-semibold text-rose-900 hover:text-rose-950 cursor-pointer"
+            className="text-xs underline font-semibold text-rose-900 dark:text-rose-200 hover:text-rose-950 dark:hover:text-white cursor-pointer"
           >
             Retry
           </button>

@@ -113,6 +113,55 @@ export default function About() {
         </div>
       ),
     },
+    {
+      id: 'viva-guide',
+      title: '7. Viva Voce Defense & Methodology FAQ',
+      icon: Code2,
+      content: (
+        <div className="space-y-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          <p>
+            Key academic defenses and scientific rationales prepared for capstone project review:
+          </p>
+          <div className="space-y-3">
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+              <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                Q1: Why does XGBoost outperform Deep Learning (MLP) on this dataset?
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                On tabular meteorological data with N=2,027 samples and 5 continuous features, gradient boosted decision trees (XGBoost) naturally build axis-aligned orthogonal decision boundaries that capture non-linear step-functions without requiring continuous gradient propagation. Deep neural networks require substantially larger sample sizes (N &gt; 100,000) to avoid overfitting and learn smooth manifold approximations.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+              <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                Q2: How was data leakage prevented across the evaluation pipeline?
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                The 406 test samples were strictly isolated prior to any preprocessing. Median imputation statistics and feature scaling scalers were fitted exclusively on the 1,621 training instances and transformed onto the test partition. Cross-validation was performed inside nested folds during hyperparameter tuning.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+              <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                Q3: Why is Barometric Pressure recorded in mmHg (~720–755 mmHg)?
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Delhi monitoring stations record surface atmospheric pressure directly in millimeters of mercury (standard Delhi elevation pressure averages ~730–745 mmHg). Ingested Open-Meteo live observations in hPa are dynamically multiplied by 0.750062 to guarantee strict feature space alignment with the training distribution.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+              <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                Q4: What is the scientific purpose of Copernicus CAMS reference comparison?
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                CAMS integrates spaceborne aerosol optical depth (AOD) satellite data into an atmospheric chemical transport model. By comparing our micro-surface meteorological estimate with CAMS, the platform provides honest scientific ground truth and calculates the atmospheric discrepancy delta in real-time.
+              </p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
   ];
 
   return (
