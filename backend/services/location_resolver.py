@@ -759,6 +759,21 @@ class LocationResolver:
         and season patterns for decision makers.
         """
         cls._ensure_loaded()
+        precomputed_file = DATASET_DIR / "precomputed_district_aqi.json"
+        if precomputed_file.exists():
+            try:
+                with open(precomputed_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if "districts" in data and len(data["districts"]) > 0:
+                        return {
+                            "total_districts": len(data["districts"]),
+                            "methodology": data.get("methodology", "Open-Meteo CAMS with spatial CPCB CAAQMS validation"),
+                            "districts": data["districts"],
+                            "generated_at": data.get("generated_at"),
+                        }
+            except Exception:
+                pass
+
         rankings = []
 
         # Synthetic climatological base for districts based on geographic latitude and zone
@@ -840,6 +855,21 @@ class LocationResolver:
     def get_states_summary(cls) -> Dict[str, Any]:
         """Aggregate state-level air quality summaries, average AQI, and station counts."""
         cls._ensure_loaded()
+        precomputed_file = DATASET_DIR / "precomputed_district_aqi.json"
+        if precomputed_file.exists():
+            try:
+                with open(precomputed_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if "states" in data and len(data["states"]) > 0:
+                        return {
+                            "total_states_uts": len(data["states"]),
+                            "methodology": data.get("methodology", "State-level rollups from CPCB stations and district centroids"),
+                            "states": data["states"],
+                            "generated_at": data.get("generated_at"),
+                        }
+            except Exception:
+                pass
+
         rankings_data = cls.get_district_rankings()["districts"]
 
         state_stats: Dict[str, Dict[str, Any]] = {}
