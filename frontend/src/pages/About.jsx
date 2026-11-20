@@ -110,6 +110,9 @@ export default function About() {
           <p>
             <strong>3. Model Reanalysis vs. Station Telemetry:</strong> CAMS is an atmospheric numerical model combining satellite data, chemical transport equations, and meteorological assimilation. While providing spatially continuous coverage across India without sensor dropouts, it represents grid-cell averages (~11 km resolution) rather than micro-local point measurements at a specific traffic intersection.
           </p>
+          <p>
+            <strong>4. Village & Rural Area Resolution:</strong> Air quality for villages and small areas is a gridded model estimate, not a measurement. Over 95% of India's rural land area lacks active ambient monitoring stations within 25 km. To prevent misleading citizens or authorities, the platform implements a 3-Tier Coverage classification: locations within 25 km of an active CPCB CAAQMS monitor display Tier 1 Station-Validated telemetry; areas beyond 50 km disclose Tier 3 Gridded Regional Reanalysis (~11 km grid resolution) and soften health verdicts to "Indicative Only".
+          </p>
         </div>
       ),
     },
@@ -167,6 +170,48 @@ export default function About() {
                 Rather than loading massive uncompressed scikit-learn Random Forest ensembles (&gt; 330 MB RAM) simultaneously with Gunicorn web workers, the online serving bundle utilizes regularized XGBoost models serialized with joblib level-3 compression. The runtime serving bundle occupies only 2.06 MB on disk and consumes just 10.2 MB memory RSS, leaving over 400 MB of free memory headroom on Render's 512 MB free tier.
               </p>
             </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+              <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                Q6: What are Coverage Tiers and why is gridded downscaling chosen over naive station interpolation?
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Interpolating between monitoring stations hundreds of kilometers apart across diverse topography creates false precision and ignores mountain barriers, inversion layers, and valley pooling. Instead, we use Copernicus CAMS numerical reanalysis assimilated with satellite aerosol optical depth, paired with a transparent 3-Tier classification: Tier 1 (&le;25 km station), Tier 2 (25–50 km district model), and Tier 3 (&gt;50 km regional estimate with explicit limitation disclosures).
+              </p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'sources',
+      title: '8. Verified Data Sources & Attribution',
+      icon: Database,
+      content: (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+            <span className="font-bold text-slate-900 dark:text-white">Central Pollution Control Board (CPCB):</span>
+            <p className="text-xs text-slate-500">Official CAAQMS station telemetry and 2014 National AQI concentration breakpoint formulas.</p>
+          </div>
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+            <span className="font-bold text-slate-900 dark:text-white">Copernicus CAMS & ECMWF ERA5:</span>
+            <p className="text-xs text-slate-500">European Atmosphere Monitoring Service chemical transport models and boundary-layer climate reanalysis.</p>
+          </div>
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+            <span className="font-bold text-slate-900 dark:text-white">Open-Meteo Air Quality & Weather API:</span>
+            <p className="text-xs text-slate-500">Hourly multi-pollutant forecasts, temperature, relative humidity, and surface wind vectors.</p>
+          </div>
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+            <span className="font-bold text-slate-900 dark:text-white">OpenAQ Global Platform:</span>
+            <p className="text-xs text-slate-500">Aggregated worldwide open regulatory monitoring data used for baseline reference validation.</p>
+          </div>
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+            <span className="font-bold text-slate-900 dark:text-white">India Post & data.gov.in:</span>
+            <p className="text-xs text-slate-500">Official All-India 6-digit postal index number directory and administrative delivery coordinates.</p>
+          </div>
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+            <span className="font-bold text-slate-900 dark:text-white">OpenStreetMap & Nominatim:</span>
+            <p className="text-xs text-slate-500">Hierarchical geocoding, district boundary resolution, and cartographic map layers.</p>
           </div>
         </div>
       ),

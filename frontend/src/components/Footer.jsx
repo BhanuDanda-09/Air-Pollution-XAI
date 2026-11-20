@@ -54,9 +54,14 @@ export default function Footer({ isBackendOnline = true }) {
 
             <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
               <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-              <p className="leading-snug">
-                <strong>CPCB Disclaimer:</strong> Indicative diagnostic estimates. Not certified regulatory monitor measurements or official statutory CAAQMS AQI.
-              </p>
+              <div className="leading-snug space-y-1">
+                <p>
+                  <strong>Scientific Disclosure:</strong> Indicative diagnostic estimates. Not certified regulatory monitor measurements or official statutory CAAQMS AQI.
+                </p>
+                <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+                  Air quality for villages and small areas is a gridded model estimate, not a measurement.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -261,6 +266,48 @@ export default function Footer({ isBackendOnline = true }) {
                 </a>
                 <p className="text-[11px] text-slate-500 dark:text-slate-500 leading-tight mt-0.5">
                   National Air Quality Index (NAQI) concentration breakpoints (Good to Severe).
+                </p>
+              </li>
+              <li>
+                <a
+                  href="https://openaq.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+                >
+                  <span>OpenAQ Data Platform</span>
+                  <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                </a>
+                <p className="text-[11px] text-slate-500 dark:text-slate-500 leading-tight mt-0.5">
+                  Open community repository for global regulatory station telemetry.
+                </p>
+              </li>
+              <li>
+                <a
+                  href="https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+                >
+                  <span>ECMWF ERA5 Reanalysis</span>
+                  <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                </a>
+                <p className="text-[11px] text-slate-500 dark:text-slate-500 leading-tight mt-0.5">
+                  Global hourly climate reanalysis for planetary boundary layer physics.
+                </p>
+              </li>
+              <li>
+                <a
+                  href="https://data.gov.in/resource/all-india-pincode-directory"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+                >
+                  <span>India Post & data.gov.in</span>
+                  <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                </a>
+                <p className="text-[11px] text-slate-500 dark:text-slate-500 leading-tight mt-0.5">
+                  Official 6-digit PIN directory and administrative delivery zone boundaries.
                 </p>
               </li>
             </ul>
