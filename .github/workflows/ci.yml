@@ -56,6 +56,8 @@ jobs:
           npm test
 
       - name: Run Vite production build
+        env:
+          VITE_API_URL: http://127.0.0.1:5000
         run: |
           cd frontend
           npm run build
@@ -66,6 +68,8 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Run Playwright E2E smoke and full flow tests
+        env:
+          VITE_API_URL: http://127.0.0.1:5000
         run: |
           cd frontend
           node test/e2e_smoke.mjs

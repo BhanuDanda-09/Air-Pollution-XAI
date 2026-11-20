@@ -189,6 +189,165 @@ staticServer.listen(4175, '127.0.0.1', () => {
     try {
       const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 
+      // Robust Hermetic Network Mocking: Intercept ALL API requests (whether to localhost or onrender.com)
+      await page.route('**/*api*/**', async (route) => {
+        const url = route.request().url();
+        const method = route.request().method();
+
+        const corsHeaders = {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': '*',
+        };
+
+        if (method === 'OPTIONS') {
+          return route.fulfill({ status: 204, headers: corsHeaders });
+        }
+
+        if (url.includes('/api/health')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({ status: 'healthy', models_loaded: true, version: '1.0.0' }),
+          });
+        }
+
+        if (url.includes('/api/auth/login') || url.includes('/api/auth/register')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              access_token: 'valid-test-jwt-token-12345',
+              refresh_token: 'valid-test-refresh-token-67890',
+              user: { id: 1, email: 'researcher@delhi.ac.in', name: 'Dr. A. Sharma', role: 'user' },
+              health_profile: { sensitivity: 'normal', mask_preference: 'n95', alert_threshold: 60 },
+            }),
+          });
+        }
+
+        if (url.includes('/api/auth/me')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              user: { id: 1, email: 'researcher@delhi.ac.in', name: 'Dr. A. Sharma', role: 'user' },
+              health_profile: { sensitivity: 'normal', mask_preference: 'n95', alert_threshold: 60 },
+            }),
+          });
+        }
+
+        if (url.includes('/api/user/alerts')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              preference: { pm25_threshold: 100, is_email_enabled: false },
+              active_alerts: [],
+            }),
+          });
+        }
+
+        if (url.includes('/api/user/profile')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              health_profile: { sensitivity: 'normal', mask_preference: 'n95', alert_threshold: 60 },
+            }),
+          });
+        }
+
+        if (url.includes('/api/location/assess')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              data: {
+                location: { name: 'Connaught Place, New Delhi', latitude: 28.6315, longitude: 77.2167 },
+                reference: {
+                  current_pm25: 142.5,
+                  source: 'Copernicus CAMS Model Data',
+                  indicative_cpcb_category: 'Very Poor',
+                  cpcb_color: '#8B5CF6',
+                },
+                model_estimate: {
+                  predicted_pm25: 138.2,
+                  model_name: 'Tuned XGBoost Regressor',
+                  r2_score: 0.7455,
+                  indicative_cpcb_category: 'Very Poor',
+                  is_out_of_range: false,
+                  features_used: { RH: 65, WD: 240, SR: 120, BP: 738, AT: 18 },
+                },
+                verdict: {
+                  key: 'very_poor',
+                  label: 'Very Poor - Significant Health Risk',
+                  color: '#8B5CF6',
+                  summary: 'Active respiratory irritation anticipated.',
+                },
+                explanation: {
+                  top_features: [
+                    { feature: 'RH', contribution: 22.4, direction: 'increases', impact: 'High' },
+                    { feature: 'AT', contribution: -8.1, direction: 'decreases', impact: 'Medium' },
+                  ],
+                },
+              },
+            }),
+          });
+        }
+
+        if (url.includes('/api/user/locations')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              locations: [
+                { id: 101, name: 'Connaught Place Central', label: 'Work', latitude: 28.6315, longitude: 77.2167, alert_threshold: 60, last_pm25: 142.5, created_at: '2026-11-20T00:00:00Z' },
+              ],
+              data: {
+                locations: [
+                  { id: 101, name: 'Connaught Place Central', label: 'Work', latitude: 28.6315, longitude: 77.2167, alert_threshold: 60, last_pm25: 142.5, created_at: '2026-11-20T00:00:00Z' },
+                ],
+              },
+            }),
+          });
+        }
+
+        if (url.includes('/api/user/history')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              history: [
+                { id: 201, location_name: 'Connaught Place', pm25: 142.5, category: 'Very Poor', timestamp: '2026-11-20T06:00:00Z' },
+                { id: 202, location_name: 'Lodhi Garden', pm25: 110.0, category: 'Poor', timestamp: '2026-11-19T18:00:00Z' },
+              ],
+            }),
+          });
+        }
+
+        return route.fulfill({
+          status: 200,
+          headers: corsHeaders,
+          contentType: 'application/json',
+          body: JSON.stringify({ status: 'success' }),
+        });
+      });
+
       // TEST 1: Navbar and Footer verification (Desktop 1280px)
       console.log('\n--- 1. Testing Navbar and Footer on Desktop (1280px) ---');
       totalTests++;
@@ -244,10 +403,8 @@ staticServer.listen(4175, '127.0.0.1', () => {
         const submitBtn = await page.$('[role="dialog"] button[type="submit"]');
         if (submitBtn) {
           await submitBtn.click();
-          await page.waitForTimeout(600);
-
-          // Check if user session avatar/name or logout appears
-          const userMenu = await page.$('button[aria-label="User profile menu"], button:has-text("Dr. A. Sharma")');
+          // Use waitForSelector to give slower CI environments adequate time to render user session
+          const userMenu = await page.waitForSelector('button[aria-label="User profile menu"], button:has-text("Dr. A. Sharma")', { timeout: 8000 }).catch(() => null);
           if (userMenu) {
             passedTests++;
             console.log('  ✓ Authenticated successfully: User profile visible in navbar.');
