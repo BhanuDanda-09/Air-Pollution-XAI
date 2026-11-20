@@ -161,6 +161,70 @@ const apiServer = http.createServer((req, res) => {
     return;
   }
 
+  if (url === '/api/hotspots') {
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      status: 'success',
+      total_cities: 3,
+      rankings: [
+        { city_id: 'faridabad', city_name: 'Faridabad', state: 'Haryana', region: 'North', mean_pm25: 72.8, p50_pm25: 62.4, p90_pm25: 129.9, p99_pm25: 217.0, representative_cpcb_aqi: 142.5, seasonal_winter_summer_ratio: 1.77, cluster_tier: 'Industrial / Transit Corridor', national_hotspot_rank: 1 },
+        { city_id: 'delhi', city_name: 'Delhi', state: 'Delhi', region: 'North', mean_pm25: 68.4, p50_pm25: 58.2, p90_pm25: 122.5, p99_pm25: 205.1, representative_cpcb_aqi: 135.0, seasonal_winter_summer_ratio: 1.82, cluster_tier: 'Severe Persistent Basin', national_hotspot_rank: 2 },
+        { city_id: 'bengaluru', city_name: 'Bengaluru', state: 'Karnataka', region: 'South', mean_pm25: 26.5, p50_pm25: 22.0, p90_pm25: 42.0, p99_pm25: 65.0, representative_cpcb_aqi: 52.0, seasonal_winter_summer_ratio: 1.15, cluster_tier: 'Highland / Clean Sanctuary', national_hotspot_rank: 42 }
+      ],
+      regional_summaries: {
+        North: { total_cities: 11, mean_pm25_region: 62.5 },
+        South: { total_cities: 9, mean_pm25_region: 29.8 }
+      }
+    }));
+    return;
+  }
+
+  if (url === '/api/relocation/compare') {
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      status: 'success',
+      origin: {
+        name: 'Delhi',
+        lat: 28.6139,
+        lon: 77.2090,
+        current_aqi: 220,
+        cpcb_category: 'Poor',
+        governing_pollutant: 'PM2.5',
+        personal_risk: { score: 72, tier: 'High Exposure Risk' }
+      },
+      candidates: [
+        {
+          destination: { name: 'Bengaluru', lat: 12.9716, lon: 77.5946 },
+          current_aqi: 65,
+          cpcb_category: 'Satisfactory',
+          cpcb_color: '#84CC16',
+          aqi_reduction_pct: 70.5,
+          risk_reduction_pct: 65.3,
+          personal_risk: { score: 25, tier: 'Low Exposure Risk' },
+          verdict: 'Highly Recommended',
+          verdict_color: '#16A34A',
+          explanation_narrative: 'Relocating from Delhi to Bengaluru reduces baseline air pollution exposure by approximately 70.5%. Because of your asthma, avoiding particulate spikes significantly lowers your risk of bronchospasms.',
+          actionable_advice: ['Optimal move window: July-September offers cleanest air.'],
+          climatology: { best_month: { month_name: 'August', mean_pm25: 18.2 }, winter_inversion_factor: 1.15 }
+        }
+      ]
+    }));
+    return;
+  }
+
+  if (url === '/api/cities') {
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      status: 'success',
+      total: 45,
+      cities: [
+        { id: 'delhi', name: 'Delhi', state: 'Delhi', region: 'North', lat: 28.6139, lon: 77.2090 },
+        { id: 'bengaluru', name: 'Bengaluru', state: 'Karnataka', region: 'South', lat: 12.9716, lon: 77.5946 }
+      ]
+    }));
+    return;
+  }
+
   res.writeHead(200);
   res.end(JSON.stringify({ status: 'success' }));
 });
@@ -178,8 +242,12 @@ staticServer.listen(4175, '127.0.0.1', () => {
     try {
       browser = await chromium.launch({ ...launchOptions, channel: 'chrome' });
     } catch (err) {
-      console.log('Falling back to default Chromium binary...');
-      browser = await chromium.launch(launchOptions);
+      try {
+        browser = await chromium.launch({ ...launchOptions, channel: 'msedge' });
+      } catch (err2) {
+        console.log('Falling back to default Chromium binary...');
+        browser = await chromium.launch(launchOptions);
+      }
     }
 
     let totalTests = 0;
@@ -340,6 +408,79 @@ staticServer.listen(4175, '127.0.0.1', () => {
           });
         }
 
+        if (url.includes('/api/hotspots')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              total_cities: 3,
+              rankings: [
+                { city_id: 'faridabad', city_name: 'Faridabad', state: 'Haryana', region: 'North', mean_pm25: 72.8, p50_pm25: 62.4, p90_pm25: 129.9, p99_pm25: 217.0, representative_cpcb_aqi: 142.5, seasonal_winter_summer_ratio: 1.77, cluster_tier: 'Industrial / Transit Corridor', national_hotspot_rank: 1 },
+                { city_id: 'delhi', city_name: 'Delhi', state: 'Delhi', region: 'North', mean_pm25: 68.4, p50_pm25: 58.2, p90_pm25: 122.5, p99_pm25: 205.1, representative_cpcb_aqi: 135.0, seasonal_winter_summer_ratio: 1.82, cluster_tier: 'Severe Persistent Basin', national_hotspot_rank: 2 },
+                { city_id: 'bengaluru', city_name: 'Bengaluru', state: 'Karnataka', region: 'South', mean_pm25: 26.5, p50_pm25: 22.0, p90_pm25: 42.0, p99_pm25: 65.0, representative_cpcb_aqi: 52.0, seasonal_winter_summer_ratio: 1.15, cluster_tier: 'Highland / Clean Sanctuary', national_hotspot_rank: 42 },
+              ],
+              regional_summaries: {
+                North: { total_cities: 11, mean_pm25_region: 62.5 },
+                South: { total_cities: 9, mean_pm25_region: 29.8 },
+              },
+            }),
+          });
+        }
+
+        if (url.includes('/api/relocation/compare')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              origin: {
+                name: 'Delhi',
+                lat: 28.6139,
+                lon: 77.2090,
+                current_aqi: 220,
+                cpcb_category: 'Poor',
+                governing_pollutant: 'PM2.5',
+                personal_risk: { score: 72, tier: 'High Exposure Risk' },
+              },
+              candidates: [
+                {
+                  destination: { name: 'Bengaluru', lat: 12.9716, lon: 77.5946 },
+                  current_aqi: 65,
+                  cpcb_category: 'Satisfactory',
+                  cpcb_color: '#84CC16',
+                  aqi_reduction_pct: 70.5,
+                  risk_reduction_pct: 65.3,
+                  personal_risk: { score: 25, tier: 'Low Exposure Risk' },
+                  verdict: 'Highly Recommended',
+                  verdict_color: '#16A34A',
+                  explanation_narrative: 'Relocating from Delhi to Bengaluru reduces baseline air pollution exposure by approximately 70.5%. Because of your asthma, avoiding particulate spikes significantly lowers your risk of bronchospasms.',
+                  actionable_advice: ['Optimal move window: July-September offers cleanest air.'],
+                  climatology: { best_month: { month_name: 'August', mean_pm25: 18.2 }, winter_inversion_factor: 1.15 },
+                },
+              ],
+            }),
+          });
+        }
+
+        if (url.includes('/api/cities')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              total: 45,
+              cities: [
+                { id: 'delhi', name: 'Delhi', state: 'Delhi', region: 'North', lat: 28.6139, lon: 77.2090 },
+                { id: 'bengaluru', name: 'Bengaluru', state: 'Karnataka', region: 'South', lat: 12.9716, lon: 77.5946 },
+              ],
+            }),
+          });
+        }
+
         return route.fulfill({
           status: 200,
           headers: corsHeaders,
@@ -404,7 +545,7 @@ staticServer.listen(4175, '127.0.0.1', () => {
         if (submitBtn) {
           await submitBtn.click();
           // Use waitForSelector to give slower CI environments adequate time to render user session
-          const userMenu = await page.waitForSelector('button[aria-label="User profile menu"], button:has-text("Dr. A. Sharma")', { timeout: 8000 }).catch(() => null);
+          const userMenu = await page.waitForSelector('button[aria-label="User account menu"], button[aria-label="User profile menu"], button:has-text("Dr. A. Sharma")', { timeout: 8000 }).catch(() => null);
           if (userMenu) {
             passedTests++;
             console.log('  ✓ Authenticated successfully: User profile visible in navbar.');
@@ -446,15 +587,15 @@ staticServer.listen(4175, '127.0.0.1', () => {
       console.log('\n--- 5. Testing Saved Places Page ---');
       totalTests++;
       await page.goto('http://127.0.0.1:4175/saved-places', { waitUntil: 'load' });
-      await page.waitForSelector('button:has-text("Add New Place")', { timeout: 6000 });
+      const addBtn = await page.waitForSelector('button:has-text("Add New Place")', { timeout: 6000 }).catch(() => null);
 
       const savedHeading = await page.$eval('h1', el => el.textContent).catch(() => '');
       const hasExportCSV = await page.waitForSelector('button:has-text("Export CSV"), button[title*="CSV"]', { timeout: 4000 }).catch(() => null);
-      if (savedHeading.includes('Saved Places') && hasExportCSV) {
+      if (savedHeading.includes('Saved Places') && addBtn && hasExportCSV) {
         passedTests++;
         console.log('  ✓ Saved Places page rendered with CSV export action and location cards.');
       } else {
-        failures.push(`Saved Places page failed heading or export CSV check. (Heading: "${savedHeading}", hasCSV: ${Boolean(hasExportCSV)})`);
+        failures.push(`Saved Places page failed check. (Heading: "${savedHeading}", addBtn: ${Boolean(addBtn)}, hasCSV: ${Boolean(hasExportCSV)})`);
       }
 
       // TEST 6: Exposure History Page & Trend Chart
@@ -475,7 +616,7 @@ staticServer.listen(4175, '127.0.0.1', () => {
       // TEST 7: Logout Flow
       console.log('\n--- 7. Testing Logout Flow ---');
       totalTests++;
-      const userMenuBtn = await page.$('button[aria-label="User profile menu"], button:has-text("Dr. A. Sharma")');
+      const userMenuBtn = await page.$('button[aria-label="User account menu"], button[aria-label="User profile menu"], button:has-text("Dr. A. Sharma")');
       if (userMenuBtn) {
         await userMenuBtn.click();
         await page.waitForTimeout(300);
@@ -497,6 +638,73 @@ staticServer.listen(4175, '127.0.0.1', () => {
         }
       } else {
         failures.push('User menu button not found for logout test.');
+      }
+
+      // TEST 8: Health-Personalised Relocation Advisor Flow
+      console.log('\n--- 8. Testing Relocation Advisor (Asthma & Multi-Place Comparison) ---');
+      totalTests++;
+      await page.goto('http://127.0.0.1:4175/relocation', { waitUntil: 'load' });
+      await page.waitForTimeout(600);
+
+      const relocHeading = await page.$eval('h1', el => el.textContent).catch(() => '');
+      if (relocHeading.includes('Relocation Advisor')) {
+        // Step 1: Click Continue to Health Profile
+        const continueStep2 = await page.$('button:has-text("Continue to Health Profile")');
+        if (continueStep2) await continueStep2.click();
+        await page.waitForTimeout(400);
+
+        // Step 2: Click Continue to Household & Consent
+        const continueStep3 = await page.$('button:has-text("Continue to Household & Consent")');
+        if (continueStep3) await continueStep3.click();
+        await page.waitForTimeout(400);
+
+        // Step 3: Click Generate Relocation Decision Report
+        const generateBtn = await page.$('button:has-text("Generate Relocation Decision Report")');
+        if (generateBtn) {
+          await generateBtn.click();
+          const reportVisible = await page.waitForSelector('text=Verified Comparative Report', { timeout: 6000 }).catch(() => null);
+          if (reportVisible) {
+            passedTests++;
+            console.log('  ✓ Relocation report generated with Personal Risk score and clinical narrative.');
+          } else {
+            failures.push('Relocation report was not visible after clicking generate.');
+          }
+        } else {
+          failures.push('Generate Relocation Report button not found in Step 3.');
+        }
+      } else {
+        failures.push(`Relocation Advisor heading verification failed: "${relocHeading}".`);
+      }
+
+      // TEST 9: National Hotspots & City Rankings Page
+      console.log('\n--- 9. Testing National Hotspots Rankings Page ---');
+      totalTests++;
+      await page.goto('http://127.0.0.1:4175/hotspots', { waitUntil: 'load' });
+      await page.waitForSelector('tbody tr', { timeout: 6000 }).catch(() => null);
+
+      const hotspotsHeading = await page.$eval('h1', el => el.textContent).catch(() => '');
+      const tableRows = await page.$$('tbody tr');
+      if (hotspotsHeading.includes('Hotspots') && tableRows.length >= 1) {
+        passedTests++;
+        console.log(`  ✓ Hotspots page rendered with ${tableRows.length} ranked cities and vulnerability tiers.`);
+      } else {
+        failures.push(`Hotspots page failed heading or table rows check (Rows: ${tableRows.length}).`);
+      }
+
+      // TEST 10: Privacy & DPDP Act 2023 Page
+      console.log('\n--- 10. Testing Privacy & DPDP Act 2023 Page ---');
+      totalTests++;
+      await page.goto('http://127.0.0.1:4175/privacy', { waitUntil: 'load' });
+      await page.waitForTimeout(600);
+
+      const privacyHeading = await page.$eval('h1', el => el.textContent).catch(() => '');
+      const hasDownloadBtn = await page.$('button:has-text("Download My Complete Data Bundle")');
+      const hasDeleteBtn = await page.$('button:has-text("Permanently Delete My Account")');
+      if (privacyHeading.includes('Privacy') && hasDownloadBtn && hasDeleteBtn) {
+        passedTests++;
+        console.log('  ✓ Privacy page rendered with DPDP Act 2023 data export and erasure controls.');
+      } else {
+        failures.push('Privacy & DPDP Act page controls not found.');
       }
 
       await page.close();

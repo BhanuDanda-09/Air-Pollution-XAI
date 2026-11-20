@@ -10,6 +10,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2026-11-20
 
 ### Added
+- **Phase A — All-India Multi-Pollutant ML & Atmospheric Physics Dataset**:
+  - Continuous 162,000-hour multi-city dataset (`dataset/all_india_hourly_multicity.csv`, 109.9 MB) covering 45 Indian cities across North, South, West, East, Central, and Northeast regions.
+  - Multi-pollutant tracking for all 6 criteria pollutants: $PM_{2.5}, PM_{10}, NO_2, SO_2, CO, O_3$.
+  - Evaluation across 1h, 6h, 24h, and 72h lead times comparing Persistence Baseline, Random Forest, XGBoost, LSTM, and Deep Transformer.
+  - Leave-cities-out unseen spatial transferability validation ($R^2 = 0.9629$ at 1h; $R^2 = 0.6027$ at 24h).
+  - Saved benchmarks in `results/multi_pollutant_benchmarks.json` and `.csv` (168 benchmark metrics).
+  - TreeExplainer SHAP attribution benchmarks in `results/multi_pollutant_shap.json` with strict scientific labeling (*"Feature attribution / What drives the model"*, never *"Chemical source apportionment"*).
+  - Nationwide exposure hotspot ranking ($P_{50}, P_{75}, P_{90}, P_{99}$, winter/summer ratios) across 5 cluster tiers in `results/city_hotspots.json`.
+  - Compressed XGBoost multi-pollutant serving bundle (`models/all_india/xgb_models_serving.joblib`, 2.06 MB) consuming only 10.2 MB RSS at runtime, respecting Render's 512 MB RAM ceiling.
+  - Comprehensive documentation in `docs/DATA_AND_MODELS.md` and `results/model_cards/MODEL_CARD_MULTI_POLLUTANT.md`.
+- **Phase B — Multi-Pollutant REST API Architecture**:
+  - Implemented `/api/cities`, `/api/geocode`, `/api/air/current`, `/api/air/forecast`, `/api/air/history`, `/api/air/climatology`, `/api/hotspots`, `/api/relocation/compare`.
+  - Multi-pollutant SHAP local explanations in `/api/explain` with complete backward compatibility for legacy callers.
+  - Thread-safe TTL caching (300s), in-memory IP rate limiting, 6-second timeouts, and graceful offline regional fallbacks.
+  - Dynamic coverage and confidence banners ("directly_trained" vs "regional_proxy" with distance metrics; 422 for coordinates outside India).
+- **Phase C — Health-Personalised Relocation Advisor Decision Engine**:
+  - 4-step wizard form collecting origin, candidate destinations, health conditions (Asthma, COPD, cardiovascular, hypertension, diabetes, pregnancy, children, elderly), symptom severity, and commute modes.
+  - Deterministic rule-based Personal Exposure Risk score ($0\text{--}100$) based on WHO 2021 guidelines and CPCB NAAQS breakpoints.
+  - Side-by-side comparative decision report ranking candidate cities with expected exposure change ($\Delta\text{Risk}$), clinical explanations, and actionable N95/HEPA advice.
+  - Complete engine documentation in `docs/RISK_ENGINE.md`.
+- **Phase D — Statutory DPDP Act 2023 Compliance & Persistence**:
+  - Explicit health data processing consent checkbox.
+  - Right to Data Portability: `GET /api/user/export-data` returning full JSON bundle of personal profile, health attributes, saved places, and assessment history.
+  - Right to Erasure: `POST /api/user/delete-account` cascading permanent account, health profile, locations, and audit deletion.
+  - Zero health field logging in backend application logs.
+- **Phase E — Clean-Air Visual Identity & Rebuilt UI**:
+  - Redesigned Navbar with 4 primary links (`Home`, `Check My Air`, `Relocation Advisor`, `Saved Places`), `Insights` dropdown, `More` dropdown, and dark mode toggle.
+  - Built `RelocationAdvisorPage.jsx`, `HotspotsPage.jsx`, `PrivacyPage.jsx`.
+  - Enhanced `LiveAssessmentPage.jsx` with 6 criteria pollutants CPCB sub-index cards and coverage badge.
+  - Comprehensive 4-column footer with CPCB / WHO / DPDP disclosures and academic citations.
+- **Phase F — End-to-End Quality & Verification**:
+  - Full Playwright E2E suite (`frontend/test/e2e_full_flow.mjs`) verifying all 10 browser user journeys.
+  - Playwright smoke test suite (`frontend/test/e2e_smoke.mjs`) verifying 18 route and breakpoint checks with 0px horizontal overflow.
+  - Comprehensive feature matrix in `docs/FEATURE_MATRIX.md` and capstone viva voce guide in `docs/VIVA_NOTES.md`.
 - **Full Flow End-to-End Test Suite**:
   - Implemented `frontend/test/e2e_full_flow.mjs` verifying authentication, live assessment, saved places CSV export, 7-day exposure SVG chart, and logout flow.
   - Updated GitHub Actions (`.github/workflows/ci.yml`) to run both smoke tests and full flow tests on every push.

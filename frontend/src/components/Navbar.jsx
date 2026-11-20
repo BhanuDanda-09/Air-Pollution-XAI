@@ -13,6 +13,8 @@ import {
   Info,
   ChevronDown,
   Shield,
+  ShieldCheck,
+  Flame,
   HardHat,
   Bell,
   BellRing,
@@ -185,15 +187,17 @@ export default function Navbar({ isBackendOnline }) {
   }, [isAuthenticated]);
 
   // Navigation Links Specification
-  // Primary (3 items)
+  // Primary (4 items)
   const primaryLinks = [
     { to: '/', label: 'Home', icon: Wind },
-    { to: '/live-assessment', label: 'Live Assessment', icon: MapPin },
+    { to: '/live-assessment', label: 'Check My Air', icon: MapPin },
+    { to: '/relocation', label: 'Relocation Advisor', icon: Compass },
     { to: '/saved-places', label: 'Saved Places', icon: Bookmark },
   ];
 
-  // Insights dropdown (5 items)
+  // Insights dropdown (6 items)
   const insightLinks = [
+    { to: '/hotspots', label: 'Hotspot Rankings', icon: Flame, desc: 'All-India 45-city exposure rankings & tiers' },
     { to: '/livability', label: 'Livability Verdict', icon: Compass, desc: 'Residential suitability & profile scoring' },
     { to: '/dashboard', label: 'Model Dashboard', icon: BarChart3, desc: 'System telemetry & prediction activity' },
     { to: '/prediction', label: 'PM2.5 Prediction', icon: Activity, desc: 'Surface meteorology ML estimator' },
@@ -201,13 +205,15 @@ export default function Navbar({ isBackendOnline }) {
     { to: '/explainability', label: 'XAI & SHAP', icon: Sparkles, desc: 'Local attributions & feature contributions' },
   ];
 
-  // More dropdown (2 utilities + role portals)
+  // More dropdown (3 utilities + role portals)
   const moreLinks = [
     { to: '/history', label: 'Exposure History', icon: History, desc: 'Past personal assessment timeline' },
     { to: '/about', label: 'About & Methodology', icon: Info, desc: 'Research design, data sources & limits' },
+    { to: '/privacy', label: 'Privacy & DPDP', icon: ShieldCheck, desc: 'DPDP Act 2023 consent, export & deletion' },
   ];
 
   const isInsightsActive = [
+    '/hotspots',
     '/livability',
     '/dashboard',
     '/prediction',
@@ -215,7 +221,7 @@ export default function Navbar({ isBackendOnline }) {
     '/explainability',
   ].includes(location.pathname);
 
-  const isMoreActive = ['/history', '/about', '/worker', '/admin'].includes(location.pathname);
+  const isMoreActive = ['/history', '/about', '/privacy', '/worker', '/admin'].includes(location.pathname);
 
   const canAccessWorker = hasRoleAccess('worker');
   const canAccessAdmin = hasRoleAccess('admin');
@@ -255,7 +261,7 @@ export default function Navbar({ isBackendOnline }) {
                 Pollution <span className="text-blue-600 dark:text-blue-400">XAI</span>
               </span>
               <span className="text-[9px] sm:text-[10px] font-bold px-1 sm:px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/80 uppercase tracking-wider shrink-0">
-                v1.0
+                v2.0
               </span>
             </div>
           </Link>

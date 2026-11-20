@@ -18,6 +18,8 @@ export default function LiveAssessmentResult({ assessmentData }) {
 
   const {
     location,
+    coverage,
+    multi_pollutant,
     model_prediction,
     reference_air_quality,
     model_vs_reference_comparison,
@@ -80,23 +82,55 @@ export default function LiveAssessmentResult({ assessmentData }) {
       aria-label="Live Air Quality Assessment Results"
       className="space-y-6 mt-6 animate-fadeIn"
     >
-      {/* 1. Regional Validity Banner (Scientific Honesty) */}
-      {!isDelhiNCR && (
-        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-300 dark:border-amber-700/80 text-amber-900 dark:text-amber-200 shadow-xs">
+      {/* 1. Data-Driven Regional Validity Banner */}
+      {coverage ? (
+        <div
+          className={`p-4 rounded-2xl border-2 shadow-xs ${
+            coverage.tier === 'directly_trained'
+              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+              : coverage.tier === 'outside_coverage'
+              ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200'
+              : 'bg-blue-50 dark:bg-blue-950/40 border-blue-300 dark:border-blue-800 text-blue-900 dark:text-blue-200'
+          }`}
+        >
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            {coverage.tier === 'directly_trained' ? (
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+            ) : coverage.tier === 'outside_coverage' ? (
+              <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+            ) : (
+              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+            )}
             <div>
-              <h4 className="font-bold text-sm text-amber-950 dark:text-amber-100">
-                Outside Validated Region (Delhi-NCR) — Geographic Extrapolation
+              <h4 className="font-bold text-sm">
+                {coverage.tier === 'directly_trained'
+                  ? `Directly Trained & Validated Hub (${coverage.nearest_city})`
+                  : coverage.tier === 'outside_coverage'
+                  ? 'Outside Indian Subcontinent Coverage Boundary'
+                  : `Validated via Regional Atmospheric Transferability (${coverage.nearest_city})`}
               </h4>
-              <p className="text-xs text-amber-800 dark:text-amber-300/90 mt-1 leading-relaxed">
-                {location?.validity_warning ||
-                  scientific_disclaimers?.regional_limitation ||
-                  'This model was trained exclusively on Delhi meteorological monitoring data. Predictions outside Delhi-NCR represent an unvalidated geographic extrapolation.'}
-              </p>
+              <p className="text-xs mt-0.5 leading-relaxed opacity-90">{coverage.message}</p>
             </div>
           </div>
         </div>
+      ) : (
+        !isDelhiNCR && (
+          <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border-2 border-amber-300 dark:border-amber-700/80 text-amber-900 dark:text-amber-200 shadow-xs">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-bold text-sm text-amber-950 dark:text-amber-100">
+                  Regional Atmospheric Generalization
+                </h4>
+                <p className="text-xs text-amber-800 dark:text-amber-300/90 mt-1 leading-relaxed">
+                  {location?.validity_warning ||
+                    scientific_disclaimers?.regional_limitation ||
+                    'Evaluating ambient conditions using regional atmospheric transferability across India.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )
       )}
 
       {/* 2. Out-of-Training-Range Warnings (No Silent Clamping) */}
@@ -261,7 +295,67 @@ export default function LiveAssessmentResult({ assessmentData }) {
         </div>
       </div>
 
-      {/* 4. Live Meteorological Features Used by Model */}
+      {/* 4. Multi-Pollutant Criteria & CPCB Sub-Index Breakdown */}
+      {multi_pollutant?.pollutants && (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Gauge className="w-4 h-4 text-blue-600" />
+                All-India 6 Criteria Pollutants (CPCB Sub-Index Breakdown)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Real-time CAMS atmospheric telemetry mapped to official Central Pollution Control Board (2014) breakpoints
+              </p>
+            </div>
+            {multi_pollutant.governing_pollutant && (
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <span className="text-xs text-slate-500">Governing Pollutant:</span>
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  {multi_pollutant.governing_pollutant} (Sub-Index: {multi_pollutant.overall_aqi})
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {Object.entries(multi_pollutant.pollutants).map(([polName, card]) => (
+              <div
+                key={polName}
+                className={`p-3.5 rounded-2xl border text-center transition-all ${
+                  card.is_governing
+                    ? 'bg-blue-50/60 dark:bg-blue-950/40 border-blue-400 shadow-xs'
+                    : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/60'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{polName}</span>
+                  {card.is_governing && (
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-600 text-white uppercase">
+                      Max
+                    </span>
+                  )}
+                </div>
+                <div className="text-lg font-black text-slate-900 dark:text-white">
+                  {card.concentration != null ? card.concentration : '—'}
+                  <span className="text-[10px] font-normal text-slate-400 ml-0.5">{card.unit}</span>
+                </div>
+                <div className="mt-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[11px]">
+                  <span className="text-slate-500">CPCB AQI:</span>
+                  <span className="font-extrabold" style={{ color: card.color }}>
+                    {card.cpcb_subindex ?? '—'}
+                  </span>
+                </div>
+                <div className="text-[10px] font-medium truncate mt-0.5" style={{ color: card.color }}>
+                  {card.category}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 5. Live Meteorological Features Used by Model */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div>

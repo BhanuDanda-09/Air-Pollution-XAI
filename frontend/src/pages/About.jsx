@@ -102,13 +102,13 @@ export default function About() {
       content: (
         <div className="space-y-2.5 text-sm text-amber-900 dark:text-amber-200 bg-amber-50/60 dark:bg-amber-950/40 p-4 rounded-xl border border-amber-200 dark:border-amber-800 leading-relaxed">
           <p>
-            <strong>1. Statistical vs. Causal Attribution:</strong> Feature attributions (SHAP/LIME) quantify how the mathematical model utilizes meteorological inputs. They do <em>not</em> prove physical chemical emission causality or physical emission source apportionment (e.g. vehicular vs. biomass burning).
+            <strong>1. Statistical vs. Causal Attribution:</strong> Feature attributions (SHAP/LIME) quantify how the mathematical model utilizes meteorological inputs (what drives the model). They do <em>not</em> prove physical chemical emission causality or analytical chemical emission source apportionment (which requires physical laboratory speciation via EPA PMF).
           </p>
           <p>
-            <strong>2. Time-Series Blocker:</strong> Because the dataset lacks genuine continuous timestamps, training sequential models (LSTM, Transformer) would introduce spurious chronological artifacts. These models remain intentionally blocked pending timestamped sequential data.
+            <strong>2. Sequential & Temporal Modeling:</strong> Using the 162,000-row all-India hourly dataset (Jan–May 2024), chronological time-series splitting (70% Train &lt; 15% Val &lt; 15% Test) was strictly applied to prevent future-to-past lookahead leakage.
           </p>
           <p>
-            <strong>3. Indicative CPCB Bands:</strong> Classifications are indicative health categories based on estimated 24-hr PM2.5 levels, not certified multi-pollutant CPCB AQI.
+            <strong>3. Model Reanalysis vs. Station Telemetry:</strong> CAMS is an atmospheric numerical model combining satellite data, chemical transport equations, and meteorological assimilation. While providing spatially continuous coverage across India without sensor dropouts, it represents grid-cell averages (~11 km resolution) rather than micro-local point measurements at a specific traffic intersection.
           </p>
         </div>
       ),
@@ -125,37 +125,46 @@ export default function About() {
           <div className="space-y-3">
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
               <h4 className="font-bold text-slate-900 dark:text-white mb-1">
-                Q1: Why does XGBoost outperform Deep Learning (MLP) on this dataset?
+                Q1: Why does persistence outperform ML at 1-hour, but collapses at 6-hour and 24-hour lead times?
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                On tabular meteorological data with N=2,027 samples and 5 continuous features, gradient boosted decision trees (XGBoost) naturally build axis-aligned orthogonal decision boundaries that capture non-linear step-functions without requiring continuous gradient propagation. Deep neural networks require substantially larger sample sizes (N &gt; 100,000) to avoid overfitting and learn smooth manifold approximations.
+                Atmospheric inertia means that over short 1-hour lags, current particulate concentration is strongly autocorrelated (y_{'{'}t+1{'}'} ≈ y_t, R² ≈ 0.92–0.96). Adding ML regression at 1h introduces slight statistical variance. However, beyond 3 hours, diurnal solar heating, boundary layer mixing, and wind advection break persistence. At 6h, persistence R² collapses to 0.57 for PM2.5 and negative for photochemical Ozone (-0.43) and reactive NO2 (-0.20), while XGBoost and Random Forest maintain high positive skill (+33% to +85% improvement over persistence).
               </p>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
               <h4 className="font-bold text-slate-900 dark:text-white mb-1">
-                Q2: How was data leakage prevented across the evaluation pipeline?
+                Q2: How was spatial generalization tested on unseen geographies?
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                The 406 test samples were strictly isolated prior to any preprocessing. Median imputation statistics and feature scaling scalers were fitted exclusively on the 1,621 training instances and transformed onto the test partition. Cross-validation was performed inside nested folds during hyperparameter tuning.
+                A rigorous Leave-Cities-Out cross-validation was conducted. Six representative cities across different meteorological zones (Amritsar, Pune, Chennai, Patna, Indore, Guwahati — 21,600 samples) were completely isolated from the training partition. On these unseen geographies, the models achieved strong generalizability (R² = 0.9629 at 1h, R² = 0.6027 at 24h for PM2.5), demonstrating that synoptic meteorological features and topographic elevation allow transferable regional predictions.
               </p>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
               <h4 className="font-bold text-slate-900 dark:text-white mb-1">
-                Q3: Why is Barometric Pressure recorded in mmHg (~720–755 mmHg)?
+                Q3: What is the exact distinction between SHAP Feature Attribution and Chemical Source Apportionment?
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Delhi monitoring stations record surface atmospheric pressure directly in millimeters of mercury (standard Delhi elevation pressure averages ~730–745 mmHg). Ingested Open-Meteo live observations in hPa are dynamically multiplied by 0.750062 to guarantee strict feature space alignment with the training distribution.
+                SHAP (Shapley Additive Explanations) is an algorithmic game-theoretic technique revealing <em>which mathematical input features drove the model's numerical prediction</em>. Chemical source apportionment (e.g. EPA Positive Matrix Factorization / PMF) requires physical chemical laboratory analysis of filter tapes for elemental carbon, heavy metals, and secondary inorganic ions to allocate mass to vehicular exhaust, coal, or biomass combustion. Our platform strictly labels SHAP as "Feature Attribution (what drives the model)", adhering to strict scientific honesty.
               </p>
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
               <h4 className="font-bold text-slate-900 dark:text-white mb-1">
-                Q4: What is the scientific purpose of Copernicus CAMS reference comparison?
+                Q4: How does the Personal Exposure Risk score integrate WHO 2021 guidelines?
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                CAMS integrates spaceborne aerosol optical depth (AOD) satellite data into an atmospheric chemical transport model. By comparing our micro-surface meteorological estimate with CAMS, the platform provides honest scientific ground truth and calculates the atmospheric discrepancy delta in real-time.
+                The relocation decision engine combines the governing CPCB pollutant sub-index with rule-based sensitivity multipliers established in WHO 2021 air quality guidelines. Pre-existing chronic airway inflammation (asthma, COPD) triggers a 1.4× to 1.8× risk penalty when PM2.5 &gt; 60 µg/m³, transplacental particulate transfer adds elevated vulnerability for pregnancy, and hyperventilation during outdoor cardio exercise (&gt; 5 hrs/week) increases the estimated inhaled aerosol dose.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+              <h4 className="font-bold text-slate-900 dark:text-white mb-1">
+                Q5: How does the system remain within Render's 512 MB free-tier RAM ceiling?
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                Rather than loading massive uncompressed scikit-learn Random Forest ensembles (&gt; 330 MB RAM) simultaneously with Gunicorn web workers, the online serving bundle utilizes regularized XGBoost models serialized with joblib level-3 compression. The runtime serving bundle occupies only 2.06 MB on disk and consumes just 10.2 MB memory RSS, leaving over 400 MB of free memory headroom on Render's 512 MB free tier.
               </p>
             </div>
           </div>

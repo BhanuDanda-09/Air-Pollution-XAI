@@ -41,6 +41,10 @@ def get_user_profile():
     if uid is None:
         return success_response(data={"health_profile": None}, message="No registered profile found.")
 
+    user = db.session.get(User, uid)
+    if not user:
+        return error_response(message="User account does not exist or has been deleted.", code="USER_NOT_FOUND", status_code=401)
+
     profile = HealthProfile.query.filter_by(user_id=uid).first()
     if not profile:
         return success_response(data={"health_profile": None}, message="No profile found.")
@@ -88,6 +92,29 @@ def update_user_profile():
 
     if "is_outdoor_worker" in payload:
         profile.is_outdoor_worker = bool(payload["is_outdoor_worker"])
+
+    import json
+    if "conditions" in payload and isinstance(payload["conditions"], list):
+        profile.conditions_json = json.dumps(payload["conditions"])
+        if "asthma" in payload["conditions"]:
+            profile.asthma = True
+        if "cardiovascular_disease" in payload["conditions"]:
+            profile.has_heart_condition = True
+
+    if "household" in payload:
+        profile.household = str(payload["household"])
+
+    if "outdoor_exercise_hours" in payload:
+        try:
+            profile.outdoor_exercise_hours = float(payload["outdoor_exercise_hours"])
+        except (ValueError, TypeError):
+            pass
+
+    if "commute_mode" in payload:
+        profile.commute_mode = str(payload["commute_mode"])
+
+    if "dpdp_consent" in payload:
+        profile.dpdp_consent = bool(payload["dpdp_consent"])
 
     try:
         db.session.commit()
@@ -488,6 +515,67 @@ def update_user_alerts():
         db.session.rollback()
         return error_response(
             message=f"Failed to update alert preferences: {str(exc)}",
+            code="DATABASE_ERROR",
+            status_code=500,
+        )
+
+
+# ---------------------------------------------------------------------------
+# 5. DPDP Act 2023 Compliance: Data Portability & Right to Erasure
+# ---------------------------------------------------------------------------
+
+@user_bp.route("/export-data", methods=["GET"])
+@token_required
+def export_user_data():
+    """DPDP Act 2023 Data Portability: Export full user account data as JSON."""
+    uid = _resolve_user_id()
+    if uid is None:
+        return error_response(message="Authentication required.", code="UNAUTHORIZED", status_code=401)
+
+    user = db.session.get(User, uid)
+    if not user:
+        return error_response(message="User not found.", code="NOT_FOUND", status_code=404)
+
+    health_profile = HealthProfile.query.filter_by(user_id=uid).first()
+    saved_locations = SavedLocation.query.filter_by(user_id=uid).all()
+    history = AssessmentHistory.query.filter_by(user_id=uid).order_by(AssessmentHistory.timestamp.desc()).all()
+    preferences = AlertPreference.query.filter_by(user_id=uid).first()
+
+    data_bundle = {
+        "user": user.to_dict(),
+        "health_profile": health_profile.to_dict() if health_profile else None,
+        "saved_locations": [loc.to_dict() for loc in saved_locations],
+        "assessment_history": [h.to_dict() for h in history],
+        "alert_preferences": preferences.to_dict() if preferences else None,
+        "dpdp_notice": "Exported in accordance with Section 12 of the Digital Personal Data Protection (DPDP) Act, 2023.",
+    }
+
+    return success_response(data=data_bundle, message="User data bundle exported successfully.")
+
+
+@user_bp.route("/delete-account", methods=["POST", "DELETE"])
+@token_required
+def delete_user_account():
+    """DPDP Act 2023 Right to Erasure: Permanently delete user and all associated health records."""
+    uid = _resolve_user_id()
+    if uid is None:
+        return error_response(message="Authentication required.", code="UNAUTHORIZED", status_code=401)
+
+    user = db.session.get(User, uid)
+    if not user:
+        return error_response(message="User not found.", code="NOT_FOUND", status_code=404)
+
+    try:
+        # Cascade deletion removes health_profiles, saved_locations, history, preferences
+        db.session.delete(user)
+        db.session.commit()
+        return success_response(
+            message="User account and all associated personal and health data have been permanently erased (DPDP Act 2023 compliant)."
+        )
+    except Exception as exc:
+        db.session.rollback()
+        return error_response(
+            message=f"Failed to delete account: {str(exc)}",
             code="DATABASE_ERROR",
             status_code=500,
         )

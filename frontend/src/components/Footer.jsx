@@ -43,19 +43,19 @@ export default function Footer({ isBackendOnline = true }) {
                   Pollution <span className="text-blue-600 dark:text-blue-400">XAI</span>
                 </span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/80 uppercase tracking-wider">
-                  v1.0
+                  v2.0.0
                 </span>
               </div>
             </Link>
 
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Explainable AI-based residential air quality intelligence, CAMS satellite reference benchmarking, and meteorological PM2.5 prediction for Delhi-NCR.
+              All-India multi-pollutant environmental intelligence, CAMS reanalysis, CPCB ground-truth benchmarking, and health-personalised relocation advisory across 45 Indian cities.
             </p>
 
             <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
               <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
               <p className="leading-snug">
-                <strong>CPCB Disclaimer:</strong> Indicative diagnostic estimates. Not certified regulatory monitor measurements or official National AQI.
+                <strong>CPCB Disclaimer:</strong> Indicative diagnostic estimates. Not certified regulatory monitor measurements or official statutory CAAQMS AQI.
               </p>
             </div>
           </div>
@@ -64,23 +64,31 @@ export default function Footer({ isBackendOnline = true }) {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
               <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>Product Capabilities</span>
+              <span>Decision Tools</span>
             </div>
             <ul className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+              <li>
+                <Link
+                  to="/relocation"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-blue-600 dark:text-blue-400 transition-colors inline-block"
+                >
+                  Relocation Advisor (From vs To)
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/hotspots"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 font-semibold text-blue-600 dark:text-blue-400 transition-colors inline-block"
+                >
+                  National Hotspot Rankings
+                </Link>
+              </li>
               <li>
                 <Link
                   to="/live-assessment"
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block"
                 >
-                  Live Air Assessment
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/livability"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block"
-                >
-                  Residential Livability Index
+                  Check My Air (6 Pollutants)
                 </Link>
               </li>
               <li>
@@ -89,6 +97,14 @@ export default function Footer({ isBackendOnline = true }) {
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block"
                 >
                   Saved Places & Alerts
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/privacy"
+                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block"
+                >
+                  Privacy & DPDP Act 2023
                 </Link>
               </li>
               <li>

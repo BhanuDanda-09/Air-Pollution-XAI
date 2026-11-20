@@ -79,6 +79,22 @@ export default function Home() {
 
   const featureCards = [
     {
+      title: 'Health-Personalised Relocation Advisor',
+      desc: 'Compare living in your current city against candidate destinations. Features WHO 2021 health sensitivity multipliers and actionable seasonal advice.',
+      icon: Compass,
+      color: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800',
+      link: '/relocation',
+      action: 'Launch Relocation Advisor',
+    },
+    {
+      title: 'All-India Hotspot Rankings (45 Cities)',
+      desc: 'Explore nationwide pollution rankings, peak percentile exposure (P90 & P99), and winter inversion factors across all 6 geographical zones.',
+      icon: BarChart3,
+      color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800',
+      link: '/hotspots',
+      action: 'View Hotspot Rankings',
+    },
+    {
       title: 'Live Air Quality Assessment',
       desc: 'Pinpoint any location with the interactive Leaflet map picker to get live Open-Meteo weather, Copernicus CAMS PM2.5, and model comparison.',
       icon: MapPin,
@@ -95,8 +111,8 @@ export default function Home() {
       action: 'Compare Places',
     },
     {
-      title: 'Explainable AI & Source Attribution',
-      desc: 'Understand the "why" behind pollution spikes using exact local SHAP feature attributions and empirical source sector decomposition.',
+      title: 'Explainable AI & Feature Attribution',
+      desc: 'Understand what drives model predictions using exact TreeExplainer SHAP values and empirical meteorological sensitivity maps.',
       icon: Sparkles,
       color: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 border-purple-200 dark:border-purple-800',
       link: '/explainability',
@@ -146,7 +162,7 @@ export default function Home() {
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-teal-300 border border-white/15 backdrop-blur-xs">
               <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-              <span>AI Decision Intelligence • Delhi-NCR Airshed</span>
+              <span>AI Decision Intelligence • All-India Multi-Pollutant & Relocation System</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
@@ -154,10 +170,10 @@ export default function Home() {
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl">
-              Instant residential air safety diagnostics, multi-factor livability scoring, and explainable PM2.5 insights backed by Copernicus satellite models and machine learning.
+              All-India multi-pollutant diagnostics (PM2.5, PM10, NO2, SO2, CO, O3), health-personalised relocation advisory (From vs To), and explainable AI insights powered by CAMS reanalysis and machine learning across 45 cities.
             </p>
 
-            {/* CTAs: Check My Location (Primary) & Try Prediction Model (Secondary) */}
+            {/* CTAs: Check My Location (Primary), Relocation Advisor, Try Prediction Model */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
                 type="button"
@@ -168,6 +184,14 @@ export default function Home() {
                 <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
                 <span>{isLocating ? 'Detecting GPS Location...' : 'Check My Location'}</span>
               </button>
+
+              <Link
+                to="/relocation"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm bg-teal-600 hover:bg-teal-500 active:scale-98 text-white shadow-lg shadow-teal-600/30 transition-all focus-visible:ring-2 focus-visible:ring-teal-400"
+              >
+                <Compass className="w-4 h-4 text-white" />
+                <span>Relocation Advisor</span>
+              </Link>
 
               <Link
                 to="/prediction"
@@ -182,15 +206,19 @@ export default function Home() {
             <div className="pt-4 border-t border-white/10 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-400">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-                <span>Copernicus CAMS Ground Truth</span>
+                <span>45 Indian Cities Monitored</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-                <span>SHAP Local Feature Attribution</span>
+                <span>6 Criteria Pollutants (CPCB)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-                <span>0–100 Residential Livability Index</span>
+                <span>SHAP Feature Attribution</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+                <span>DPDP Act 2023 Compliant</span>
               </div>
             </div>
           </div>

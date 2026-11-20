@@ -24,6 +24,9 @@ const Prediction = lazy(() => import('./pages/Prediction'));
 const ModelComparisonPage = lazy(() => import('./pages/ModelComparisonPage'));
 const Explainability = lazy(() => import('./pages/Explainability'));
 const About = lazy(() => import('./pages/About'));
+const RelocationAdvisorPage = lazy(() => import('./pages/RelocationAdvisorPage'));
+const HotspotsPage = lazy(() => import('./pages/HotspotsPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const WorkerPage = lazy(() => import('./pages/WorkerPage'));
 const UnauthorizedPage = lazy(() => import('./pages/UnauthorizedPage'));
@@ -66,8 +69,12 @@ export default function App() {
                 <Suspense fallback={<PageSkeleton variant="generic" className="py-6" />}>
                   <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/relocation" element={<RelocationAdvisorPage />} />
+                    <Route path="/hotspots" element={<HotspotsPage />} />
+                    <Route path="/privacy" element={<PrivacyPage />} />
                     <Route path="/livability" element={<LivabilityPage />} />
                     <Route path="/live-assessment" element={<LiveAssessmentPage />} />
+                    <Route path="/check-air" element={<LiveAssessmentPage />} />
                     <Route path="/saved-places" element={<SavedPlacesPage />} />
                     <Route path="/history" element={<HistoryPage />} />
                     <Route path="/dashboard" element={<Dashboard />} />

@@ -163,6 +163,11 @@ def mock_open_meteo_weather_response(*args, **kwargs):
             "current": {
                 "time": "2026-11-16T12:00",
                 "pm2_5": 115.4,
+                "pm10": 185.0,
+                "nitrogen_dioxide": 45.0,
+                "sulphur_dioxide": 15.0,
+                "carbon_monoxide": 850.0,
+                "ozone": 60.0,
                 "european_aqi": 85,
                 "us_aqi": 182,
             }

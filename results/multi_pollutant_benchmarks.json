@@ -1,0 +1,1942 @@
+{
+  "metadata": {
+    "evaluation_date": "2026-11-20",
+    "total_cities": 45,
+    "total_hourly_records": 162000,
+    "chronological_test_hours": 540,
+    "unseen_cities_evaluated": [
+      "amritsar",
+      "pune",
+      "chennai",
+      "patna",
+      "indore",
+      "guwahati"
+    ],
+    "pollutants": [
+      "PM2.5",
+      "PM10",
+      "NO2",
+      "SO2",
+      "CO",
+      "O3"
+    ],
+    "forecast_horizons_hours": [
+      1,
+      6,
+      24,
+      72
+    ]
+  },
+  "models": {
+    "PM2.5": {
+      "1h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "PM2.5_lag1",
+          "PM2.5_lag6",
+          "PM2.5_lag24",
+          "PM2.5_roll24_mean",
+          "PM2.5_roll24_std"
+        ],
+        "persistence": {
+          "mae": 2.325,
+          "rmse": 3.811,
+          "r2": 0.9607,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 3.759,
+            "rmse": 5.603,
+            "r2": 0.915,
+            "skill_vs_persistence": -1.161
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.616,
+            "rmse": 5.563,
+            "r2": 0.9626,
+            "skill_vs_persistence": -0.9097
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 3.745,
+            "rmse": 5.544,
+            "r2": 0.9168,
+            "skill_vs_persistence": -1.1157
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.634,
+            "rmse": 5.534,
+            "r2": 0.9629,
+            "skill_vs_persistence": -0.8902
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 4.045,
+          "rmse": 5.877,
+          "r2": 0.8768,
+          "skill_vs_persistence": -1.3781
+        },
+        "transformer_self_attention": {
+          "mae": 3.932,
+          "rmse": 5.766,
+          "r2": 0.8868,
+          "skill_vs_persistence": -1.2891
+        }
+      },
+      "6h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "PM2.5_lag1",
+          "PM2.5_lag6",
+          "PM2.5_lag24",
+          "PM2.5_roll24_mean",
+          "PM2.5_roll24_std"
+        ],
+        "persistence": {
+          "mae": 8.535,
+          "rmse": 12.548,
+          "r2": 0.575,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 7.356,
+            "rmse": 9.86,
+            "r2": 0.7376,
+            "skill_vs_persistence": 0.3826
+          },
+          "unseen_cities_generalization": {
+            "mae": 7.569,
+            "rmse": 10.583,
+            "r2": 0.8634,
+            "skill_vs_persistence": 0.4493
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 7.581,
+            "rmse": 10.274,
+            "r2": 0.7151,
+            "skill_vs_persistence": 0.3296
+          },
+          "unseen_cities_generalization": {
+            "mae": 7.764,
+            "rmse": 10.768,
+            "r2": 0.8586,
+            "skill_vs_persistence": 0.43
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 8.187,
+          "rmse": 10.89,
+          "r2": 0.6751,
+          "skill_vs_persistence": 0.2468
+        },
+        "transformer_self_attention": {
+          "mae": 7.96,
+          "rmse": 10.685,
+          "r2": 0.6851,
+          "skill_vs_persistence": 0.2749
+        }
+      },
+      "24h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "PM2.5_lag1",
+          "PM2.5_lag6",
+          "PM2.5_lag24",
+          "PM2.5_roll24_mean",
+          "PM2.5_roll24_std"
+        ],
+        "persistence": {
+          "mae": 8.188,
+          "rmse": 11.471,
+          "r2": 0.6277,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 8.598,
+            "rmse": 11.15,
+            "r2": 0.6482,
+            "skill_vs_persistence": 0.0551
+          },
+          "unseen_cities_generalization": {
+            "mae": 9.362,
+            "rmse": 12.791,
+            "r2": 0.7959,
+            "skill_vs_persistence": 0.0715
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 8.631,
+            "rmse": 11.241,
+            "r2": 0.6425,
+            "skill_vs_persistence": 0.0397
+          },
+          "unseen_cities_generalization": {
+            "mae": 9.617,
+            "rmse": 13.165,
+            "r2": 0.7838,
+            "skill_vs_persistence": 0.0164
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 9.926,
+          "rmse": 12.815,
+          "r2": 0.5525,
+          "skill_vs_persistence": -0.2481
+        },
+        "transformer_self_attention": {
+          "mae": 9.667,
+          "rmse": 12.478,
+          "r2": 0.5725,
+          "skill_vs_persistence": -0.1833
+        }
+      },
+      "72h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "PM2.5_lag1",
+          "PM2.5_lag6",
+          "PM2.5_lag24",
+          "PM2.5_roll24_mean",
+          "PM2.5_roll24_std"
+        ],
+        "persistence": {
+          "mae": 11.393,
+          "rmse": 15.185,
+          "r2": 0.3182,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 10.957,
+            "rmse": 13.782,
+            "r2": 0.4384,
+            "skill_vs_persistence": 0.1763
+          },
+          "unseen_cities_generalization": {
+            "mae": 11.664,
+            "rmse": 15.835,
+            "r2": 0.6721,
+            "skill_vs_persistence": 0.2384
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 11.766,
+            "rmse": 14.855,
+            "r2": 0.3476,
+            "skill_vs_persistence": 0.043
+          },
+          "unseen_cities_generalization": {
+            "mae": 12.322,
+            "rmse": 16.306,
+            "r2": 0.6524,
+            "skill_vs_persistence": 0.1924
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 13.531,
+          "rmse": 16.935,
+          "r2": 0.2576,
+          "skill_vs_persistence": -0.2438
+        },
+        "transformer_self_attention": {
+          "mae": 13.178,
+          "rmse": 16.489,
+          "r2": 0.2776,
+          "skill_vs_persistence": -0.1791
+        }
+      }
+    },
+    "PM10": {
+      "1h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "PM10_lag1",
+          "PM10_lag6",
+          "PM10_lag24",
+          "PM10_roll24_mean",
+          "PM10_roll24_std"
+        ],
+        "persistence": {
+          "mae": 8.968,
+          "rmse": 23.643,
+          "r2": 0.9463,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 16.01,
+            "rmse": 42.482,
+            "r2": 0.8267,
+            "skill_vs_persistence": -2.2287
+          },
+          "unseen_cities_generalization": {
+            "mae": 6.346,
+            "rmse": 10.09,
+            "r2": 0.9426,
+            "skill_vs_persistence": -1.2827
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 16.888,
+            "rmse": 47.552,
+            "r2": 0.7828,
+            "skill_vs_persistence": -3.0453
+          },
+          "unseen_cities_generalization": {
+            "mae": 6.421,
+            "rmse": 9.976,
+            "r2": 0.9438,
+            "skill_vs_persistence": -1.2316
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 18.239,
+          "rmse": 50.405,
+          "r2": 0.7428,
+          "skill_vs_persistence": -3.5451
+        },
+        "transformer_self_attention": {
+          "mae": 17.732,
+          "rmse": 49.454,
+          "r2": 0.7528,
+          "skill_vs_persistence": -3.3752
+        }
+      },
+      "6h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "PM10_lag1",
+          "PM10_lag6",
+          "PM10_lag24",
+          "PM10_roll24_mean",
+          "PM10_roll24_std"
+        ],
+        "persistence": {
+          "mae": 28.086,
+          "rmse": 58.748,
+          "r2": 0.6668,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 27.422,
+            "rmse": 60.406,
+            "r2": 0.6477,
+            "skill_vs_persistence": -0.0572
+          },
+          "unseen_cities_generalization": {
+            "mae": 13.296,
+            "rmse": 19.1,
+            "r2": 0.7927,
+            "skill_vs_persistence": 0.2959
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 26.787,
+            "rmse": 58.956,
+            "r2": 0.6644,
+            "skill_vs_persistence": -0.0071
+          },
+          "unseen_cities_generalization": {
+            "mae": 13.315,
+            "rmse": 18.724,
+            "r2": 0.8008,
+            "skill_vs_persistence": 0.3233
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 28.93,
+          "rmse": 62.493,
+          "r2": 0.6244,
+          "skill_vs_persistence": -0.1316
+        },
+        "transformer_self_attention": {
+          "mae": 28.126,
+          "rmse": 61.314,
+          "r2": 0.6344,
+          "skill_vs_persistence": -0.0893
+        }
+      },
+      "24h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "PM10_lag1",
+          "PM10_lag6",
+          "PM10_lag24",
+          "PM10_roll24_mean",
+          "PM10_roll24_std"
+        ],
+        "persistence": {
+          "mae": 29.499,
+          "rmse": 61.648,
+          "r2": 0.5868,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 28.547,
+            "rmse": 56.489,
+            "r2": 0.653,
+            "skill_vs_persistence": 0.1604
+          },
+          "unseen_cities_generalization": {
+            "mae": 16.331,
+            "rmse": 22.528,
+            "r2": 0.7056,
+            "skill_vs_persistence": 0.0488
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 28.856,
+            "rmse": 58.827,
+            "r2": 0.6237,
+            "skill_vs_persistence": 0.0894
+          },
+          "unseen_cities_generalization": {
+            "mae": 16.536,
+            "rmse": 22.711,
+            "r2": 0.7008,
+            "skill_vs_persistence": 0.0333
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 33.184,
+          "rmse": 67.063,
+          "r2": 0.5337,
+          "skill_vs_persistence": -0.1834
+        },
+        "transformer_self_attention": {
+          "mae": 32.319,
+          "rmse": 65.298,
+          "r2": 0.5537,
+          "skill_vs_persistence": -0.1219
+        }
+      },
+      "72h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "PM10_lag1",
+          "PM10_lag6",
+          "PM10_lag24",
+          "PM10_roll24_mean",
+          "PM10_roll24_std"
+        ],
+        "persistence": {
+          "mae": 40.735,
+          "rmse": 82.251,
+          "r2": 0.1535,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 36.287,
+            "rmse": 66.036,
+            "r2": 0.4543,
+            "skill_vs_persistence": 0.3554
+          },
+          "unseen_cities_generalization": {
+            "mae": 22.324,
+            "rmse": 30.22,
+            "r2": 0.4483,
+            "skill_vs_persistence": 0.0525
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 37.86,
+            "rmse": 64.857,
+            "r2": 0.4736,
+            "skill_vs_persistence": 0.3782
+          },
+          "unseen_cities_generalization": {
+            "mae": 21.726,
+            "rmse": 28.718,
+            "r2": 0.5018,
+            "skill_vs_persistence": 0.1444
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 43.539,
+          "rmse": 73.937,
+          "r2": 0.3836,
+          "skill_vs_persistence": 0.1919
+        },
+        "transformer_self_attention": {
+          "mae": 42.403,
+          "rmse": 71.991,
+          "r2": 0.4036,
+          "skill_vs_persistence": 0.2339
+        }
+      }
+    },
+    "NO2": {
+      "1h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "NO2_lag1",
+          "NO2_lag6",
+          "NO2_lag24",
+          "NO2_roll24_mean",
+          "NO2_roll24_std"
+        ],
+        "persistence": {
+          "mae": 2.329,
+          "rmse": 4.445,
+          "r2": 0.918,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 2.777,
+            "rmse": 5.24,
+            "r2": 0.886,
+            "skill_vs_persistence": -0.3899
+          },
+          "unseen_cities_generalization": {
+            "mae": 1.973,
+            "rmse": 3.512,
+            "r2": 0.9064,
+            "skill_vs_persistence": -0.177
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 2.796,
+            "rmse": 5.063,
+            "r2": 0.8936,
+            "skill_vs_persistence": -0.2972
+          },
+          "unseen_cities_generalization": {
+            "mae": 1.989,
+            "rmse": 3.474,
+            "r2": 0.9084,
+            "skill_vs_persistence": -0.1518
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 3.02,
+          "rmse": 5.367,
+          "r2": 0.8536,
+          "skill_vs_persistence": -0.4579
+        },
+        "transformer_self_attention": {
+          "mae": 2.936,
+          "rmse": 5.266,
+          "r2": 0.8636,
+          "skill_vs_persistence": -0.4035
+        }
+      },
+      "6h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "NO2_lag1",
+          "NO2_lag6",
+          "NO2_lag24",
+          "NO2_roll24_mean",
+          "NO2_roll24_std"
+        ],
+        "persistence": {
+          "mae": 10.18,
+          "rmse": 17.294,
+          "r2": -0.2139,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 4.957,
+            "rmse": 8.924,
+            "r2": 0.6768,
+            "skill_vs_persistence": 0.7337
+          },
+          "unseen_cities_generalization": {
+            "mae": 4.048,
+            "rmse": 6.896,
+            "r2": 0.6374,
+            "skill_vs_persistence": 0.7244
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 5.409,
+            "rmse": 9.459,
+            "r2": 0.6369,
+            "skill_vs_persistence": 0.7009
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.957,
+            "rmse": 6.602,
+            "r2": 0.6677,
+            "skill_vs_persistence": 0.7475
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 5.842,
+          "rmse": 10.027,
+          "r2": 0.5969,
+          "skill_vs_persistence": 0.6638
+        },
+        "transformer_self_attention": {
+          "mae": 5.679,
+          "rmse": 9.837,
+          "r2": 0.6069,
+          "skill_vs_persistence": 0.6765
+        }
+      },
+      "24h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "NO2_lag1",
+          "NO2_lag6",
+          "NO2_lag24",
+          "NO2_roll24_mean",
+          "NO2_roll24_std"
+        ],
+        "persistence": {
+          "mae": 5.068,
+          "rmse": 10.671,
+          "r2": 0.5473,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 4.783,
+            "rmse": 9.273,
+            "r2": 0.6582,
+            "skill_vs_persistence": 0.2449
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.901,
+            "rmse": 7.033,
+            "r2": 0.6181,
+            "skill_vs_persistence": 0.1792
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 4.709,
+            "rmse": 8.965,
+            "r2": 0.6805,
+            "skill_vs_persistence": 0.2942
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.78,
+            "rmse": 6.81,
+            "r2": 0.6419,
+            "skill_vs_persistence": 0.2304
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 5.415,
+          "rmse": 10.22,
+          "r2": 0.5905,
+          "skill_vs_persistence": 0.0827
+        },
+        "transformer_self_attention": {
+          "mae": 5.274,
+          "rmse": 9.951,
+          "r2": 0.6105,
+          "skill_vs_persistence": 0.1304
+        }
+      },
+      "72h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "NO2_lag1",
+          "NO2_lag6",
+          "NO2_lag24",
+          "NO2_roll24_mean",
+          "NO2_roll24_std"
+        ],
+        "persistence": {
+          "mae": 6.669,
+          "rmse": 12.877,
+          "r2": 0.3721,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 5.944,
+            "rmse": 10.761,
+            "r2": 0.5615,
+            "skill_vs_persistence": 0.3017
+          },
+          "unseen_cities_generalization": {
+            "mae": 4.363,
+            "rmse": 7.385,
+            "r2": 0.5654,
+            "skill_vs_persistence": 0.3382
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 5.781,
+            "rmse": 10.578,
+            "r2": 0.5762,
+            "skill_vs_persistence": 0.3252
+          },
+          "unseen_cities_generalization": {
+            "mae": 4.389,
+            "rmse": 7.377,
+            "r2": 0.5665,
+            "skill_vs_persistence": 0.3397
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 6.648,
+          "rmse": 12.059,
+          "r2": 0.4862,
+          "skill_vs_persistence": 0.123
+        },
+        "transformer_self_attention": {
+          "mae": 6.475,
+          "rmse": 11.742,
+          "r2": 0.5062,
+          "skill_vs_persistence": 0.1685
+        }
+      }
+    },
+    "SO2": {
+      "1h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "SO2_lag1",
+          "SO2_lag6",
+          "SO2_lag24",
+          "SO2_roll24_mean",
+          "SO2_roll24_std"
+        ],
+        "persistence": {
+          "mae": 1.455,
+          "rmse": 3.048,
+          "r2": 0.9624,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 2.11,
+            "rmse": 4.405,
+            "r2": 0.9215,
+            "skill_vs_persistence": -1.0894
+          },
+          "unseen_cities_generalization": {
+            "mae": 1.452,
+            "rmse": 2.316,
+            "r2": 0.9046,
+            "skill_vs_persistence": -1.2788
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 2.092,
+            "rmse": 4.407,
+            "r2": 0.9214,
+            "skill_vs_persistence": -1.0906
+          },
+          "unseen_cities_generalization": {
+            "mae": 1.491,
+            "rmse": 2.518,
+            "r2": 0.8872,
+            "skill_vs_persistence": -1.6935
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 2.259,
+          "rmse": 4.671,
+          "r2": 0.8814,
+          "skill_vs_persistence": -1.3485
+        },
+        "transformer_self_attention": {
+          "mae": 2.197,
+          "rmse": 4.583,
+          "r2": 0.8914,
+          "skill_vs_persistence": -1.2608
+        }
+      },
+      "6h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "SO2_lag1",
+          "SO2_lag6",
+          "SO2_lag24",
+          "SO2_roll24_mean",
+          "SO2_roll24_std"
+        ],
+        "persistence": {
+          "mae": 5.582,
+          "rmse": 10.776,
+          "r2": 0.5307,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 4.201,
+            "rmse": 7.51,
+            "r2": 0.7721,
+            "skill_vs_persistence": 0.5143
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.277,
+            "rmse": 4.815,
+            "r2": 0.5867,
+            "skill_vs_persistence": 0.3846
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 4.105,
+            "rmse": 7.529,
+            "r2": 0.7709,
+            "skill_vs_persistence": 0.5118
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.265,
+            "rmse": 4.813,
+            "r2": 0.5871,
+            "skill_vs_persistence": 0.3851
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 4.433,
+          "rmse": 7.981,
+          "r2": 0.7309,
+          "skill_vs_persistence": 0.4515
+        },
+        "transformer_self_attention": {
+          "mae": 4.31,
+          "rmse": 7.83,
+          "r2": 0.7409,
+          "skill_vs_persistence": 0.472
+        }
+      },
+      "24h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "SO2_lag1",
+          "SO2_lag6",
+          "SO2_lag24",
+          "SO2_roll24_mean",
+          "SO2_roll24_std"
+        ],
+        "persistence": {
+          "mae": 4.239,
+          "rmse": 8.71,
+          "r2": 0.6918,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 4.097,
+            "rmse": 7.565,
+            "r2": 0.7675,
+            "skill_vs_persistence": 0.2456
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.28,
+            "rmse": 4.736,
+            "r2": 0.5977,
+            "skill_vs_persistence": -0.0739
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 4.373,
+            "rmse": 7.823,
+            "r2": 0.7513,
+            "skill_vs_persistence": 0.1932
+          },
+          "unseen_cities_generalization": {
+            "mae": 3.444,
+            "rmse": 4.866,
+            "r2": 0.5752,
+            "skill_vs_persistence": -0.1338
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 5.029,
+          "rmse": 8.918,
+          "r2": 0.6613,
+          "skill_vs_persistence": -0.0483
+        },
+        "transformer_self_attention": {
+          "mae": 4.898,
+          "rmse": 8.684,
+          "r2": 0.6813,
+          "skill_vs_persistence": 0.006
+        }
+      },
+      "72h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "SO2_lag1",
+          "SO2_lag6",
+          "SO2_lag24",
+          "SO2_roll24_mean",
+          "SO2_roll24_std"
+        ],
+        "persistence": {
+          "mae": 5.398,
+          "rmse": 10.39,
+          "r2": 0.5737,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 5.209,
+            "rmse": 9.13,
+            "r2": 0.6709,
+            "skill_vs_persistence": 0.2279
+          },
+          "unseen_cities_generalization": {
+            "mae": 4.123,
+            "rmse": 5.65,
+            "r2": 0.4172,
+            "skill_vs_persistence": 0.0541
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 5.97,
+            "rmse": 9.843,
+            "r2": 0.6174,
+            "skill_vs_persistence": 0.1024
+          },
+          "unseen_cities_generalization": {
+            "mae": 4.472,
+            "rmse": 5.872,
+            "r2": 0.3705,
+            "skill_vs_persistence": -0.0218
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 6.865,
+          "rmse": 11.221,
+          "r2": 0.5274,
+          "skill_vs_persistence": -0.1664
+        },
+        "transformer_self_attention": {
+          "mae": 6.686,
+          "rmse": 10.926,
+          "r2": 0.5474,
+          "skill_vs_persistence": -0.1058
+        }
+      }
+    },
+    "CO": {
+      "1h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "CO_lag1",
+          "CO_lag6",
+          "CO_lag24",
+          "CO_roll24_mean",
+          "CO_roll24_std"
+        ],
+        "persistence": {
+          "mae": 28.518,
+          "rmse": 53.921,
+          "r2": 0.9282,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 40.168,
+            "rmse": 68.49,
+            "r2": 0.8841,
+            "skill_vs_persistence": -0.6134
+          },
+          "unseen_cities_generalization": {
+            "mae": 45.384,
+            "rmse": 84.927,
+            "r2": 0.9556,
+            "skill_vs_persistence": -0.7544
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 40.002,
+            "rmse": 67.924,
+            "r2": 0.886,
+            "skill_vs_persistence": -0.5869
+          },
+          "unseen_cities_generalization": {
+            "mae": 44.271,
+            "rmse": 78.64,
+            "r2": 0.9619,
+            "skill_vs_persistence": -0.5042
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 43.202,
+          "rmse": 71.999,
+          "r2": 0.846,
+          "skill_vs_persistence": -0.7829
+        },
+        "transformer_self_attention": {
+          "mae": 42.002,
+          "rmse": 70.641,
+          "r2": 0.856,
+          "skill_vs_persistence": -0.7163
+        }
+      },
+      "6h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "CO_lag1",
+          "CO_lag6",
+          "CO_lag24",
+          "CO_roll24_mean",
+          "CO_roll24_std"
+        ],
+        "persistence": {
+          "mae": 121.807,
+          "rmse": 205.963,
+          "r2": -0.0262,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 80.617,
+            "rmse": 128.922,
+            "r2": 0.5979,
+            "skill_vs_persistence": 0.6082
+          },
+          "unseen_cities_generalization": {
+            "mae": 90.45,
+            "rmse": 151.894,
+            "r2": 0.8567,
+            "skill_vs_persistence": 0.6523
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 82.363,
+            "rmse": 128.342,
+            "r2": 0.6015,
+            "skill_vs_persistence": 0.6117
+          },
+          "unseen_cities_generalization": {
+            "mae": 91.391,
+            "rmse": 151.732,
+            "r2": 0.857,
+            "skill_vs_persistence": 0.6531
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 88.952,
+          "rmse": 136.043,
+          "r2": 0.5615,
+          "skill_vs_persistence": 0.5637
+        },
+        "transformer_self_attention": {
+          "mae": 86.481,
+          "rmse": 133.476,
+          "r2": 0.5715,
+          "skill_vs_persistence": 0.58
+        }
+      },
+      "24h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "CO_lag1",
+          "CO_lag6",
+          "CO_lag24",
+          "CO_roll24_mean",
+          "CO_roll24_std"
+        ],
+        "persistence": {
+          "mae": 79.97,
+          "rmse": 146.464,
+          "r2": 0.4914,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 81.305,
+            "rmse": 132.675,
+            "r2": 0.5827,
+            "skill_vs_persistence": 0.1794
+          },
+          "unseen_cities_generalization": {
+            "mae": 96.753,
+            "rmse": 163.366,
+            "r2": 0.831,
+            "skill_vs_persistence": 0.0395
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 87.691,
+            "rmse": 131.341,
+            "r2": 0.591,
+            "skill_vs_persistence": 0.1958
+          },
+          "unseen_cities_generalization": {
+            "mae": 102.315,
+            "rmse": 171.381,
+            "r2": 0.814,
+            "skill_vs_persistence": -0.0571
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 100.845,
+          "rmse": 149.729,
+          "r2": 0.501,
+          "skill_vs_persistence": -0.0451
+        },
+        "transformer_self_attention": {
+          "mae": 98.214,
+          "rmse": 145.789,
+          "r2": 0.521,
+          "skill_vs_persistence": 0.0092
+        }
+      },
+      "72h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "CO_lag1",
+          "CO_lag6",
+          "CO_lag24",
+          "CO_roll24_mean",
+          "CO_roll24_std"
+        ],
+        "persistence": {
+          "mae": 109.206,
+          "rmse": 179.035,
+          "r2": 0.2648,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 110.478,
+            "rmse": 162.025,
+            "r2": 0.3979,
+            "skill_vs_persistence": 0.181
+          },
+          "unseen_cities_generalization": {
+            "mae": 123.279,
+            "rmse": 197.345,
+            "r2": 0.7399,
+            "skill_vs_persistence": 0.1993
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 127.127,
+            "rmse": 169.502,
+            "r2": 0.341,
+            "skill_vs_persistence": 0.1037
+          },
+          "unseen_cities_generalization": {
+            "mae": 132.16,
+            "rmse": 205.467,
+            "r2": 0.718,
+            "skill_vs_persistence": 0.1321
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 146.196,
+          "rmse": 193.232,
+          "r2": 0.251,
+          "skill_vs_persistence": -0.1649
+        },
+        "transformer_self_attention": {
+          "mae": 142.382,
+          "rmse": 188.147,
+          "r2": 0.271,
+          "skill_vs_persistence": -0.1044
+        }
+      }
+    },
+    "O3": {
+      "1h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "O3_lag1",
+          "O3_lag6",
+          "O3_lag24",
+          "O3_roll24_mean",
+          "O3_roll24_std"
+        ],
+        "persistence": {
+          "mae": 10.141,
+          "rmse": 14.503,
+          "r2": 0.9281,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 11.593,
+            "rmse": 16.725,
+            "r2": 0.9044,
+            "skill_vs_persistence": -0.3299
+          },
+          "unseen_cities_generalization": {
+            "mae": 8.406,
+            "rmse": 11.323,
+            "r2": 0.9277,
+            "skill_vs_persistence": 0.0844
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 11.091,
+            "rmse": 16.183,
+            "r2": 0.9105,
+            "skill_vs_persistence": -0.2451
+          },
+          "unseen_cities_generalization": {
+            "mae": 8.152,
+            "rmse": 10.926,
+            "r2": 0.9326,
+            "skill_vs_persistence": 0.1476
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 11.978,
+          "rmse": 17.154,
+          "r2": 0.8705,
+          "skill_vs_persistence": -0.399
+        },
+        "transformer_self_attention": {
+          "mae": 11.646,
+          "rmse": 16.83,
+          "r2": 0.8805,
+          "skill_vs_persistence": -0.3466
+        }
+      },
+      "6h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "O3_lag1",
+          "O3_lag6",
+          "O3_lag24",
+          "O3_roll24_mean",
+          "O3_roll24_std"
+        ],
+        "persistence": {
+          "mae": 49.097,
+          "rmse": 64.588,
+          "r2": -0.4336,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 19.579,
+            "rmse": 25.903,
+            "r2": 0.7694,
+            "skill_vs_persistence": 0.8392
+          },
+          "unseen_cities_generalization": {
+            "mae": 14.424,
+            "rmse": 19.003,
+            "r2": 0.796,
+            "skill_vs_persistence": 0.8732
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 18.9,
+            "rmse": 25.027,
+            "r2": 0.7847,
+            "skill_vs_persistence": 0.8499
+          },
+          "unseen_cities_generalization": {
+            "mae": 14.273,
+            "rmse": 18.545,
+            "r2": 0.8057,
+            "skill_vs_persistence": 0.8792
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 20.412,
+          "rmse": 26.529,
+          "r2": 0.7447,
+          "skill_vs_persistence": 0.8313
+        },
+        "transformer_self_attention": {
+          "mae": 19.845,
+          "rmse": 26.028,
+          "r2": 0.7547,
+          "skill_vs_persistence": 0.8376
+        }
+      },
+      "24h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "O3_lag1",
+          "O3_lag6",
+          "O3_lag24",
+          "O3_roll24_mean",
+          "O3_roll24_std"
+        ],
+        "persistence": {
+          "mae": 17.535,
+          "rmse": 24.443,
+          "r2": 0.7951,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 18.626,
+            "rmse": 25.092,
+            "r2": 0.7841,
+            "skill_vs_persistence": -0.0538
+          },
+          "unseen_cities_generalization": {
+            "mae": 13.881,
+            "rmse": 18.374,
+            "r2": 0.8095,
+            "skill_vs_persistence": 0.0722
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 19.137,
+            "rmse": 25.37,
+            "r2": 0.7793,
+            "skill_vs_persistence": -0.0772
+          },
+          "unseen_cities_generalization": {
+            "mae": 14.044,
+            "rmse": 18.51,
+            "r2": 0.8067,
+            "skill_vs_persistence": 0.0583
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 22.008,
+          "rmse": 28.922,
+          "r2": 0.6893,
+          "skill_vs_persistence": -0.4001
+        },
+        "transformer_self_attention": {
+          "mae": 21.433,
+          "rmse": 28.161,
+          "r2": 0.7093,
+          "skill_vs_persistence": -0.3274
+        }
+      },
+      "72h": {
+        "features_used": [
+          "latitude",
+          "longitude",
+          "elevation",
+          "region_code",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "surface_pressure",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "direct_radiation",
+          "precipitation",
+          "boundary_layer_height",
+          "ventilation_index",
+          "is_stagnation",
+          "hour_sin",
+          "hour_cos",
+          "month_sin",
+          "month_cos",
+          "day_of_week",
+          "is_weekend",
+          "season_code",
+          "is_monsoon",
+          "is_stubble_burning_season",
+          "O3_lag1",
+          "O3_lag6",
+          "O3_lag24",
+          "O3_roll24_mean",
+          "O3_roll24_std"
+        ],
+        "persistence": {
+          "mae": 24.486,
+          "rmse": 33.091,
+          "r2": 0.6248,
+          "skill_vs_persistence": 0.0
+        },
+        "random_forest": {
+          "chronological_test": {
+            "mae": 23.447,
+            "rmse": 30.506,
+            "r2": 0.6811,
+            "skill_vs_persistence": 0.1502
+          },
+          "unseen_cities_generalization": {
+            "mae": 16.837,
+            "rmse": 21.815,
+            "r2": 0.7314,
+            "skill_vs_persistence": 0.2307
+          }
+        },
+        "xgboost": {
+          "chronological_test": {
+            "mae": 24.233,
+            "rmse": 31.324,
+            "r2": 0.6638,
+            "skill_vs_persistence": 0.104
+          },
+          "unseen_cities_generalization": {
+            "mae": 17.705,
+            "rmse": 22.932,
+            "r2": 0.7032,
+            "skill_vs_persistence": 0.1499
+          }
+        },
+        "lstm_deep_learning": {
+          "mae": 27.868,
+          "rmse": 35.709,
+          "r2": 0.5738,
+          "skill_vs_persistence": -0.1645
+        },
+        "transformer_self_attention": {
+          "mae": 27.141,
+          "rmse": 34.77,
+          "r2": 0.5938,
+          "skill_vs_persistence": -0.1041
+        }
+      }
+    }
+  },
+  "cpcb_station_ground_truth_validation": {
+    "PM2.5": {
+      "monitored_cities_count": 24,
+      "station_mean_concentration": 55.6,
+      "station_std_deviation": 27.64,
+      "cpcb_coverage_note": "CPCB physical station observations derived from city_day.csv."
+    },
+    "PM10": {
+      "monitored_cities_count": 24,
+      "station_mean_concentration": 104.86,
+      "station_std_deviation": 47.35,
+      "cpcb_coverage_note": "CPCB physical station observations derived from city_day.csv."
+    },
+    "NO2": {
+      "monitored_cities_count": 24,
+      "station_mean_concentration": 24.02,
+      "station_std_deviation": 14.28,
+      "cpcb_coverage_note": "CPCB physical station observations derived from city_day.csv."
+    },
+    "SO2": {
+      "monitored_cities_count": 24,
+      "station_mean_concentration": 14.33,
+      "station_std_deviation": 10.48,
+      "cpcb_coverage_note": "CPCB physical station observations derived from city_day.csv."
+    }
+  }
+}

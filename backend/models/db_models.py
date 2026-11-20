@@ -67,7 +67,7 @@ class User(db.Model):
 
 
 class HealthProfile(db.Model):
-    """Persistent personalized health vulnerability profile."""
+    """Persistent personalized health vulnerability profile conforming to DPDP Act 2023."""
 
     __tablename__ = "health_profiles"
 
@@ -78,6 +78,11 @@ class HealthProfile(db.Model):
     has_heart_condition = db.Column(db.Boolean, default=False, nullable=False)
     is_pregnant = db.Column(db.Boolean, default=False, nullable=False)
     is_outdoor_worker = db.Column(db.Boolean, default=False, nullable=False)
+    conditions_json = db.Column(db.Text, default="[]", nullable=True)
+    household = db.Column(db.String(50), default="none", nullable=True)
+    outdoor_exercise_hours = db.Column(db.Float, default=0.0, nullable=True)
+    commute_mode = db.Column(db.String(50), default="car", nullable=True)
+    dpdp_consent = db.Column(db.Boolean, default=True, nullable=True)
     updated_at = db.Column(db.DateTime(timezone=True), default=_utc_now, onupdate=_utc_now, nullable=False)
 
     def __init__(
@@ -88,6 +93,11 @@ class HealthProfile(db.Model):
         has_heart_condition: bool = False,
         is_pregnant: bool = False,
         is_outdoor_worker: bool = False,
+        conditions_json: str = "[]",
+        household: str = "none",
+        outdoor_exercise_hours: float = 0.0,
+        commute_mode: str = "car",
+        dpdp_consent: bool = True,
         **kwargs: Any,
     ):
         super().__init__(**kwargs)
@@ -98,15 +108,37 @@ class HealthProfile(db.Model):
         self.has_heart_condition = has_heart_condition
         self.is_pregnant = is_pregnant
         self.is_outdoor_worker = is_outdoor_worker
+        self.conditions_json = conditions_json
+        self.household = household
+        self.outdoor_exercise_hours = outdoor_exercise_hours
+        self.commute_mode = commute_mode
+        self.dpdp_consent = dpdp_consent
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialize health profile matching frontend form schema."""
+        import json
+        conds = []
+        try:
+            conds = json.loads(self.conditions_json) if self.conditions_json else []
+        except Exception:
+            conds = []
+
+        if self.asthma and "asthma" not in conds:
+            conds.append("asthma")
+        if self.has_heart_condition and "cardiovascular_disease" not in conds:
+            conds.append("cardiovascular_disease")
+
         return {
             "age_group": self.age_group,
             "asthma": self.asthma,
             "has_heart_condition": self.has_heart_condition,
             "is_pregnant": self.is_pregnant,
             "is_outdoor_worker": self.is_outdoor_worker,
+            "conditions": conds,
+            "household": self.household or "none",
+            "outdoor_exercise_hours": self.outdoor_exercise_hours or 0.0,
+            "commute_mode": self.commute_mode or "car",
+            "dpdp_consent": self.dpdp_consent,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 

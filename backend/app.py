@@ -17,6 +17,7 @@ from backend.database import init_db
 from backend.models.model_loader import get_model_loader
 from backend.routes import (
     admin_bp,
+    air_bp,
     auth_bp,
     explanation_bp,
     health_bp,
@@ -24,6 +25,7 @@ from backend.routes import (
     location_bp,
     model_bp,
     prediction_bp,
+    relocation_bp,
     user_bp,
     worker_bp,
 )
@@ -70,6 +72,8 @@ def create_app(config_class=Config):
     app.register_blueprint(explanation_bp)
     app.register_blueprint(location_bp)
     app.register_blueprint(livability_bp)
+    app.register_blueprint(air_bp)
+    app.register_blueprint(relocation_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(worker_bp)
     app.register_blueprint(auth_bp)
@@ -81,13 +85,21 @@ def create_app(config_class=Config):
         return success_response(
             data={
                 "project": "Explainable AI-Based Air Pollution Prediction and Source Attribution",
-                "version": "1.0.0",
+                "version": "2.0.0",
                 "endpoints": {
                     "health": "/api/health",
+                    "cities": "/api/cities",
+                    "geocode": "/api/geocode",
+                    "air_current": "/api/air/current",
+                    "air_forecast": "/api/air/forecast",
+                    "air_history": "/api/air/history",
+                    "air_climatology": "/api/air/climatology",
+                    "hotspots": "/api/hotspots",
+                    "relocation_compare": "/api/relocation/compare",
+                    "explain": "/api/explain",
                     "models": "/api/models",
                     "predict": "/api/predict",
                     "compare": "/api/compare",
-                    "explain": "/api/explain",
                     "location_assess": "/api/location/assess",
                     "livability_assess": "/api/location/livability",
                 },

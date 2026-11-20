@@ -194,3 +194,24 @@ def test_alert_threshold_validation(client, registered_auth):
     resp_str = client.put("/api/user/alerts", headers=headers, json={"pm25_threshold": "low"})
     assert resp_str.status_code == 400
     assert resp_str.get_json()["error"]["code"] == "INVALID_THRESHOLD"
+
+
+def test_dpdp_export_and_delete_account(client, registered_auth):
+    """Test DPDP Act 2023 data export and right-to-erasure account deletion."""
+    headers = registered_auth["headers"]
+
+    # 1. Export Data
+    exp_resp = client.get("/api/user/export-data", headers=headers)
+    assert exp_resp.status_code == 200
+    bundle = exp_resp.get_json()
+    assert "user" in bundle
+    assert "dpdp_notice" in bundle
+
+    # 2. Delete Account (Right to Erasure)
+    del_resp = client.post("/api/user/delete-account", headers=headers)
+    assert del_resp.status_code == 200
+    assert "permanently erased" in del_resp.get_json()["message"]
+
+    # 3. Subsequent authenticated calls should fail
+    sub_resp = client.get("/api/user/profile", headers=headers)
+    assert sub_resp.status_code in (401, 404)

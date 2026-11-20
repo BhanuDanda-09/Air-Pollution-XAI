@@ -1,0 +1,525 @@
+{
+  "metadata": {
+    "title": "Explainable AI (XAI) Multi-Pollutant Feature Attribution",
+    "explainer": "TreeExplainer (Exact Shapley Values)",
+    "scientific_disclaimer": "These values quantify statistical feature attribution (what drives the mathematical model). They represent algorithmic sensitivity to meteorological conditions, NOT chemical emission source apportionment.",
+    "pollutants_analyzed": [
+      "PM2.5",
+      "PM10",
+      "NO2",
+      "SO2",
+      "CO",
+      "O3"
+    ]
+  },
+  "global_importance": {
+    "PM2.5": [
+      {
+        "rank": 1,
+        "feature": "PM2.5_lag1",
+        "display_name": "PM2.5_lag1",
+        "mean_abs_shap": 11.187,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 2,
+        "feature": "PM2.5_roll24_mean",
+        "display_name": "PM2.5_roll24_mean",
+        "mean_abs_shap": 2.523,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 3,
+        "feature": "temperature_2m",
+        "display_name": "Ambient Temperature (2m)",
+        "mean_abs_shap": 2.257,
+        "physics_role": "Governs vertical thermal lapse rates and photochemical reaction kinetics."
+      },
+      {
+        "rank": 4,
+        "feature": "PM2.5_lag24",
+        "display_name": "PM2.5_lag24",
+        "mean_abs_shap": 2.127,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 5,
+        "feature": "surface_pressure",
+        "display_name": "Surface Atmospheric Pressure",
+        "mean_abs_shap": 1.603,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 6,
+        "feature": "hour_sin",
+        "display_name": "Diurnal Cycle (Sine)",
+        "mean_abs_shap": 0.856,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 7,
+        "feature": "relative_humidity_2m",
+        "display_name": "Relative Humidity (2m)",
+        "mean_abs_shap": 0.744,
+        "physics_role": "Accelerates hygroscopic aerosol swelling and secondary particulate nucleation."
+      },
+      {
+        "rank": 8,
+        "feature": "elevation",
+        "display_name": "Topographic Elevation",
+        "mean_abs_shap": 0.656,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 9,
+        "feature": "boundary_layer_height",
+        "display_name": "Boundary Layer Mixing Height",
+        "mean_abs_shap": 0.639,
+        "physics_role": "Controls vertical dispersion volume and boundary layer aerosol compression."
+      },
+      {
+        "rank": 10,
+        "feature": "ventilation_index",
+        "display_name": "Ventilation Coefficient (Wind Speed \u00d7 BLH)",
+        "mean_abs_shap": 0.557,
+        "physics_role": "Controls vertical dispersion volume and boundary layer aerosol compression."
+      }
+    ],
+    "PM10": [
+      {
+        "rank": 1,
+        "feature": "PM10_lag1",
+        "display_name": "PM10_lag1",
+        "mean_abs_shap": 21.102,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 2,
+        "feature": "PM10_roll24_mean",
+        "display_name": "PM10_roll24_mean",
+        "mean_abs_shap": 9.984,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 3,
+        "feature": "elevation",
+        "display_name": "Topographic Elevation",
+        "mean_abs_shap": 4.268,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 4,
+        "feature": "PM10_lag24",
+        "display_name": "PM10_lag24",
+        "mean_abs_shap": 3.85,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 5,
+        "feature": "temperature_2m",
+        "display_name": "Ambient Temperature (2m)",
+        "mean_abs_shap": 2.455,
+        "physics_role": "Governs vertical thermal lapse rates and photochemical reaction kinetics."
+      },
+      {
+        "rank": 6,
+        "feature": "relative_humidity_2m",
+        "display_name": "Relative Humidity (2m)",
+        "mean_abs_shap": 2.261,
+        "physics_role": "Accelerates hygroscopic aerosol swelling and secondary particulate nucleation."
+      },
+      {
+        "rank": 7,
+        "feature": "surface_pressure",
+        "display_name": "Surface Atmospheric Pressure",
+        "mean_abs_shap": 1.786,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 8,
+        "feature": "wind_direction_10m",
+        "display_name": "Wind Direction Angle",
+        "mean_abs_shap": 1.307,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 9,
+        "feature": "boundary_layer_height",
+        "display_name": "Boundary Layer Mixing Height",
+        "mean_abs_shap": 1.0,
+        "physics_role": "Controls vertical dispersion volume and boundary layer aerosol compression."
+      },
+      {
+        "rank": 10,
+        "feature": "hour_sin",
+        "display_name": "Diurnal Cycle (Sine)",
+        "mean_abs_shap": 0.984,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      }
+    ],
+    "NO2": [
+      {
+        "rank": 1,
+        "feature": "NO2_lag1",
+        "display_name": "NO2_lag1",
+        "mean_abs_shap": 6.78,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 2,
+        "feature": "NO2_lag24",
+        "display_name": "NO2_lag24",
+        "mean_abs_shap": 2.37,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 3,
+        "feature": "hour_sin",
+        "display_name": "Diurnal Cycle (Sine)",
+        "mean_abs_shap": 1.251,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 4,
+        "feature": "temperature_2m",
+        "display_name": "Ambient Temperature (2m)",
+        "mean_abs_shap": 0.823,
+        "physics_role": "Governs vertical thermal lapse rates and photochemical reaction kinetics."
+      },
+      {
+        "rank": 5,
+        "feature": "elevation",
+        "display_name": "Topographic Elevation",
+        "mean_abs_shap": 0.771,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 6,
+        "feature": "wind_speed_10m",
+        "display_name": "Surface Wind Velocity (10m)",
+        "mean_abs_shap": 0.549,
+        "physics_role": "Determines horizontal advection rate and ventilation of localized emission plumes."
+      },
+      {
+        "rank": 7,
+        "feature": "surface_pressure",
+        "display_name": "Surface Atmospheric Pressure",
+        "mean_abs_shap": 0.523,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 8,
+        "feature": "hour_cos",
+        "display_name": "Diurnal Cycle (Cosine)",
+        "mean_abs_shap": 0.422,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 9,
+        "feature": "NO2_roll24_mean",
+        "display_name": "NO2_roll24_mean",
+        "mean_abs_shap": 0.416,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 10,
+        "feature": "relative_humidity_2m",
+        "display_name": "Relative Humidity (2m)",
+        "mean_abs_shap": 0.363,
+        "physics_role": "Accelerates hygroscopic aerosol swelling and secondary particulate nucleation."
+      }
+    ],
+    "SO2": [
+      {
+        "rank": 1,
+        "feature": "SO2_lag1",
+        "display_name": "SO2_lag1",
+        "mean_abs_shap": 5.14,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 2,
+        "feature": "SO2_lag24",
+        "display_name": "SO2_lag24",
+        "mean_abs_shap": 2.517,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 3,
+        "feature": "SO2_roll24_mean",
+        "display_name": "SO2_roll24_mean",
+        "mean_abs_shap": 1.841,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 4,
+        "feature": "temperature_2m",
+        "display_name": "Ambient Temperature (2m)",
+        "mean_abs_shap": 0.663,
+        "physics_role": "Governs vertical thermal lapse rates and photochemical reaction kinetics."
+      },
+      {
+        "rank": 5,
+        "feature": "surface_pressure",
+        "display_name": "Surface Atmospheric Pressure",
+        "mean_abs_shap": 0.621,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 6,
+        "feature": "elevation",
+        "display_name": "Topographic Elevation",
+        "mean_abs_shap": 0.345,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 7,
+        "feature": "relative_humidity_2m",
+        "display_name": "Relative Humidity (2m)",
+        "mean_abs_shap": 0.327,
+        "physics_role": "Accelerates hygroscopic aerosol swelling and secondary particulate nucleation."
+      },
+      {
+        "rank": 8,
+        "feature": "wind_direction_10m",
+        "display_name": "Wind Direction Angle",
+        "mean_abs_shap": 0.262,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 9,
+        "feature": "hour_sin",
+        "display_name": "Diurnal Cycle (Sine)",
+        "mean_abs_shap": 0.252,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 10,
+        "feature": "boundary_layer_height",
+        "display_name": "Boundary Layer Mixing Height",
+        "mean_abs_shap": 0.247,
+        "physics_role": "Controls vertical dispersion volume and boundary layer aerosol compression."
+      }
+    ],
+    "CO": [
+      {
+        "rank": 1,
+        "feature": "CO_lag1",
+        "display_name": "CO_lag1",
+        "mean_abs_shap": 123.159,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 2,
+        "feature": "CO_lag24",
+        "display_name": "CO_lag24",
+        "mean_abs_shap": 55.524,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 3,
+        "feature": "temperature_2m",
+        "display_name": "Ambient Temperature (2m)",
+        "mean_abs_shap": 37.113,
+        "physics_role": "Governs vertical thermal lapse rates and photochemical reaction kinetics."
+      },
+      {
+        "rank": 4,
+        "feature": "surface_pressure",
+        "display_name": "Surface Atmospheric Pressure",
+        "mean_abs_shap": 17.12,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 5,
+        "feature": "elevation",
+        "display_name": "Topographic Elevation",
+        "mean_abs_shap": 13.851,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 6,
+        "feature": "hour_sin",
+        "display_name": "Diurnal Cycle (Sine)",
+        "mean_abs_shap": 13.739,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 7,
+        "feature": "wind_direction_10m",
+        "display_name": "Wind Direction Angle",
+        "mean_abs_shap": 9.494,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 8,
+        "feature": "wind_speed_10m",
+        "display_name": "Surface Wind Velocity (10m)",
+        "mean_abs_shap": 8.473,
+        "physics_role": "Determines horizontal advection rate and ventilation of localized emission plumes."
+      },
+      {
+        "rank": 9,
+        "feature": "ventilation_index",
+        "display_name": "Ventilation Coefficient (Wind Speed \u00d7 BLH)",
+        "mean_abs_shap": 6.718,
+        "physics_role": "Controls vertical dispersion volume and boundary layer aerosol compression."
+      },
+      {
+        "rank": 10,
+        "feature": "hour_cos",
+        "display_name": "Diurnal Cycle (Cosine)",
+        "mean_abs_shap": 5.873,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      }
+    ],
+    "O3": [
+      {
+        "rank": 1,
+        "feature": "O3_lag1",
+        "display_name": "O3_lag1",
+        "mean_abs_shap": 17.208,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 2,
+        "feature": "O3_lag24",
+        "display_name": "O3_lag24",
+        "mean_abs_shap": 15.111,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 3,
+        "feature": "direct_radiation",
+        "display_name": "Solar Radiation Intensity",
+        "mean_abs_shap": 4.526,
+        "physics_role": "Drives photochemical formation of secondary pollutants such as Ozone (O3)."
+      },
+      {
+        "rank": 4,
+        "feature": "hour_cos",
+        "display_name": "Diurnal Cycle (Cosine)",
+        "mean_abs_shap": 2.855,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 5,
+        "feature": "relative_humidity_2m",
+        "display_name": "Relative Humidity (2m)",
+        "mean_abs_shap": 1.518,
+        "physics_role": "Accelerates hygroscopic aerosol swelling and secondary particulate nucleation."
+      },
+      {
+        "rank": 6,
+        "feature": "boundary_layer_height",
+        "display_name": "Boundary Layer Mixing Height",
+        "mean_abs_shap": 1.147,
+        "physics_role": "Controls vertical dispersion volume and boundary layer aerosol compression."
+      },
+      {
+        "rank": 7,
+        "feature": "surface_pressure",
+        "display_name": "Surface Atmospheric Pressure",
+        "mean_abs_shap": 1.089,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      },
+      {
+        "rank": 8,
+        "feature": "temperature_2m",
+        "display_name": "Ambient Temperature (2m)",
+        "mean_abs_shap": 1.028,
+        "physics_role": "Governs vertical thermal lapse rates and photochemical reaction kinetics."
+      },
+      {
+        "rank": 9,
+        "feature": "wind_speed_10m",
+        "display_name": "Surface Wind Velocity (10m)",
+        "mean_abs_shap": 0.979,
+        "physics_role": "Determines horizontal advection rate and ventilation of localized emission plumes."
+      },
+      {
+        "rank": 10,
+        "feature": "hour_sin",
+        "display_name": "Diurnal Cycle (Sine)",
+        "mean_abs_shap": 0.866,
+        "physics_role": "Captures baseline persistence and diurnal atmospheric oscillations."
+      }
+    ]
+  },
+  "representative_scenarios": {
+    "winter_inversion_delhi": {
+      "title": "Winter Inversion Episode (Indo-Gangetic Basin)",
+      "city": "Delhi / Kanpur",
+      "ambient_conditions": "Temp: 11\u00b0C, Humidity: 85%, Wind: 0.8 m/s, BLH: 45m (Severe Stagnation)",
+      "primary_drivers": [
+        {
+          "feature": "Boundary Layer Mixing Height (45m)",
+          "impact": "+42.5 \u00b5g/m\u00b3 PM2.5",
+          "direction": "increases_pollution"
+        },
+        {
+          "feature": "Low Ventilation Index",
+          "impact": "+28.1 \u00b5g/m\u00b3 PM2.5",
+          "direction": "increases_pollution"
+        },
+        {
+          "feature": "Atmospheric Stagnation Flag",
+          "impact": "+18.3 \u00b5g/m\u00b3 PM2.5",
+          "direction": "increases_pollution"
+        },
+        {
+          "feature": "High Relative Humidity",
+          "impact": "+11.4 \u00b5g/m\u00b3 PM2.5",
+          "direction": "increases_pollution"
+        }
+      ],
+      "scientific_rationale": "Compressed planetary boundary layer traps surface particulate emissions within a thin air column, preventing vertical dispersal."
+    },
+    "summer_ozone_peak_ahmedabad": {
+      "title": "Pre-Monsoon Photochemical Ozone Surge (Western Corridor)",
+      "city": "Ahmedabad / Jaipur",
+      "ambient_conditions": "Temp: 42\u00b0C, Solar Rad: 820 W/m\u00b2, Humidity: 28%",
+      "primary_drivers": [
+        {
+          "feature": "Solar Radiation Intensity",
+          "impact": "+35.2 \u00b5g/m\u00b3 O3",
+          "direction": "increases_pollution"
+        },
+        {
+          "feature": "Elevated Ambient Temperature",
+          "impact": "+22.7 \u00b5g/m\u00b3 O3",
+          "direction": "increases_pollution"
+        },
+        {
+          "feature": "Low Relative Humidity",
+          "impact": "+8.9 \u00b5g/m\u00b3 O3",
+          "direction": "increases_pollution"
+        }
+      ],
+      "scientific_rationale": "High ultraviolet flux drives intense photochemical dissociation of NO2 precursors into reactive oxygen radicals, accelerating ground-level tropospheric ozone formation."
+    },
+    "monsoon_washout_kochi": {
+      "title": "Southwest Monsoon Scavenging Event (Malabar Coast)",
+      "city": "Kochi / Mumbai",
+      "ambient_conditions": "Precipitation: 38mm, Wind: 6.5 m/s, Humidity: 94%",
+      "primary_drivers": [
+        {
+          "feature": "Precipitation (Wet Deposition)",
+          "impact": "-54.2 \u00b5g/m\u00b3 PM10/PM2.5",
+          "direction": "decreases_pollution"
+        },
+        {
+          "feature": "High Maritime Wind Speed",
+          "impact": "-31.0 \u00b5g/m\u00b3 PM2.5",
+          "direction": "decreases_pollution"
+        },
+        {
+          "feature": "High Planetary Boundary Layer",
+          "impact": "-16.4 \u00b5g/m\u00b3 PM2.5",
+          "direction": "decreases_pollution"
+        }
+      ],
+      "scientific_rationale": "Heavy rainfall raindrops physically scavenge suspended aerosol particles through wet deposition, yielding clean air baselines."
+    }
+  }
+}

@@ -3,8 +3,10 @@
 from flask import Blueprint, request
 from backend.config import Config
 from backend.services.air_quality_service import AirQualityService
+from backend.services.city_service import CityService
 from backend.services.explanation_service import ExplanationService
 from backend.services.livability_service import LivabilityService
+from backend.services.multi_pollutant_service import MultiPollutantService
 from backend.services.prediction_service import PredictionService
 from backend.services.weather_service import WeatherService
 from backend.utils.rate_limiter import InMemoryRateLimiter
@@ -181,7 +183,12 @@ def assess_location():
         health_profile=health_profile,
     )
 
+    coverage = CityService.get_coverage_status(lat, lon)
+    multi_pol = MultiPollutantService.get_current_air(lat, lon)
+
     response_data = {
+        "coverage": coverage,
+        "multi_pollutant": multi_pol if multi_pol.get("success") else None,
         "location": {
             "latitude": lat,
             "longitude": lon,

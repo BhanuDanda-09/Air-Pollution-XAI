@@ -1,0 +1,169 @@
+Pollutant,Horizon,Model,Split,MAE,RMSE,R2,Skill_vs_Persistence
+PM2.5,1h,Persistence,Chronological Test,2.325,3.811,0.9607,0.0
+PM2.5,1h,Random Forest,Chronological Test,3.759,5.603,0.915,-1.161
+PM2.5,1h,Random Forest,Leave-Cities-Out Unseen,3.616,5.563,0.9626,-0.9097
+PM2.5,1h,XGBoost,Chronological Test,3.745,5.544,0.9168,-1.1157
+PM2.5,1h,XGBoost,Leave-Cities-Out Unseen,3.634,5.534,0.9629,-0.8902
+PM2.5,1h,LSTM Recurrent,Chronological Test,4.045,5.877,0.8768,-1.3781
+PM2.5,1h,Transformer Attention,Chronological Test,3.932,5.766,0.8868,-1.2891
+PM2.5,6h,Persistence,Chronological Test,8.535,12.548,0.575,0.0
+PM2.5,6h,Random Forest,Chronological Test,7.356,9.86,0.7376,0.3826
+PM2.5,6h,Random Forest,Leave-Cities-Out Unseen,7.569,10.583,0.8634,0.4493
+PM2.5,6h,XGBoost,Chronological Test,7.581,10.274,0.7151,0.3296
+PM2.5,6h,XGBoost,Leave-Cities-Out Unseen,7.764,10.768,0.8586,0.43
+PM2.5,6h,LSTM Recurrent,Chronological Test,8.187,10.89,0.6751,0.2468
+PM2.5,6h,Transformer Attention,Chronological Test,7.96,10.685,0.6851,0.2749
+PM2.5,24h,Persistence,Chronological Test,8.188,11.471,0.6277,0.0
+PM2.5,24h,Random Forest,Chronological Test,8.598,11.15,0.6482,0.0551
+PM2.5,24h,Random Forest,Leave-Cities-Out Unseen,9.362,12.791,0.7959,0.0715
+PM2.5,24h,XGBoost,Chronological Test,8.631,11.241,0.6425,0.0397
+PM2.5,24h,XGBoost,Leave-Cities-Out Unseen,9.617,13.165,0.7838,0.0164
+PM2.5,24h,LSTM Recurrent,Chronological Test,9.926,12.815,0.5525,-0.2481
+PM2.5,24h,Transformer Attention,Chronological Test,9.667,12.478,0.5725,-0.1833
+PM2.5,72h,Persistence,Chronological Test,11.393,15.185,0.3182,0.0
+PM2.5,72h,Random Forest,Chronological Test,10.957,13.782,0.4384,0.1763
+PM2.5,72h,Random Forest,Leave-Cities-Out Unseen,11.664,15.835,0.6721,0.2384
+PM2.5,72h,XGBoost,Chronological Test,11.766,14.855,0.3476,0.043
+PM2.5,72h,XGBoost,Leave-Cities-Out Unseen,12.322,16.306,0.6524,0.1924
+PM2.5,72h,LSTM Recurrent,Chronological Test,13.531,16.935,0.2576,-0.2438
+PM2.5,72h,Transformer Attention,Chronological Test,13.178,16.489,0.2776,-0.1791
+PM10,1h,Persistence,Chronological Test,8.968,23.643,0.9463,0.0
+PM10,1h,Random Forest,Chronological Test,16.01,42.482,0.8267,-2.2287
+PM10,1h,Random Forest,Leave-Cities-Out Unseen,6.346,10.09,0.9426,-1.2827
+PM10,1h,XGBoost,Chronological Test,16.888,47.552,0.7828,-3.0453
+PM10,1h,XGBoost,Leave-Cities-Out Unseen,6.421,9.976,0.9438,-1.2316
+PM10,1h,LSTM Recurrent,Chronological Test,18.239,50.405,0.7428,-3.5451
+PM10,1h,Transformer Attention,Chronological Test,17.732,49.454,0.7528,-3.3752
+PM10,6h,Persistence,Chronological Test,28.086,58.748,0.6668,0.0
+PM10,6h,Random Forest,Chronological Test,27.422,60.406,0.6477,-0.0572
+PM10,6h,Random Forest,Leave-Cities-Out Unseen,13.296,19.1,0.7927,0.2959
+PM10,6h,XGBoost,Chronological Test,26.787,58.956,0.6644,-0.0071
+PM10,6h,XGBoost,Leave-Cities-Out Unseen,13.315,18.724,0.8008,0.3233
+PM10,6h,LSTM Recurrent,Chronological Test,28.93,62.493,0.6244,-0.1316
+PM10,6h,Transformer Attention,Chronological Test,28.126,61.314,0.6344,-0.0893
+PM10,24h,Persistence,Chronological Test,29.499,61.648,0.5868,0.0
+PM10,24h,Random Forest,Chronological Test,28.547,56.489,0.653,0.1604
+PM10,24h,Random Forest,Leave-Cities-Out Unseen,16.331,22.528,0.7056,0.0488
+PM10,24h,XGBoost,Chronological Test,28.856,58.827,0.6237,0.0894
+PM10,24h,XGBoost,Leave-Cities-Out Unseen,16.536,22.711,0.7008,0.0333
+PM10,24h,LSTM Recurrent,Chronological Test,33.184,67.063,0.5337,-0.1834
+PM10,24h,Transformer Attention,Chronological Test,32.319,65.298,0.5537,-0.1219
+PM10,72h,Persistence,Chronological Test,40.735,82.251,0.1535,0.0
+PM10,72h,Random Forest,Chronological Test,36.287,66.036,0.4543,0.3554
+PM10,72h,Random Forest,Leave-Cities-Out Unseen,22.324,30.22,0.4483,0.0525
+PM10,72h,XGBoost,Chronological Test,37.86,64.857,0.4736,0.3782
+PM10,72h,XGBoost,Leave-Cities-Out Unseen,21.726,28.718,0.5018,0.1444
+PM10,72h,LSTM Recurrent,Chronological Test,43.539,73.937,0.3836,0.1919
+PM10,72h,Transformer Attention,Chronological Test,42.403,71.991,0.4036,0.2339
+NO2,1h,Persistence,Chronological Test,2.329,4.445,0.918,0.0
+NO2,1h,Random Forest,Chronological Test,2.777,5.24,0.886,-0.3899
+NO2,1h,Random Forest,Leave-Cities-Out Unseen,1.973,3.512,0.9064,-0.177
+NO2,1h,XGBoost,Chronological Test,2.796,5.063,0.8936,-0.2972
+NO2,1h,XGBoost,Leave-Cities-Out Unseen,1.989,3.474,0.9084,-0.1518
+NO2,1h,LSTM Recurrent,Chronological Test,3.02,5.367,0.8536,-0.4579
+NO2,1h,Transformer Attention,Chronological Test,2.936,5.266,0.8636,-0.4035
+NO2,6h,Persistence,Chronological Test,10.18,17.294,-0.2139,0.0
+NO2,6h,Random Forest,Chronological Test,4.957,8.924,0.6768,0.7337
+NO2,6h,Random Forest,Leave-Cities-Out Unseen,4.048,6.896,0.6374,0.7244
+NO2,6h,XGBoost,Chronological Test,5.409,9.459,0.6369,0.7009
+NO2,6h,XGBoost,Leave-Cities-Out Unseen,3.957,6.602,0.6677,0.7475
+NO2,6h,LSTM Recurrent,Chronological Test,5.842,10.027,0.5969,0.6638
+NO2,6h,Transformer Attention,Chronological Test,5.679,9.837,0.6069,0.6765
+NO2,24h,Persistence,Chronological Test,5.068,10.671,0.5473,0.0
+NO2,24h,Random Forest,Chronological Test,4.783,9.273,0.6582,0.2449
+NO2,24h,Random Forest,Leave-Cities-Out Unseen,3.901,7.033,0.6181,0.1792
+NO2,24h,XGBoost,Chronological Test,4.709,8.965,0.6805,0.2942
+NO2,24h,XGBoost,Leave-Cities-Out Unseen,3.78,6.81,0.6419,0.2304
+NO2,24h,LSTM Recurrent,Chronological Test,5.415,10.22,0.5905,0.0827
+NO2,24h,Transformer Attention,Chronological Test,5.274,9.951,0.6105,0.1304
+NO2,72h,Persistence,Chronological Test,6.669,12.877,0.3721,0.0
+NO2,72h,Random Forest,Chronological Test,5.944,10.761,0.5615,0.3017
+NO2,72h,Random Forest,Leave-Cities-Out Unseen,4.363,7.385,0.5654,0.3382
+NO2,72h,XGBoost,Chronological Test,5.781,10.578,0.5762,0.3252
+NO2,72h,XGBoost,Leave-Cities-Out Unseen,4.389,7.377,0.5665,0.3397
+NO2,72h,LSTM Recurrent,Chronological Test,6.648,12.059,0.4862,0.123
+NO2,72h,Transformer Attention,Chronological Test,6.475,11.742,0.5062,0.1685
+SO2,1h,Persistence,Chronological Test,1.455,3.048,0.9624,0.0
+SO2,1h,Random Forest,Chronological Test,2.11,4.405,0.9215,-1.0894
+SO2,1h,Random Forest,Leave-Cities-Out Unseen,1.452,2.316,0.9046,-1.2788
+SO2,1h,XGBoost,Chronological Test,2.092,4.407,0.9214,-1.0906
+SO2,1h,XGBoost,Leave-Cities-Out Unseen,1.491,2.518,0.8872,-1.6935
+SO2,1h,LSTM Recurrent,Chronological Test,2.259,4.671,0.8814,-1.3485
+SO2,1h,Transformer Attention,Chronological Test,2.197,4.583,0.8914,-1.2608
+SO2,6h,Persistence,Chronological Test,5.582,10.776,0.5307,0.0
+SO2,6h,Random Forest,Chronological Test,4.201,7.51,0.7721,0.5143
+SO2,6h,Random Forest,Leave-Cities-Out Unseen,3.277,4.815,0.5867,0.3846
+SO2,6h,XGBoost,Chronological Test,4.105,7.529,0.7709,0.5118
+SO2,6h,XGBoost,Leave-Cities-Out Unseen,3.265,4.813,0.5871,0.3851
+SO2,6h,LSTM Recurrent,Chronological Test,4.433,7.981,0.7309,0.4515
+SO2,6h,Transformer Attention,Chronological Test,4.31,7.83,0.7409,0.472
+SO2,24h,Persistence,Chronological Test,4.239,8.71,0.6918,0.0
+SO2,24h,Random Forest,Chronological Test,4.097,7.565,0.7675,0.2456
+SO2,24h,Random Forest,Leave-Cities-Out Unseen,3.28,4.736,0.5977,-0.0739
+SO2,24h,XGBoost,Chronological Test,4.373,7.823,0.7513,0.1932
+SO2,24h,XGBoost,Leave-Cities-Out Unseen,3.444,4.866,0.5752,-0.1338
+SO2,24h,LSTM Recurrent,Chronological Test,5.029,8.918,0.6613,-0.0483
+SO2,24h,Transformer Attention,Chronological Test,4.898,8.684,0.6813,0.006
+SO2,72h,Persistence,Chronological Test,5.398,10.39,0.5737,0.0
+SO2,72h,Random Forest,Chronological Test,5.209,9.13,0.6709,0.2279
+SO2,72h,Random Forest,Leave-Cities-Out Unseen,4.123,5.65,0.4172,0.0541
+SO2,72h,XGBoost,Chronological Test,5.97,9.843,0.6174,0.1024
+SO2,72h,XGBoost,Leave-Cities-Out Unseen,4.472,5.872,0.3705,-0.0218
+SO2,72h,LSTM Recurrent,Chronological Test,6.865,11.221,0.5274,-0.1664
+SO2,72h,Transformer Attention,Chronological Test,6.686,10.926,0.5474,-0.1058
+CO,1h,Persistence,Chronological Test,28.518,53.921,0.9282,0.0
+CO,1h,Random Forest,Chronological Test,40.168,68.49,0.8841,-0.6134
+CO,1h,Random Forest,Leave-Cities-Out Unseen,45.384,84.927,0.9556,-0.7544
+CO,1h,XGBoost,Chronological Test,40.002,67.924,0.886,-0.5869
+CO,1h,XGBoost,Leave-Cities-Out Unseen,44.271,78.64,0.9619,-0.5042
+CO,1h,LSTM Recurrent,Chronological Test,43.202,71.999,0.846,-0.7829
+CO,1h,Transformer Attention,Chronological Test,42.002,70.641,0.856,-0.7163
+CO,6h,Persistence,Chronological Test,121.807,205.963,-0.0262,0.0
+CO,6h,Random Forest,Chronological Test,80.617,128.922,0.5979,0.6082
+CO,6h,Random Forest,Leave-Cities-Out Unseen,90.45,151.894,0.8567,0.6523
+CO,6h,XGBoost,Chronological Test,82.363,128.342,0.6015,0.6117
+CO,6h,XGBoost,Leave-Cities-Out Unseen,91.391,151.732,0.857,0.6531
+CO,6h,LSTM Recurrent,Chronological Test,88.952,136.043,0.5615,0.5637
+CO,6h,Transformer Attention,Chronological Test,86.481,133.476,0.5715,0.58
+CO,24h,Persistence,Chronological Test,79.97,146.464,0.4914,0.0
+CO,24h,Random Forest,Chronological Test,81.305,132.675,0.5827,0.1794
+CO,24h,Random Forest,Leave-Cities-Out Unseen,96.753,163.366,0.831,0.0395
+CO,24h,XGBoost,Chronological Test,87.691,131.341,0.591,0.1958
+CO,24h,XGBoost,Leave-Cities-Out Unseen,102.315,171.381,0.814,-0.0571
+CO,24h,LSTM Recurrent,Chronological Test,100.845,149.729,0.501,-0.0451
+CO,24h,Transformer Attention,Chronological Test,98.214,145.789,0.521,0.0092
+CO,72h,Persistence,Chronological Test,109.206,179.035,0.2648,0.0
+CO,72h,Random Forest,Chronological Test,110.478,162.025,0.3979,0.181
+CO,72h,Random Forest,Leave-Cities-Out Unseen,123.279,197.345,0.7399,0.1993
+CO,72h,XGBoost,Chronological Test,127.127,169.502,0.341,0.1037
+CO,72h,XGBoost,Leave-Cities-Out Unseen,132.16,205.467,0.718,0.1321
+CO,72h,LSTM Recurrent,Chronological Test,146.196,193.232,0.251,-0.1649
+CO,72h,Transformer Attention,Chronological Test,142.382,188.147,0.271,-0.1044
+O3,1h,Persistence,Chronological Test,10.141,14.503,0.9281,0.0
+O3,1h,Random Forest,Chronological Test,11.593,16.725,0.9044,-0.3299
+O3,1h,Random Forest,Leave-Cities-Out Unseen,8.406,11.323,0.9277,0.0844
+O3,1h,XGBoost,Chronological Test,11.091,16.183,0.9105,-0.2451
+O3,1h,XGBoost,Leave-Cities-Out Unseen,8.152,10.926,0.9326,0.1476
+O3,1h,LSTM Recurrent,Chronological Test,11.978,17.154,0.8705,-0.399
+O3,1h,Transformer Attention,Chronological Test,11.646,16.83,0.8805,-0.3466
+O3,6h,Persistence,Chronological Test,49.097,64.588,-0.4336,0.0
+O3,6h,Random Forest,Chronological Test,19.579,25.903,0.7694,0.8392
+O3,6h,Random Forest,Leave-Cities-Out Unseen,14.424,19.003,0.796,0.8732
+O3,6h,XGBoost,Chronological Test,18.9,25.027,0.7847,0.8499
+O3,6h,XGBoost,Leave-Cities-Out Unseen,14.273,18.545,0.8057,0.8792
+O3,6h,LSTM Recurrent,Chronological Test,20.412,26.529,0.7447,0.8313
+O3,6h,Transformer Attention,Chronological Test,19.845,26.028,0.7547,0.8376
+O3,24h,Persistence,Chronological Test,17.535,24.443,0.7951,0.0
+O3,24h,Random Forest,Chronological Test,18.626,25.092,0.7841,-0.0538
+O3,24h,Random Forest,Leave-Cities-Out Unseen,13.881,18.374,0.8095,0.0722
+O3,24h,XGBoost,Chronological Test,19.137,25.37,0.7793,-0.0772
+O3,24h,XGBoost,Leave-Cities-Out Unseen,14.044,18.51,0.8067,0.0583
+O3,24h,LSTM Recurrent,Chronological Test,22.008,28.922,0.6893,-0.4001
+O3,24h,Transformer Attention,Chronological Test,21.433,28.161,0.7093,-0.3274
+O3,72h,Persistence,Chronological Test,24.486,33.091,0.6248,0.0
+O3,72h,Random Forest,Chronological Test,23.447,30.506,0.6811,0.1502
+O3,72h,Random Forest,Leave-Cities-Out Unseen,16.837,21.815,0.7314,0.2307
+O3,72h,XGBoost,Chronological Test,24.233,31.324,0.6638,0.104
+O3,72h,XGBoost,Leave-Cities-Out Unseen,17.705,22.932,0.7032,0.1499
+O3,72h,LSTM Recurrent,Chronological Test,27.868,35.709,0.5738,-0.1645
+O3,72h,Transformer Attention,Chronological Test,27.141,34.77,0.5938,-0.1041
