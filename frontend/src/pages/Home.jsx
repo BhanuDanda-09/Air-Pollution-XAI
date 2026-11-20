@@ -21,6 +21,7 @@ import {
   Sliders,
   CloudRain,
   Thermometer,
+  Building2,
 } from 'lucide-react';
 
 const PRESET_PLACES = [
@@ -85,6 +86,14 @@ export default function Home() {
       color: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 border-teal-200 dark:border-teal-800',
       link: '/relocation',
       action: 'Launch Relocation Advisor',
+    },
+    {
+      title: 'District Intelligence & Authority Briefs',
+      desc: '320+ Indian districts ranked with Coverage Tier indicators, state averages, and mitigation playbooks for pollution control boards.',
+      icon: Building2,
+      color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800',
+      link: '/districts',
+      action: 'Explore District Rankings',
     },
     {
       title: 'All-India Hotspot Rankings (45 Cities)',

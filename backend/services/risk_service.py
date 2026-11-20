@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from backend.services.city_service import CityService
 from backend.services.climatology_service import ClimatologyService
+from backend.services.location_resolver import LocationResolver
 from backend.services.multi_pollutant_service import MultiPollutantService
 
 logger = logging.getLogger(__name__)
@@ -133,6 +134,7 @@ class RiskService:
         # Fetch origin air & climatology
         origin_air = MultiPollutantService.get_current_air(origin_lat, origin_lon)
         origin_clim = ClimatologyService.get_city_climatology(lat=origin_lat, lon=origin_lon)
+        origin_coverage = LocationResolver.classify_coverage_tier(origin_lat, origin_lon)
         origin_aqi = origin_air.get("overall_aqi", 150)
         origin_risk = cls.evaluate_personal_risk(origin_aqi, origin_air.get("pollutants", {}), profile)
 
@@ -145,6 +147,7 @@ class RiskService:
             d_air = MultiPollutantService.get_current_air(d_lat, d_lon)
             d_forecast = MultiPollutantService.get_forecast(d_lat, d_lon, horizon_hours=24)
             d_clim = ClimatologyService.get_city_climatology(lat=d_lat, lon=d_lon)
+            d_coverage = LocationResolver.classify_coverage_tier(d_lat, d_lon)
 
             d_aqi = d_air.get("overall_aqi", 120)
             d_risk = cls.evaluate_personal_risk(d_aqi, d_air.get("pollutants", {}), profile)
@@ -171,6 +174,11 @@ class RiskService:
                 verdict_color = "#EF4444"
                 verdict_icon = "alert-triangle"
 
+            # Low confidence adjustment: soften verdict wording honestly
+            is_low_confidence = d_coverage.get("confidence_level") == "Low" or d_coverage.get("tier_number") == 3
+            if is_low_confidence:
+                verdict = f"Indicative Only: {verdict}"
+
             # Plain English clinical explanation
             explanation = cls._generate_clinical_narrative(
                 origin_name=origin_name,
@@ -181,6 +189,7 @@ class RiskService:
                 risk_reduction_pct=risk_reduction_pct,
                 profile=profile,
                 dest_clim=d_clim.get("data", {}),
+                is_low_confidence=is_low_confidence,
             )
 
             # Actionable advisory checklist
@@ -190,6 +199,11 @@ class RiskService:
                 "Outdoor Exercise: Schedule between 12:00 PM and 4:00 PM when vertical boundary layer mixing is highest.",
                 "Peak Protection: N95 respirator mask recommended when outdoor AQI exceeds 200.",
             ]
+            if is_low_confidence:
+                actionable_advice.insert(
+                    0,
+                    f"Precision Advisory: Air quality for {d_name} is a Tier 3 gridded regional estimate (~11 km CAMS grid) without a nearby ground station. Verdict is indicative only.",
+                )
 
             dest_results.append({
                 "destination": {
@@ -208,6 +222,11 @@ class RiskService:
                 "verdict": verdict,
                 "verdict_color": verdict_color,
                 "verdict_icon": verdict_icon,
+                "coverage": d_coverage,
+                "coverage_tier": d_coverage.get("tier_label"),
+                "confidence_score": d_coverage.get("confidence_score"),
+                "confidence_level": d_coverage.get("confidence_level"),
+                "nearest_station": d_coverage.get("nearest_station"),
                 "explanation_narrative": explanation,
                 "actionable_advice": actionable_advice,
                 "climatology": d_clim.get("data"),
@@ -224,6 +243,11 @@ class RiskService:
                 "cpcb_color": origin_air.get("color"),
                 "governing_pollutant": origin_air.get("governing_pollutant"),
                 "personal_risk": origin_risk,
+                "coverage": origin_coverage,
+                "coverage_tier": origin_coverage.get("tier_label"),
+                "confidence_score": origin_coverage.get("confidence_score"),
+                "confidence_level": origin_coverage.get("confidence_level"),
+                "nearest_station": origin_coverage.get("nearest_station"),
                 "climatology": origin_clim.get("data"),
             },
             "candidates": dest_results,
@@ -244,6 +268,7 @@ class RiskService:
         risk_reduction_pct: float,
         profile: Dict[str, Any],
         dest_clim: Dict[str, Any],
+        is_low_confidence: bool = False,
     ) -> str:
         """Compose clear viva-friendly clinical narrative for relocation report."""
         conditions = profile.get("conditions", [])
@@ -275,5 +300,11 @@ class RiskService:
             )
 
         season_note = f" The optimal clean-air period in {dest_name} occurs around {best_month}."
+        confidence_note = (
+            f" Note: Atmospheric values for {dest_name} represent a gridded regional model estimate (~11 km resolution) "
+            "rather than on-site ground station monitoring; recommendations are indicative."
+            if is_low_confidence
+            else ""
+        )
 
-        return f"{core}{health_note}{season_note}"
+        return f"{core}{health_note}{season_note}{confidence_note}"

@@ -7,6 +7,7 @@ from flask import Blueprint, jsonify, request
 from backend.services.city_service import CityService
 from backend.services.climatology_service import ClimatologyService
 from backend.services.hotspot_service import HotspotService
+from backend.services.location_resolver import LocationResolver
 from backend.services.multi_pollutant_service import MultiPollutantService
 from backend.utils.rate_limiter import InMemoryRateLimiter
 from backend.utils.response import error_response, success_response
@@ -148,6 +149,14 @@ def get_current_air():
             code=result.get("error", "AIR_QUALITY_ERROR"),
             status_code=422 if result.get("error") == "outside_coverage" else 500,
         )
+
+    # Attach precision coverage tier and nearest station
+    coverage = LocationResolver.classify_coverage_tier(lat, lon)
+    result["coverage"] = coverage
+    result["coverage_tier"] = coverage.get("tier_label")
+    result["confidence_score"] = coverage.get("confidence_score")
+    result["confidence_level"] = coverage.get("confidence_level")
+    result["nearest_station"] = coverage.get("nearest_station")
 
     return success_response(data=result, message="Current multi-pollutant air quality retrieved.")
 
@@ -295,3 +304,84 @@ def get_hotspots():
 
     hotspots = HotspotService.get_national_hotspots(region=region, tier=tier, limit=limit)
     return success_response(data=hotspots, message="National hotspot rankings retrieved.")
+
+
+@air_bp.route("/air/<place_id>", methods=["GET"])
+def get_place_air(place_id: str):
+    """Retrieve full air assessment (current, forecast, climatology, tier, confidence) for place ID or PIN."""
+    rl_err = _check_rate_limit()
+    if rl_err:
+        return rl_err
+
+    p_clean = place_id.strip()
+    lat, lon, place_name = None, None, p_clean
+
+    # 1. 6-digit PIN code
+    if p_clean.isdigit() and len(p_clean) == 6:
+        pin_res = LocationResolver.resolve_pincode(p_clean)
+        if pin_res.get("success"):
+            lat = pin_res["lat"]
+            lon = pin_res["lon"]
+            place_name = pin_res.get("place_name")
+
+    # 2. City catalog ID
+    if lat is None:
+        c_info = CityService.get_city_by_id(p_clean)
+        if c_info:
+            lat = c_info["lat"]
+            lon = c_info["lon"]
+            place_name = c_info["name"]
+
+    # 3. Comma-separated coordinates "lat,lon"
+    if lat is None and "," in p_clean:
+        try:
+            parts = p_clean.split(",")
+            lat = float(parts[0].strip())
+            lon = float(parts[1].strip())
+            place_name = f"Location ({round(lat, 2)}, {round(lon, 2)})"
+        except ValueError:
+            pass
+
+    if lat is None or lon is None:
+        # Search places
+        matches = LocationResolver.search_places(p_clean, limit=1)
+        if matches:
+            lat = matches[0]["lat"]
+            lon = matches[0]["lon"]
+            place_name = matches[0]["name"]
+        else:
+            return error_response(
+                message=f"Place identifier '{place_id}' could not be resolved to coordinates.",
+                code="PLACE_NOT_RESOLVED",
+                status_code=404,
+            )
+
+    if not CityService.is_within_india(lat, lon):
+        cov = LocationResolver.classify_coverage_tier(lat, lon)
+        return error_response(
+            message=cov["explanation"],
+            code="OUTSIDE_COVERAGE",
+            status_code=422,
+            details=cov,
+        )
+
+    current_air = MultiPollutantService.get_current_air(lat, lon)
+    forecast = MultiPollutantService.get_forecast(lat, lon, horizon_hours=24)
+    climatology = ClimatologyService.get_city_climatology(lat=lat, lon=lon)
+    coverage = LocationResolver.classify_coverage_tier(lat, lon)
+    hierarchy = LocationResolver.reverse_geocode(lat, lon)
+
+    return success_response(
+        data={
+            "place_id": place_id,
+            "place_name": place_name,
+            "latitude": lat,
+            "longitude": lon,
+            "current_air": current_air,
+            "forecast_24h": forecast,
+            "climatology": climatology.get("data"),
+            "coverage": coverage,
+            "hierarchy": hierarchy if hierarchy.get("success") else None,
+        },
+        message=f"Complete air assessment for '{place_name}' retrieved successfully.",
+    )

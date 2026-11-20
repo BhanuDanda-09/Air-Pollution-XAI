@@ -124,6 +124,73 @@ export const airService = {
     const response = await api.post('/api/user/delete-account');
     return unwrap(response);
   },
+
+  /**
+   * Fetch all 36 States and Union Territories.
+   */
+  async getStates() {
+    const response = await api.get('/api/geo/states');
+    return unwrap(response);
+  },
+
+  /**
+   * Fetch districts for a specific state.
+   */
+  async getDistricts(state) {
+    const response = await api.get('/api/geo/districts', { params: { state } });
+    return unwrap(response);
+  },
+
+  /**
+   * Search villages, towns, cities, or areas with state/district filter.
+   */
+  async searchPlaces({ query, state, district, limit = 10 } = {}) {
+    const params = { q: query, limit };
+    if (state) params.state = state;
+    if (district) params.district = district;
+    const response = await api.get('/api/geo/places', { params });
+    return unwrap(response);
+  },
+
+  /**
+   * Resolve 6-digit Indian PIN code to administrative hierarchy and tier.
+   */
+  async resolvePincode(pin) {
+    const response = await api.get(`/api/geo/pincode/${pin}`);
+    return unwrap(response);
+  },
+
+  /**
+   * Reverse geocode coordinates to State, District, Locality, PIN.
+   */
+  async reverseGeocode({ lat, lon }) {
+    const response = await api.get('/api/geo/reverse', { params: { lat, lon } });
+    return unwrap(response);
+  },
+
+  /**
+   * Retrieve national district air quality rankings.
+   */
+  async getDistrictRankings() {
+    const response = await api.get('/api/districts/ranking');
+    return unwrap(response);
+  },
+
+  /**
+   * Retrieve state-level aggregated air quality summaries.
+   */
+  async getStatesSummary() {
+    const response = await api.get('/api/states/summary');
+    return unwrap(response);
+  },
+
+  /**
+   * Retrieve complete air quality assessment for place identifier or PIN.
+   */
+  async getPlaceAir(placeId) {
+    const response = await api.get(`/api/air/${placeId}`);
+    return unwrap(response);
+  },
 };
 
 export default airService;

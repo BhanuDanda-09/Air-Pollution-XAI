@@ -4,6 +4,7 @@ from .admin_routes import admin_bp
 from .air_routes import air_bp
 from .auth_routes import auth_bp
 from .explanation_routes import explanation_bp
+from .geo_routes import geo_bp
 from .health_routes import health_bp
 from .livability_routes import livability_bp
 from .location_routes import location_bp
@@ -18,6 +19,7 @@ __all__ = [
     "air_bp",
     "auth_bp",
     "explanation_bp",
+    "geo_bp",
     "health_bp",
     "livability_bp",
     "location_bp",

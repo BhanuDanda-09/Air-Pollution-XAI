@@ -6,6 +6,7 @@ from backend.services.air_quality_service import AirQualityService
 from backend.services.city_service import CityService
 from backend.services.explanation_service import ExplanationService
 from backend.services.livability_service import LivabilityService
+from backend.services.location_resolver import LocationResolver
 from backend.services.multi_pollutant_service import MultiPollutantService
 from backend.services.prediction_service import PredictionService
 from backend.services.weather_service import WeatherService
@@ -184,10 +185,14 @@ def assess_location():
     )
 
     coverage = CityService.get_coverage_status(lat, lon)
+    tier_info = LocationResolver.classify_coverage_tier(lat, lon)
+    coverage.update(tier_info)
     multi_pol = MultiPollutantService.get_current_air(lat, lon)
+    hierarchy = LocationResolver.reverse_geocode(lat, lon)
 
     response_data = {
         "coverage": coverage,
+        "hierarchy": hierarchy if hierarchy.get("success") else None,
         "multi_pollutant": multi_pol if multi_pol.get("success") else None,
         "location": {
             "latitude": lat,

@@ -20,6 +20,7 @@ from backend.routes import (
     air_bp,
     auth_bp,
     explanation_bp,
+    geo_bp,
     health_bp,
     livability_bp,
     location_bp,
@@ -73,6 +74,7 @@ def create_app(config_class=Config):
     app.register_blueprint(location_bp)
     app.register_blueprint(livability_bp)
     app.register_blueprint(air_bp)
+    app.register_blueprint(geo_bp)
     app.register_blueprint(relocation_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(worker_bp)
@@ -85,10 +87,17 @@ def create_app(config_class=Config):
         return success_response(
             data={
                 "project": "Explainable AI-Based Air Pollution Prediction and Source Attribution",
-                "version": "2.0.0",
+                "version": "2.1.0",
                 "endpoints": {
                     "health": "/api/health",
                     "cities": "/api/cities",
+                    "geo_states": "/api/geo/states",
+                    "geo_districts": "/api/geo/districts",
+                    "geo_places": "/api/geo/places",
+                    "geo_pincode": "/api/geo/pincode/<pin>",
+                    "geo_reverse": "/api/geo/reverse",
+                    "districts_ranking": "/api/districts/ranking",
+                    "states_summary": "/api/states/summary",
                     "geocode": "/api/geocode",
                     "air_current": "/api/air/current",
                     "air_forecast": "/api/air/forecast",
@@ -103,7 +112,7 @@ def create_app(config_class=Config):
                     "location_assess": "/api/location/assess",
                     "livability_assess": "/api/location/livability",
                 },
-                "documentation": "See backend/README.md for API documentation and examples.",
+                "documentation": "See backend/README.md and docs/LOCATION_DATA.md for API documentation and examples.",
             },
             message="Air Pollution XAI REST API Backend is online.",
         )

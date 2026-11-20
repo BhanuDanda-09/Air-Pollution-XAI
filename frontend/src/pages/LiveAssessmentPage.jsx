@@ -13,6 +13,7 @@ import {
   Activity,
 } from 'lucide-react';
 import LocationPicker from '../components/LocationPicker';
+import LocationHierarchySelector from '../components/LocationHierarchySelector';
 import HealthProfileSelector from '../components/HealthProfileSelector';
 import LivabilityScoreCard from '../components/LivabilityScoreCard';
 import LiveAssessmentResult from '../components/LiveAssessmentResult';
@@ -218,6 +219,15 @@ export default function LiveAssessmentPage() {
           </button>
         </div>
       )}
+
+      {/* All-India Administrative & PIN Code Selector */}
+      <LocationHierarchySelector
+        label="Search Any Place in India by PIN Code or State / District"
+        onSelectLocation={(loc) => {
+          handleLocationChange(loc.lat, loc.lon);
+          fetchAssessment(loc.lat, loc.lon, healthProfile);
+        }}
+      />
 
       {/* Location Picker Component */}
       <LocationPicker

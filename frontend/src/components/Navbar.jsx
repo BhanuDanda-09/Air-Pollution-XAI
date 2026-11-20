@@ -15,6 +15,7 @@ import {
   Shield,
   ShieldCheck,
   Flame,
+  Building2,
   HardHat,
   Bell,
   BellRing,
@@ -195,8 +196,9 @@ export default function Navbar({ isBackendOnline }) {
     { to: '/saved-places', label: 'Saved Places', icon: Bookmark },
   ];
 
-  // Insights dropdown (6 items)
+  // Insights dropdown (7 items)
   const insightLinks = [
+    { to: '/districts', label: 'District Intelligence', icon: Building2, desc: '320+ district rankings & authority insights' },
     { to: '/hotspots', label: 'Hotspot Rankings', icon: Flame, desc: 'All-India 45-city exposure rankings & tiers' },
     { to: '/livability', label: 'Livability Verdict', icon: Compass, desc: 'Residential suitability & profile scoring' },
     { to: '/dashboard', label: 'Model Dashboard', icon: BarChart3, desc: 'System telemetry & prediction activity' },
@@ -213,6 +215,7 @@ export default function Navbar({ isBackendOnline }) {
   ];
 
   const isInsightsActive = [
+    '/districts',
     '/hotspots',
     '/livability',
     '/dashboard',

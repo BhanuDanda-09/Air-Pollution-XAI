@@ -26,6 +26,7 @@ const Explainability = lazy(() => import('./pages/Explainability'));
 const About = lazy(() => import('./pages/About'));
 const RelocationAdvisorPage = lazy(() => import('./pages/RelocationAdvisorPage'));
 const HotspotsPage = lazy(() => import('./pages/HotspotsPage'));
+const DistrictsPage = lazy(() => import('./pages/DistrictsPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const WorkerPage = lazy(() => import('./pages/WorkerPage'));
@@ -71,6 +72,7 @@ export default function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/relocation" element={<RelocationAdvisorPage />} />
                     <Route path="/hotspots" element={<HotspotsPage />} />
+                    <Route path="/districts" element={<DistrictsPage />} />
                     <Route path="/privacy" element={<PrivacyPage />} />
                     <Route path="/livability" element={<LivabilityPage />} />
                     <Route path="/live-assessment" element={<LiveAssessmentPage />} />

@@ -1,5 +1,6 @@
 import React from 'react';
 import SourceAttributionBreakdown from './SourceAttributionBreakdown';
+import CoverageTierBadge from './CoverageTierBadge';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -11,6 +12,7 @@ import {
   HelpCircle,
   ShieldAlert,
   XCircle,
+  MapPin,
 } from 'lucide-react';
 
 export default function LiveAssessmentResult({ assessmentData }) {
@@ -82,6 +84,19 @@ export default function LiveAssessmentResult({ assessmentData }) {
       aria-label="Live Air Quality Assessment Results"
       className="space-y-6 mt-6 animate-fadeIn"
     >
+      {/* Precision Coverage Tier Badge & Hierarchy Header */}
+      {coverage && (
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
+          {assessmentData.hierarchy?.formatted_hierarchy && (
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+              <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>{assessmentData.hierarchy.formatted_hierarchy}</span>
+            </div>
+          )}
+          <CoverageTierBadge coverage={coverage} showDetails={true} />
+        </div>
+      )}
+
       {/* 1. Data-Driven Regional Validity Banner */}
       {coverage ? (
         <div

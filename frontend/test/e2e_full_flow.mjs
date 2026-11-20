@@ -212,6 +212,75 @@ const apiServer = http.createServer((req, res) => {
     return;
   }
 
+  if (url.includes('/api/geo/states')) {
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      success: true,
+      status: 'success',
+      total: 36,
+      states: [
+        { name: 'Delhi', code: 'DL', zone: 'North', capital: 'New Delhi', district_count: 11 },
+        { name: 'Telangana', code: 'TG', zone: 'South', capital: 'Hyderabad', district_count: 13 },
+        { name: 'Karnataka', code: 'KA', zone: 'South', capital: 'Bengaluru', district_count: 15 },
+      ],
+    }));
+    return;
+  }
+
+  if (url.includes('/api/geo/pincode')) {
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      success: true,
+      status: 'success',
+      pincode: '506001',
+      place_name: 'Hanamkonda',
+      district: 'Warangal',
+      state: 'Telangana',
+      latitude: 17.9689,
+      longitude: 79.5941,
+      display_name: 'Hanamkonda, Warangal district, Telangana, PIN 506001',
+      coverage: {
+        in_coverage: true,
+        tier: 'tier_1',
+        tier_number: 1,
+        tier_label: 'Station-Validated',
+        confidence_score: 92,
+        confidence_level: 'High',
+        nearest_station: { name: 'NIT Warangal - TSPCB', distance_km: 3.2 },
+      },
+    }));
+    return;
+  }
+
+  if (url.includes('/api/districts/ranking')) {
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      success: true,
+      status: 'success',
+      total_districts: 3,
+      districts: [
+        { national_rank: 1, district: 'Central Delhi', state: 'Delhi', zone: 'North', estimated_aqi: 245, governing_pollutant: 'PM2.5', coverage_tier: 1, worst_season: 'Winter', clean_season: 'Monsoon' },
+        { national_rank: 2, district: 'Faridabad', state: 'Haryana', zone: 'North', estimated_aqi: 238, governing_pollutant: 'PM2.5', coverage_tier: 1, worst_season: 'Winter', clean_season: 'Monsoon' },
+        { national_rank: 3, district: 'Warangal', state: 'Telangana', zone: 'South', estimated_aqi: 95, governing_pollutant: 'PM2.5', coverage_tier: 1, worst_season: 'Winter', clean_season: 'Monsoon' },
+      ],
+    }));
+    return;
+  }
+
+  if (url.includes('/api/states/summary')) {
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      success: true,
+      status: 'success',
+      total_states_uts: 2,
+      states: [
+        { state: 'Delhi', zone: 'North', average_aqi: 220, worst_district: 'Central Delhi (245)', cleanest_district: 'South Delhi (190)', cpcb_stations_count: 40, districts_count: 11 },
+        { state: 'Telangana', zone: 'South', average_aqi: 98, worst_district: 'Hyderabad (135)', cleanest_district: 'Adilabad (72)', cpcb_stations_count: 10, districts_count: 13 },
+      ],
+    }));
+    return;
+  }
+
   if (url === '/api/cities') {
     res.writeHead(200);
     res.end(JSON.stringify({
@@ -465,6 +534,83 @@ staticServer.listen(4175, '127.0.0.1', () => {
           });
         }
 
+        if (url.includes('/api/geo/states')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              total: 36,
+              states: [
+                { name: 'Delhi', code: 'DL', zone: 'North', capital: 'New Delhi', district_count: 11 },
+                { name: 'Telangana', code: 'TG', zone: 'South', capital: 'Hyderabad', district_count: 13 },
+                { name: 'Karnataka', code: 'KA', zone: 'South', capital: 'Bengaluru', district_count: 15 },
+              ],
+            }),
+          });
+        }
+
+        if (url.includes('/api/geo/pincode')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              pincode: '506001',
+              place_name: 'Hanamkonda',
+              district: 'Warangal',
+              state: 'Telangana',
+              latitude: 17.9689,
+              longitude: 79.5941,
+              display_name: 'Hanamkonda, Warangal district, Telangana, PIN 506001',
+              coverage: {
+                in_coverage: true,
+                tier: 'tier_1',
+                tier_number: 1,
+                tier_label: 'Station-Validated',
+                confidence_score: 92,
+                confidence_level: 'High',
+                nearest_station: { name: 'NIT Warangal - TSPCB', distance_km: 3.2 },
+              },
+            }),
+          });
+        }
+
+        if (url.includes('/api/districts/ranking')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              total_districts: 3,
+              districts: [
+                { national_rank: 1, district: 'Central Delhi', state: 'Delhi', zone: 'North', estimated_aqi: 245, governing_pollutant: 'PM2.5', coverage_tier: 1, worst_season: 'Winter', clean_season: 'Monsoon' },
+                { national_rank: 2, district: 'Faridabad', state: 'Haryana', zone: 'North', estimated_aqi: 238, governing_pollutant: 'PM2.5', coverage_tier: 1, worst_season: 'Winter', clean_season: 'Monsoon' },
+                { national_rank: 3, district: 'Warangal', state: 'Telangana', zone: 'South', estimated_aqi: 95, governing_pollutant: 'PM2.5', coverage_tier: 1, worst_season: 'Winter', clean_season: 'Monsoon' },
+              ],
+            }),
+          });
+        }
+
+        if (url.includes('/api/states/summary')) {
+          return route.fulfill({
+            status: 200,
+            headers: corsHeaders,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              status: 'success',
+              total_states_uts: 3,
+              states: [
+                { state: 'Delhi', zone: 'North', average_aqi: 220, worst_district: 'Central Delhi (245)', cleanest_district: 'South Delhi (190)', cpcb_stations_count: 40, districts_count: 11 },
+                { state: 'Telangana', zone: 'South', average_aqi: 98, worst_district: 'Hyderabad (135)', cleanest_district: 'Adilabad (72)', cpcb_stations_count: 10, districts_count: 13 },
+              ],
+            }),
+          });
+        }
+
         if (url.includes('/api/cities')) {
           return route.fulfill({
             status: 200,
@@ -705,6 +851,49 @@ staticServer.listen(4175, '127.0.0.1', () => {
         console.log('  ✓ Privacy page rendered with DPDP Act 2023 data export and erasure controls.');
       } else {
         failures.push('Privacy & DPDP Act page controls not found.');
+      }
+
+      // TEST 11: District Intelligence & Administrative Rankings
+      console.log('\n--- 11. Testing District Intelligence Page ---');
+      totalTests++;
+      await page.goto('http://127.0.0.1:4175/districts', { waitUntil: 'load' });
+      await page.waitForSelector('tbody tr', { timeout: 6000 }).catch(() => null);
+
+      const districtsHeading = await page.$eval('h1', el => el.textContent).catch(() => '');
+      const distRows = await page.$$('tbody tr');
+      if (districtsHeading.includes('District') && distRows.length >= 1) {
+        passedTests++;
+        console.log(`  ✓ Districts page rendered successfully with ${distRows.length} ranked district rows.`);
+      } else {
+        failures.push(`Districts page failed: heading "${districtsHeading}", rows: ${distRows.length}`);
+      }
+
+      // TEST 12: Location Hierarchy Selector & PIN Code Input on Relocation Advisor
+      console.log('\n--- 12. Testing PIN Code Auto-Fill & Coverage Tier Badges ---');
+      totalTests++;
+      await page.goto('http://127.0.0.1:4175/relocation', { waitUntil: 'load' });
+      await page.waitForSelector('input[placeholder*="PIN code"]', { timeout: 6000 }).catch(() => null);
+
+      const pinInput = await page.$('input[placeholder*="PIN code"]');
+      if (pinInput) {
+        await pinInput.fill('506001');
+        await page.waitForTimeout(600);
+        const hasTierBadge = await page.waitForSelector('text=Tier 1: Station-Validated', { timeout: 4000 }).catch(() => null);
+        if (hasTierBadge) {
+          passedTests++;
+          console.log('  ✓ PIN 506001 resolved to Hanamkonda with Tier 1 Station-Validated badge.');
+        } else {
+          // If badge rendered with alternative text
+          const hasAnyTier = await page.$('text=Station-Validated, text=Tier 1');
+          if (hasAnyTier) {
+            passedTests++;
+            console.log('  ✓ PIN 506001 resolved with Station-Validated badge.');
+          } else {
+            failures.push('Tier 1 badge not rendered after filling PIN 506001.');
+          }
+        }
+      } else {
+        failures.push('PIN code input field not found on Relocation Advisor page.');
       }
 
       await page.close();

@@ -22,6 +22,8 @@ import {
 import { usePageMeta } from '../hooks/usePageMeta';
 import { useAuth } from '../context/AuthContext';
 import airService from '../services/airService';
+import LocationHierarchySelector from '../components/LocationHierarchySelector';
+import CoverageTierBadge from '../components/CoverageTierBadge';
 
 const PRESET_ORIGINS = [
   { name: 'Delhi', lat: 28.6139, lon: 77.2090 },
@@ -247,19 +249,22 @@ export default function RelocationAdvisorPage() {
             </div>
 
             {/* Origin Selection */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                Current Origin City (Where you live now)
-              </label>
-              <div className="p-3 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-slate-900 dark:text-white text-base">{origin.name}</span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">
-                    ({origin.lat.toFixed(2)}°N, {origin.lon.toFixed(2)}°E)
-                  </span>
-                </div>
-                <span className="text-xs px-2 py-0.5 rounded bg-blue-600 text-white font-medium">Origin Baseline</span>
-              </div>
+            <div className="space-y-3">
+              <LocationHierarchySelector
+                label="Current Origin Location (Where you live now)"
+                initialLocation={origin}
+                onSelectLocation={(loc) => {
+                  setOrigin({
+                    name: loc.name || loc.display_name,
+                    lat: loc.lat,
+                    lon: loc.lon,
+                    district: loc.district,
+                    state: loc.state,
+                    pincode: loc.pincode,
+                    coverage: loc.coverage,
+                  });
+                }}
+              />
 
               {/* Quick Presets for Origin */}
               <div className="flex flex-wrap gap-1.5 pt-1">
@@ -289,6 +294,7 @@ export default function RelocationAdvisorPage() {
                 </label>
               </div>
 
+              {/* Selected Destinations List */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {destinations.map((d, idx) => (
                   <div
@@ -298,7 +304,7 @@ export default function RelocationAdvisorPage() {
                     <div>
                       <div className="font-bold text-slate-800 dark:text-slate-200 text-sm">{d.name}</div>
                       <div className="text-[11px] text-slate-400">
-                        {d.lat.toFixed(2)}°N, {d.lon.toFixed(2)}°E
+                        {d.lat?.toFixed(2)}°N, {d.lon?.toFixed(2)}°E {d.pincode ? `| PIN ${d.pincode}` : ''}
                       </div>
                     </div>
                     {destinations.length > 1 && (
@@ -315,38 +321,30 @@ export default function RelocationAdvisorPage() {
                 ))}
               </div>
 
-              {/* Add Destination Search */}
+              {/* Add Destination using LocationHierarchySelector */}
               {destinations.length < 4 && (
-                <div className="relative pt-2">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchingType('dest');
-                      setSearchQuery(e.target.value);
+                <div className="pt-2">
+                  <LocationHierarchySelector
+                    label={`Add Candidate Destination (${destinations.length + 1} of 4)`}
+                    onSelectLocation={(loc) => {
+                      const item = {
+                        name: loc.name || loc.display_name,
+                        lat: loc.lat,
+                        lon: loc.lon,
+                        district: loc.district,
+                        state: loc.state,
+                        pincode: loc.pincode,
+                        coverage: loc.coverage,
+                      };
+                      if (!destinations.some((d) => d.name === item.name)) {
+                        setDestinations([...destinations, item]);
+                      }
                     }}
-                    placeholder="Search an Indian city to add (e.g. Hyderabad, Chandigarh, Indore)..."
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  {searchResults.length > 0 && (
-                    <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-20 overflow-hidden">
-                      {searchResults.map((r, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => handleSelectLocation(r)}
-                          className="w-full text-left px-4 py-2.5 text-xs hover:bg-slate-100 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-700/50 last:border-b-0 flex items-center justify-between"
-                        >
-                          <span className="font-semibold text-slate-800 dark:text-slate-200">{r.name}</span>
-                          <span className="text-slate-400">{r.state || 'India'}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
 
                   {/* Preset Suggestions */}
                   <div className="flex flex-wrap gap-1.5 pt-2">
-                    <span className="text-xs text-slate-400 self-center mr-1">Recommended:</span>
+                    <span className="text-xs text-slate-400 self-center mr-1">Recommended Cities:</span>
                     {PRESET_DESTINATIONS.map((p) => (
                       <button
                         key={p.name}
@@ -690,6 +688,13 @@ export default function RelocationAdvisorPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Origin Precision Coverage Tier Badge */}
+              {comparisonReport.origin?.coverage && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <CoverageTierBadge coverage={comparisonReport.origin.coverage} showDetails={false} />
+                </div>
+              )}
             </div>
 
             {/* Side-by-Side Candidates Grid */}
@@ -751,6 +756,13 @@ export default function RelocationAdvisorPage() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Precision Coverage Tier Badge */}
+                  {cand.coverage && (
+                    <div className="pt-1">
+                      <CoverageTierBadge coverage={cand.coverage} showDetails={true} />
+                    </div>
+                  )}
 
                   {/* Plain English Clinical Narrative */}
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-1.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
