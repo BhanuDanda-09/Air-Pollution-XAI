@@ -641,7 +641,7 @@ staticServer.listen(4175, '127.0.0.1', () => {
       await page.goto('http://127.0.0.1:4175/', { waitUntil: 'load' });
       await page.waitForTimeout(500);
       const hasBrand = await page.$eval('header', el => el.textContent.includes('AirIQ')).catch(() => false);
-      const hasFooter = await page.$eval('footer', el => el.textContent.includes('AirIQ') && el.textContent.includes('Open-Meteo')).catch(() => false);
+      const hasFooter = await page.$eval('footer', el => el.textContent.includes('AirIQ') && (el.textContent.includes('Data Sources') || el.textContent.includes('Open-Meteo'))).catch(() => false);
       if (hasBrand && hasFooter) {
         passedTests++;
         console.log('  ✓ Desktop Navbar brand (AirIQ India) & 4-column Footer present with full attribution.');

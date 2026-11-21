@@ -81,6 +81,18 @@ const PAGE_META = {
     title: 'About AirIQ India | AirIQ India',
     description: 'Our mission to empower citizens across India with transparent, health-first air quality intelligence.',
   },
+  '/data-sources': {
+    title: 'Data Sources & Credits | AirIQ India',
+    description: 'Complete transparency on Copernicus CAMS, Open-Meteo, OpenStreetMap, and CPCB data attribution and licensing.',
+  },
+  '/cookies': {
+    title: 'Cookie & Storage Notice | AirIQ India',
+    description: 'Zero third-party tracking cookies or ad network surveillance. Essential functional storage disclosure.',
+  },
+  '/methodology': {
+    title: 'Methodology & Science | AirIQ India',
+    description: 'Scientific architecture: satellite atmospheric reanalysis, XGBoost ground calibration, and SHAP feature attribution.',
+  },
   '/404': {
     title: '404 Page Not Found | AirIQ India',
     description: 'The requested page was not found. Return to AirIQ India home.',

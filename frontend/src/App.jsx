@@ -28,6 +28,9 @@ const HowItWorksPage = lazy(() => import('./pages/HowItWorksPage'));
 const FAQPage = lazy(() => import('./pages/FAQPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
+const DataSourcesPage = lazy(() => import('./pages/DataSourcesPage'));
+const CookieNoticePage = lazy(() => import('./pages/CookieNoticePage'));
+const MethodologyPage = lazy(() => import('./pages/MethodologyPage'));
 const RelocationAdvisorPage = lazy(() => import('./pages/RelocationAdvisorPage'));
 const HotspotsPage = lazy(() => import('./pages/HotspotsPage'));
 const DistrictsPage = lazy(() => import('./pages/DistrictsPage'));
@@ -63,7 +66,7 @@ export default function App() {
       <ThemeProvider>
         <Router>
           <MetaHandler />
-          <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100 transition-colors">
+          <div className="flex flex-col min-h-[100dvh] pb-[env(safe-area-inset-bottom)] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-100 selection:text-blue-900 dark:selection:bg-blue-900 dark:selection:text-blue-100 transition-colors">
             <DemoBanner />
             <Navbar isBackendOnline={isBackendOnline} />
             <AuthModal />
@@ -89,9 +92,12 @@ export default function App() {
                     <Route path="/explainability" element={<Explainability />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/how-it-works" element={<HowItWorksPage />} />
+                    <Route path="/methodology" element={<MethodologyPage />} />
                     <Route path="/faq" element={<FAQPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/data-sources" element={<DataSourcesPage />} />
+                    <Route path="/cookies" element={<CookieNoticePage />} />
                     <Route
                       path="/admin"
                       element={
