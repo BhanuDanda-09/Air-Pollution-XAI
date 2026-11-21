@@ -27,7 +27,7 @@ const TIERS = [
 
 export default function HotspotsPage() {
   usePageMeta({
-    title: 'National Air Pollution Hotspots & Rankings | Pollution XAI',
+    title: 'National Hotspots | AirIQ India',
     description: 'All-India 45-city exposure percentiles, seasonal inversion ratios, and regional vulnerability tiers.',
   });
 

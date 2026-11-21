@@ -185,7 +185,7 @@ export default function Navbar({ isBackendOnline }) {
             });
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [isAuthenticated]);
 
@@ -258,15 +258,14 @@ export default function Navbar({ isBackendOnline }) {
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-200 overflow-x-clip ${
-        isScrolled
+      className={`sticky top-0 z-40 transition-all duration-200 overflow-x-clip ${isScrolled
           ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm border-b border-slate-200/90 dark:border-slate-800'
           : 'bg-white/85 dark:bg-slate-900/85 backdrop-blur-sm border-b border-slate-200/50 dark:border-slate-800/60'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-1 sm:gap-4">
-          
+
           {/* Brand Logo & Title on One Line */}
           <Link
             to="/"
@@ -277,7 +276,7 @@ export default function Navbar({ isBackendOnline }) {
             </div>
             <div className="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap shrink-0">
               <span className="font-extrabold text-sm sm:text-base lg:text-lg text-slate-900 dark:text-white tracking-tight whitespace-nowrap">
-                Vayu<span className="text-emerald-600 dark:text-emerald-400">Pulse</span>
+                Air<span className="text-cyan-600 dark:text-cyan-400">IQ</span><span className="hidden sm:inline"> <span className="text-emerald-600 dark:text-emerald-400">India</span></span>
               </span>
               <span className="text-[9px] sm:text-[10px] font-bold px-1 sm:px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/80 uppercase tracking-wider shrink-0">
                 Live
@@ -294,10 +293,9 @@ export default function Navbar({ isBackendOnline }) {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                      isActive
-                        ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    `flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 ${isActive
+                      ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`
                   }
                 >
@@ -316,11 +314,10 @@ export default function Navbar({ isBackendOnline }) {
                   setMoreDropdownOpen(false);
                 }}
                 onKeyDown={(e) => handleDropdownKeyDown(e, setInsightsDropdownOpen, insightsDropdownOpen)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                  isInsightsActive
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 ${isInsightsActive
                     ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                  }`}
                 aria-expanded={insightsDropdownOpen}
                 aria-haspopup="true"
               >
@@ -346,10 +343,9 @@ export default function Navbar({ isBackendOnline }) {
                         to={link.to}
                         onClick={() => setInsightsDropdownOpen(false)}
                         className={({ isActive }) =>
-                          `flex items-start gap-2.5 px-3.5 py-2.5 text-xs transition-colors focus-visible:bg-slate-100 dark:focus-visible:bg-slate-800 ${
-                            isActive
-                              ? 'bg-blue-50/90 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
-                              : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200'
+                          `flex items-start gap-2.5 px-3.5 py-2.5 text-xs transition-colors focus-visible:bg-slate-100 dark:focus-visible:bg-slate-800 ${isActive
+                            ? 'bg-blue-50/90 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
+                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200'
                           }`
                         }
                         role="menuitem"
@@ -375,11 +371,10 @@ export default function Navbar({ isBackendOnline }) {
                   setInsightsDropdownOpen(false);
                 }}
                 onKeyDown={(e) => handleDropdownKeyDown(e, setMoreDropdownOpen, moreDropdownOpen)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 ${
-                  isMoreActive
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 ${isMoreActive
                     ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
+                  }`}
                 aria-expanded={moreDropdownOpen}
                 aria-haspopup="true"
               >
@@ -405,10 +400,9 @@ export default function Navbar({ isBackendOnline }) {
                         to={link.to}
                         onClick={() => setMoreDropdownOpen(false)}
                         className={({ isActive }) =>
-                          `flex items-start gap-2.5 px-3.5 py-2.5 text-xs transition-colors focus-visible:bg-slate-100 dark:focus-visible:bg-slate-800 ${
-                            isActive
-                              ? 'bg-blue-50/90 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
-                              : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200'
+                          `flex items-start gap-2.5 px-3.5 py-2.5 text-xs transition-colors focus-visible:bg-slate-100 dark:focus-visible:bg-slate-800 ${isActive
+                            ? 'bg-blue-50/90 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
+                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200'
                           }`
                         }
                         role="menuitem"
@@ -458,15 +452,14 @@ export default function Navbar({ isBackendOnline }) {
 
           {/* Right Section: Compact Status Dot, Theme Toggle, Alerts, Auth Menu, Mobile Trigger */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            
+
             {/* Status Dot with Tooltip (No clipped text, 0px horizontal overflow) */}
             <div className="relative group flex items-center p-0.5 sm:p-1 cursor-default" tabIndex="0" aria-label={`Backend API is ${isBackendOnline ? 'online' : 'connecting'}`}>
               <span
-                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all shrink-0 ${
-                  isBackendOnline
+                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all shrink-0 ${isBackendOnline
                     ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]'
                     : 'bg-rose-500 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.7)]'
-                }`}
+                  }`}
               />
               <div
                 role="tooltip"
@@ -683,9 +676,8 @@ export default function Navbar({ isBackendOnline }) {
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <span
-                className={`w-2.5 h-2.5 rounded-full ${
-                  isBackendOnline ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'
-                }`}
+                className={`w-2.5 h-2.5 rounded-full ${isBackendOnline ? 'bg-emerald-500' : 'bg-rose-500 animate-pulse'
+                  }`}
               />
               <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 {isBackendOnline ? 'Backend Online' : 'Connecting API...'}
@@ -723,10 +715,9 @@ export default function Navbar({ isBackendOnline }) {
                   to={item.to}
                   onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) =>
-                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
-                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${isActive
+                      ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`
                   }
                 >
@@ -750,10 +741,9 @@ export default function Navbar({ isBackendOnline }) {
                   to={item.to}
                   onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) =>
-                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
-                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${isActive
+                      ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`
                   }
                 >
@@ -780,10 +770,9 @@ export default function Navbar({ isBackendOnline }) {
                   to={item.to}
                   onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) =>
-                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
-                        : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    `min-h-[44px] flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${isActive
+                      ? 'bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`
                   }
                 >
@@ -828,7 +817,7 @@ export default function Navbar({ isBackendOnline }) {
                 className="w-full min-h-[44px] flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800"
               >
                 <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Install VayuPulse Web App</span>
+                <span>Install AirIQ Web App</span>
               </button>
             </div>
           )}

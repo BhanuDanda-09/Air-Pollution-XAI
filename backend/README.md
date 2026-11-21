@@ -1,7 +1,7 @@
-# Air Pollution XAI - Flask REST API Backend
+# AirIQ India - Flask REST API Backend
 
-A production-grade Python Flask REST API backend for the capstone project:
-**"Explainable AI-Based Air Pollution Prediction and Source Attribution"**
+A production-grade Python Flask REST API backend for the platform:
+**"AirIQ India — Smarter air decisions for every address in India"**
 
 The backend connects directly to the trained Machine Learning and Deep Learning models from Phases 1–4 to serve real-time $\text{PM}_{2.5}$ predictions, multi-model benchmarks, indicative CPCB health classifications, and Explainable AI (SHAP) feature attributions.
 
@@ -90,7 +90,7 @@ Models were rigorously evaluated on 406 untouched, held-out test observations:
 - **Example Response (`200 OK`):**
 ```json
 {
-  "app_name": "Air Pollution XAI Backend",
+  "app_name": "AirIQ India Backend",
   "models_available": {
     "lstm": false,
     "mlp": true,

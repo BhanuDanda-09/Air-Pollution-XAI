@@ -24,7 +24,7 @@ export default function TermsPage() {
           Terms of Service
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Effective Date: November 2026 • Platform: VayuPulse (India)
+          Effective Date: November 2026 • Platform: AirIQ India
         </p>
       </div>
 
@@ -34,7 +34,7 @@ export default function TermsPage() {
         <div className="space-y-1 text-xs sm:text-sm leading-relaxed">
           <h4 className="font-bold">Medical and Statutory Notice</h4>
           <p>
-            VayuPulse provides environmental risk estimates and comparative insights for public awareness and lifestyle planning. Our metrics do not constitute official statutory regulatory measurements or individual clinical medical advice. If you have asthma, COPD, cardiovascular conditions, or pregnancy complications, always consult your physician for clinical care.
+            AirIQ India provides environmental risk estimates and comparative insights for public awareness and lifestyle planning. Our metrics do not constitute official statutory regulatory measurements or individual clinical medical advice. If you have asthma, COPD, cardiovascular conditions, or pregnancy complications, always consult your physician for clinical care.
           </p>
         </div>
       </div>
@@ -46,7 +46,7 @@ export default function TermsPage() {
             1. Acceptance of Terms
           </h2>
           <p>
-            By accessing or using VayuPulse (the "Platform", accessible at air-pollution-xai.vercel.app), you agree to be bound by these Terms of Service. If you do not agree to all provisions, you may discontinue use of the platform.
+            By accessing or using AirIQ India (the "Platform", accessible at air-pollution-xai.vercel.app), you agree to be bound by these Terms of Service. If you do not agree to all provisions, you may discontinue use of the platform.
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export default function TermsPage() {
             2. Scope of Service & Gridded Estimates
           </h2>
           <p>
-            VayuPulse aggregates atmospheric telemetry from Open-Meteo, the European Copernicus Atmosphere Monitoring Service (CAMS), and ground validation data from the Central Pollution Control Board (CPCB).
+            AirIQ India aggregates atmospheric telemetry from Open-Meteo, the European Copernicus Atmosphere Monitoring Service (CAMS), and ground validation data from the Central Pollution Control Board (CPCB).
           </p>
           <p>
             <strong>Village and Rural Disclosures:</strong> For locations located beyond 50 km from physical continuous ambient monitoring stations, values are synthesized using gridded numerical models (~11 km grid cells). These are regional estimates rather than point physical measurements.
@@ -81,7 +81,7 @@ export default function TermsPage() {
             4. Limitation of Liability
           </h2>
           <p>
-            To the maximum extent permitted by applicable Indian law, VayuPulse and its contributors shall not be held liable for any direct, indirect, incidental, or consequential damages resulting from relocation decisions, lifestyle changes, or outdoor activities undertaken based on platform estimates.
+            To the maximum extent permitted by applicable Indian law, AirIQ India and its contributors shall not be held liable for any direct, indirect, incidental, or consequential damages resulting from relocation decisions, lifestyle changes, or outdoor activities undertaken based on platform estimates.
           </p>
         </div>
 

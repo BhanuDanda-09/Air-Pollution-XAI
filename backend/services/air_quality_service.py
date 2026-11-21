@@ -51,7 +51,7 @@ class AirQualityService:
                 "forecast_days": 7,
             }
             headers = {
-                "User-Agent": "AirPollutionXAI/1.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI; research-capstone)",
+                "User-Agent": "AirIQIndia/2.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
                 "Accept": "application/json",
             }
             if getattr(Config, "OPEN_METEO_API_KEY", None):

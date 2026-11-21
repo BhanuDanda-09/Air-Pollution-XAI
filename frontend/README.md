@@ -1,7 +1,7 @@
-# Air Pollution XAI - React Frontend Dashboard
+# AirIQ India - Frontend Application
 
-A modern, responsive, and interactive environmental analytics dashboard for the capstone project:
-**"Explainable AI-Based Air Pollution Prediction and Source Attribution"**
+A modern, responsive, and interactive environmental analytics application:
+**"AirIQ India — Smarter air decisions for every address in India."**
 
 Built with **React 18**, **Vite**, **Tailwind CSS**, **Chart.js**, and **Lucide React**, connecting directly to the Flask REST API backend to provide real-time $\text{PM}_{2.5}$ predictions, multi-model held-out benchmark comparisons, indicative CPCB health classifications, and Explainable AI (SHAP) local feature attributions.
 

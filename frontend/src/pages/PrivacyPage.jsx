@@ -15,7 +15,7 @@ import airService from '../services/airService';
 
 export default function PrivacyPage() {
   usePageMeta({
-    title: 'Privacy & DPDP Act 2023 | Pollution XAI',
+    title: 'Privacy Policy & DPDP Rights | AirIQ India',
     description: 'Statutory compliance with the Digital Personal Data Protection Act, 2023. Export or delete your health profile.',
   });
 
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `pollution_xai_user_data_${Date.now()}.json`;
+      link.download = `airiq_india_user_data_${Date.now()}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

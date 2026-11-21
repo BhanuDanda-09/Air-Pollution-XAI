@@ -2,88 +2,88 @@ import { useEffect } from 'react';
 
 const BASE_URL = 'https://air-pollution-xai.vercel.app';
 const OG_IMAGE_URL = `${BASE_URL}/og-image.png`;
-const OG_IMAGE_ALT = 'VayuPulse - Live Air Quality & Health Advisor';
+const OG_IMAGE_ALT = 'AirIQ India — Smarter air decisions for every address in India';
 
 const PAGE_META = {
   '/': {
-    title: 'VayuPulse | Know Your Air. Protect Your Life.',
-    description: 'Real-time air quality forecasts, personal health advisories, and relocation intelligence across India.',
+    title: 'AirIQ India | Smarter air decisions for every address in India',
+    description: 'Smarter air decisions for every address in India. Real-time air quality forecasts, gridded village estimates, and personalized health guidance.',
   },
   '/live-assessment': {
-    title: 'Check My Air | VayuPulse',
+    title: 'Live Air Quality Assessment | AirIQ India',
     description: 'Instant local air quality check, 6-pollutant breakdown, and practical health recommendations.',
   },
   '/check-air': {
-    title: 'Check My Air | VayuPulse',
+    title: 'Check My Air | AirIQ India',
     description: 'Instant local air quality check, 6-pollutant breakdown, and practical health recommendations.',
   },
   '/relocation': {
-    title: 'Relocation Advisor | VayuPulse',
+    title: 'Relocation Advisor | AirIQ India',
     description: 'Compare air quality between cities and find healthier places to live with asthma-safe guidance.',
   },
   '/districts': {
-    title: 'District Intelligence | VayuPulse',
+    title: 'District Intelligence | AirIQ India',
     description: 'All-India administrative district air quality rankings, seasonal patterns, and environmental guidance.',
   },
   '/hotspots': {
-    title: 'National Hotspot Rankings | VayuPulse',
+    title: 'National Hotspots | AirIQ India',
     description: 'Empirical exposure rankings identifying vulnerable pollution basins and clean sanctuaries across India.',
   },
   '/livability': {
-    title: 'Livability Score & Verdict | VayuPulse',
+    title: 'Residential Livability Index | AirIQ India',
     description: 'Personalized 0–100 residential suitability scoring based on your family health profile.',
   },
   '/saved-places': {
-    title: 'Saved Places & Custom Alerts | VayuPulse',
+    title: 'Saved Places & Alerts | AirIQ India',
     description: 'Save your home, office, and school locations for custom air quality safety alerts.',
   },
   '/history': {
-    title: 'Personal Exposure & Assessment History | VayuPulse',
+    title: 'Exposure History | AirIQ India',
     description: 'Review your past air quality assessments, exposure trends, and export consultation reports.',
   },
   '/dashboard': {
-    title: 'Environmental Intelligence Dashboard | VayuPulse',
+    title: 'Air Quality Dashboard | AirIQ India',
     description: 'Comprehensive system telemetry, monitoring station status, and atmospheric stability indicators.',
   },
   '/prediction': {
-    title: 'Surface Weather Estimator | VayuPulse',
+    title: 'Surface Weather Estimator | AirIQ India',
     description: 'Understand how surface temperature, humidity, and wind physics shape particulate concentrations.',
   },
   '/comparison': {
-    title: 'Forecast Accuracy & Model Verification | VayuPulse',
+    title: 'Model Comparison & Verification | AirIQ India',
     description: 'Transparent verification metrics and held-out cross-validation across lead forecast horizons.',
   },
   '/explainability': {
-    title: 'Weather Factors & Air Quality Drivers | VayuPulse',
+    title: 'Weather Factors & Air Drivers | AirIQ India',
     description: 'Explore what atmospheric conditions are driving particulate spikes in your neighborhood.',
   },
   '/how-it-works': {
-    title: 'How It Works | VayuPulse',
+    title: 'How It Works | AirIQ India',
     description: 'Learn how satellites, monitoring stations, and atmospheric physics provide neighborhood-level air forecasts.',
   },
   '/faq': {
-    title: 'Frequently Asked Questions | VayuPulse',
+    title: 'Frequently Asked Questions | AirIQ India',
     description: 'Answers on AQI, masks, air purifiers, outdoor exercise, and health precautions.',
   },
   '/terms': {
-    title: 'Terms of Service | VayuPulse',
+    title: 'Terms of Service | AirIQ India',
     description: 'Terms of service, platform guidance, and environmental advisory notices.',
   },
   '/contact': {
-    title: 'Contact & Feedback | VayuPulse',
+    title: 'Contact & Support | AirIQ India',
     description: 'Get in touch with our team for questions, suggestions, or reporting station discrepancies.',
   },
   '/privacy': {
-    title: 'Privacy Policy & Data Rights | VayuPulse',
+    title: 'Privacy Policy & DPDP Rights | AirIQ India',
     description: 'DPDP Act 2023 compliance, explicit consent, data export, and permanent account erasure.',
   },
   '/about': {
-    title: 'About Our Mission | VayuPulse',
+    title: 'About AirIQ India | AirIQ India',
     description: 'Our mission to empower citizens across India with transparent, health-first air quality intelligence.',
   },
   '/404': {
-    title: '404 Page Not Found | VayuPulse',
-    description: 'The requested page was not found. Return to VayuPulse home.',
+    title: '404 Page Not Found | AirIQ India',
+    description: 'The requested page was not found. Return to AirIQ India home.',
   },
 };
 
@@ -113,8 +113,8 @@ export function usePageMeta(pathname) {
     // Normalize path (handle trailing slashes or subpaths)
     const normalizedPath = pathname && pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : (pathname || '/');
     const meta = PAGE_META[normalizedPath] || {
-      title: 'VayuPulse | Know Your Air. Protect Your Life.',
-      description: 'Real-time air quality forecasts, personal health advisories, and relocation intelligence across India.',
+      title: 'AirIQ India | Smarter air decisions for every address in India',
+      description: 'Smarter air decisions for every address in India. Real-time air quality forecasts, gridded village estimates, and personalized health guidance.',
     };
 
     const currentUrl = `${BASE_URL}${normalizedPath === '/' ? '' : normalizedPath}`;

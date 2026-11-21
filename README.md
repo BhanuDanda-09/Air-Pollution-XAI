@@ -1,5 +1,5 @@
-# Explainable AI-Based Air Pollution Prediction and Source Attribution
-### All-India Multi-Pollutant & Health-Personalised Air Quality Decision System (v2.0.0)
+# AirIQ India — Smarter air decisions for every address in India.
+### All-India Multi-Pollutant & Health-Personalised Air Quality Decision Platform (v2.0.0)
 
 [![Version 2.0.0](https://img.shields.io/badge/Version-2.0.0%20All--India-brightgreen.svg)]()
 [![Backend Tests: 99/99](https://img.shields.io/badge/Backend%20Tests-99%2F99%20Passing-brightgreen.svg)]()

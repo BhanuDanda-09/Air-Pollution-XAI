@@ -1,4 +1,4 @@
-"""Service package for Air Pollution XAI backend."""
+"""Service package for AirIQ India backend."""
 
 from .validation_service import ValidationService
 from .prediction_service import PredictionService

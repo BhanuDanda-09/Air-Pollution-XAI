@@ -1,6 +1,6 @@
 # Comprehensive Block-by-Block Visual & Functional Audit (BLOCK_AUDIT.md)
 
-**Application:** Pollution XAI – Explainable AI & Livability Platform for Delhi-NCR  
+**Application:** AirIQ India – Smarter air decisions for every address in India  
 **Audited Targets:**
 - **Live Frontend:** [https://air-pollution-xai.vercel.app](https://air-pollution-xai.vercel.app)
 - **Live Backend:** [https://air-pollution-xai.onrender.com](https://air-pollution-xai.onrender.com)

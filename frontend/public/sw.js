@@ -1,5 +1,5 @@
-// Air Pollution XAI - Hardened Production Service Worker (v2.0.0)
-const CACHE_NAME = 'air-xai-v2';
+// AirIQ India - Hardened Production Service Worker (v2.0.0)
+const CACHE_NAME = 'airiq-india-v2';
 const STATIC_PRECACHE = [
   '/',
   '/index.html',

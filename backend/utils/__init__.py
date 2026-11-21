@@ -1,4 +1,4 @@
-"""Utility modules for Air Pollution XAI backend."""
+"""Utility modules for AirIQ India backend."""
 
 from .response import error_response, success_response
 

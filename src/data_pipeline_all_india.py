@@ -92,7 +92,7 @@ def fetch_open_meteo_data(lat, lon, start_date=DATASET_START_DATE, end_date=DATA
     }
     weather_url = f"https://archive-api.open-meteo.com/v1/archive?{urllib.parse.urlencode(weather_params)}"
 
-    headers = {"User-Agent": "AirPollutionXAI-AllIndiaPipeline/2.0 (Academic Research)"}
+    headers = {"User-Agent": "AirIQIndia-AllIndiaPipeline/2.0"}
 
     # Query Air Quality with retry
     aq_data = None

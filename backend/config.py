@@ -1,4 +1,4 @@
-"""Application configuration for Air Pollution XAI Flask backend."""
+"""Application configuration for AirIQ India Flask backend."""
 
 import os
 from pathlib import Path

@@ -79,7 +79,7 @@ export default function HowItWorksPage() {
           Transparent Science & Technology
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-          How VayuPulse Works
+          How AirIQ India Works
         </h1>
         <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
           From satellite sensors in orbit to neighborhood air quality forecasts. Here is how we turn complex atmospheric physics into practical, health-first advice for families across India.

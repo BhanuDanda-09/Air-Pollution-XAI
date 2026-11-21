@@ -54,7 +54,7 @@ const HEALTH_CONDITIONS = [
 
 export default function RelocationAdvisorPage() {
   usePageMeta({
-    title: 'Relocation Advisor | Pollution XAI',
+    title: 'Relocation Advisor | AirIQ India',
     description: 'Health-personalised relocation decision engine and side-by-side air quality comparison across Indian cities.',
   });
 

@@ -227,10 +227,10 @@ export default function About() {
           <span>Methodology & Architecture</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 dark:text-white tracking-tight">
-          About VayuPulse
+          About AirIQ India
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          VayuPulse — Real-Time Explainable Air Quality Intelligence & Relocation Platform for India.
+          AirIQ India — Smarter air decisions for every address in India.
         </p>
       </div>
 

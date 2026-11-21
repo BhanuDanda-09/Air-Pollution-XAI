@@ -77,7 +77,7 @@ export default function ServiceWorkerToast() {
           Update Available
         </h4>
         <p className="text-slate-300 mt-1 leading-relaxed">
-          A new version of Pollution XAI is available with improved accuracy and fixes.
+          A new version of AirIQ India is available with improved accuracy and fixes.
         </p>
 
         <div className="mt-3 flex items-center gap-2">

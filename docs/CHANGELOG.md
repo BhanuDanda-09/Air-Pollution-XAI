@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the **Air Pollution XAI** capstone platform are documented in this file.
+All notable changes to the **AirIQ India** platform are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -84,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Rewrote hero section around real-world benefit ("Is the air safe where you are right now?").
   - Added interactive **"Check Your Air Now"** card with popular Delhi-NCR presets and live mini-verdict preview.
   - Added collapsible scientific disclaimer accordion.
-  - Added 3-step **"How Pollution XAI Works"** walkthrough and 4 feature discovery cards.
+  - Added 3-step **"How AirIQ India Works"** walkthrough and 4 feature discovery cards.
 - **Performance & Memory Optimization**:
   - Implemented lazy-loading for Keras/TensorFlow MLP model and SHAP KernelExplainer, reducing initial backend process memory from ~521 MB to ~295 MB (saving 226 MB of RAM on Render free-tier).
   - Configured Rollup vendor chunking (`vendor-react`, `vendor-charts`, `vendor-icons`), keeping main entry bundle to 115 kB (35 kB gzip).

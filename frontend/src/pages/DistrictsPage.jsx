@@ -439,7 +439,7 @@ export default function DistrictsPage() {
                   <span>Tier 3 Gridded Estimation Disclosure</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Over 180 rural and remote districts in India currently lack physical continuous CAAQMS monitors. VayuPulse estimates these areas using satellite-assimilated numerical transport models (~11 km resolution) rather than guessing from urban station readings.
+                  Over 180 rural and remote districts in India currently lack physical continuous CAAQMS monitors. AirIQ India estimates these areas using satellite-assimilated numerical transport models (~11 km resolution) rather than guessing from urban station readings.
                 </p>
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
                   <span className="font-bold text-slate-800 dark:text-slate-200">Methodological Standard:</span>

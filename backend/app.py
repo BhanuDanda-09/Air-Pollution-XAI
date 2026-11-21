@@ -1,4 +1,4 @@
-"""Flask application factory for Air Pollution XAI backend."""
+"""Flask application factory for AirIQ India backend."""
 
 import logging
 import sys
@@ -114,7 +114,7 @@ def create_app(config_class=Config):
                 },
                 "documentation": "See backend/README.md and docs/LOCATION_DATA.md for API documentation and examples.",
             },
-            message="Air Pollution XAI REST API Backend is online.",
+            message="AirIQ India REST API Backend is online.",
         )
 
     @app.route("/health", methods=["GET"])

@@ -1,5 +1,5 @@
 /**
- * VayuPulse Comprehensive E2E Product Crawler & Functional Audit Suite
+ * AirIQ India Comprehensive E2E Product Crawler & Functional Audit Suite
  *
  * Exercises all 21 production routes across 4 responsive viewports (360px, 768px, 1280px, 1920px)
  * in both Light and Dark themes.
@@ -63,19 +63,19 @@ const MOCK_API_RESPONSES = {
     status: 'success',
     access_token: 'mock-valid-jwt-token-crawler-12345',
     refresh_token: 'mock-refresh-token-crawler-67890',
-    user: { id: 101, email: 'citizen@vayupulse.in', name: 'Priya Sharma', role: 'user' },
+    user: { id: 101, email: 'citizen@airiq.in', name: 'Priya Sharma', role: 'user' },
     health_profile: { sensitivity: 'normal', mask_preference: 'n95', alert_threshold: 60 }
   },
   '/api/auth/register': {
     status: 'success',
     access_token: 'mock-valid-jwt-token-crawler-12345',
     refresh_token: 'mock-refresh-token-crawler-67890',
-    user: { id: 101, email: 'citizen@vayupulse.in', name: 'Priya Sharma', role: 'user' },
+    user: { id: 101, email: 'citizen@airiq.in', name: 'Priya Sharma', role: 'user' },
     health_profile: { sensitivity: 'normal', mask_preference: 'n95', alert_threshold: 60 }
   },
   '/api/auth/me': {
     status: 'success',
-    user: { id: 101, email: 'citizen@vayupulse.in', name: 'Priya Sharma', role: 'user' },
+    user: { id: 101, email: 'citizen@airiq.in', name: 'Priya Sharma', role: 'user' },
     health_profile: { sensitivity: 'normal', mask_preference: 'n95', alert_threshold: 60 }
   },
   '/api/location/compare-livability': {
@@ -377,7 +377,7 @@ const ROUTES_TO_AUDIT = [
   { path: '/prediction', name: 'Forecast Engine' },
   { path: '/comparison', name: 'Model Comparison' },
   { path: '/explainability', name: 'Air Drivers & XAI' },
-  { path: '/about', name: 'About VayuPulse' },
+  { path: '/about', name: 'About AirIQ India' },
   { path: '/how-it-works', name: 'How It Works' },
   { path: '/faq', name: 'FAQ' },
   { path: '/privacy', name: 'Privacy Policy' },
@@ -398,7 +398,7 @@ const THEMES = ['light', 'dark'];
 
 async function runTestSuite() {
   console.log('=====================================================');
-  console.log('🚀 Starting VayuPulse Playwright E2E Product Audit');
+  console.log('🚀 Starting AirIQ India Playwright E2E Product Audit');
   console.log('=====================================================\n');
 
   await new Promise(resolve => staticServer.listen(4176, resolve));
@@ -449,14 +449,14 @@ async function runTestSuite() {
           });
 
           const title = await page.title();
-          const hasVayuPulseTitle = title.includes('VayuPulse');
+          const hasAirIQTitle = title.includes('AirIQ India');
 
-          const passed = consoleErrors.length === 0 && (!overflow || vp.width > 360) && hasVayuPulseTitle;
+          const passed = consoleErrors.length === 0 && (!overflow || vp.width > 360) && hasAirIQTitle;
           recordResult(
             `Route: ${route.path} (${route.name}) @ ${vp.name} [${theme}]`,
             'Route Crawl & Responsive',
             passed ? 'PASS' : 'FAIL',
-            'Zero console errors, zero body horizontal overflow, VayuPulse page title',
+            'Zero console errors, zero body horizontal overflow, AirIQ India page title',
             `Errors: ${consoleErrors.length}, Overflow: ${overflow}, Title: "${title}"`,
             passed ? 'Clean responsive render' : 'Issue detected'
           );
@@ -560,7 +560,7 @@ async function runTestSuite() {
       await authPage.waitForTimeout(200);
 
       // Unhappy Path: Wrong Password
-      await authPage.fill('#modal-email', 'citizen@vayupulse.in');
+      await authPage.fill('#modal-email', 'citizen@airiq.in');
       await authPage.fill('#modal-password', 'wrongpassword');
       await authPage.click('button[type="submit"]');
       await authPage.waitForTimeout(400);
@@ -695,9 +695,9 @@ function generateQaMatrixDoc(results, passCount, totalTests) {
   const qaMatrixPath = path.resolve(__dirname, '../../docs/QA_MATRIX.md');
   const now = new Date().toISOString();
 
-  let markdown = `# VayuPulse Comprehensive QA & Verification Matrix
+  let markdown = `# AirIQ India Comprehensive QA & Verification Matrix
 
-> **Application:** VayuPulse ("Know Your Air. Protect Your Life.")  
+> **Application:** AirIQ India ("Smarter air decisions for every address in India.")  
 > **Production Live URL:** [https://air-pollution-xai.vercel.app](https://air-pollution-xai.vercel.app)  
 > **Production Backend:** [https://air-pollution-xai.onrender.com](https://air-pollution-xai.onrender.com)  
 > **Audit Timestamp:** ${now}  
@@ -710,7 +710,7 @@ function generateQaMatrixDoc(results, passCount, totalTests) {
 
 ## 1. Executive Summary & Verification Scope
 
-This document represents the formal quality assurance sign-off for **VayuPulse**. All academic and student project references ("capstone", "B.Tech", "final-year", raw model names in primary headings) have been completely eliminated from consumer-facing UI and replaced with consumer-friendly language backed by verified scientific methodology.
+This document represents the formal quality assurance sign-off for **AirIQ India**. All academic and student project references ("capstone", "B.Tech", "final-year", raw model names in primary headings) have been completely eliminated from consumer-facing UI and replaced with consumer-friendly language backed by verified scientific methodology.
 
 The test suite exercised:
 1. **21 Production Routes** across 4 responsive viewports (**360px Mobile, 768px Tablet, 1280px Desktop, 1920px UltraWide**) in both **Light and Dark modes**.
@@ -767,7 +767,7 @@ $ node scripts/verify_brand_cleanliness.mjs
 ## 5. Verification Sign-Off
 
 - **ML & Data Integrity:** Unaltered serving bundles (\`models/*.pkl\`, \`xgb_models_serving.joblib\`), verified held-out benchmarks ($R^2=0.7455$).
-- **Consumer Brand:** VayuPulse ("Know Your Air. Protect Your Life.").
+- **Consumer Brand:** AirIQ India ("Smarter air decisions for every address in India.").
 - **Statutory DPDP Act 2023 Compliance:** Consent gating, complete data export, permanent deletion active.
 - **Sign-Off Verdict:** **READY FOR PRODUCTION RELEASE.**
 `;

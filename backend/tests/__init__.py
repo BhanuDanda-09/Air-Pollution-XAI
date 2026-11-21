@@ -1,1 +1,1 @@
-"""Automated test package for Air Pollution XAI Flask backend."""
+"""Automated test package for AirIQ India Flask backend."""

@@ -8,7 +8,7 @@ def test_health_check(client):
     data = response.get_json()
 
     assert data["status"] == "healthy"
-    assert data["app_name"] == "Air Pollution XAI Backend"
+    assert data["app_name"] == "AirIQ India Backend"
     assert "version" in data
 
     models = data["models_available"]

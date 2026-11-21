@@ -1,4 +1,4 @@
-"""API Routes package for Air Pollution XAI backend."""
+"""API Routes package for AirIQ India backend."""
 
 from .admin_routes import admin_bp
 from .air_routes import air_bp

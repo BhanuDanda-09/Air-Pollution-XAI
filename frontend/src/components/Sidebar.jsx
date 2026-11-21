@@ -24,7 +24,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <div className="w-8 h-8 rounded-lg bg-navy-800 flex items-center justify-center text-white">
             <Wind className="w-4 h-4 text-teal-400" />
           </div>
-          <span className="font-bold text-base text-navy-800">Air Pollution XAI</span>
+          <span className="font-bold text-base text-navy-800">AirIQ India</span>
         </div>
 
         {/* Links */}
@@ -53,8 +53,8 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Footer info */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500">
-          <p className="font-semibold text-slate-700 dark:text-slate-200">VayuPulse</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Know Your Air. Protect Your Life.</p>
+          <p className="font-semibold text-slate-700 dark:text-slate-200">AirIQ India</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Smarter air decisions for every address in India.</p>
         </div>
       </div>
     </aside>

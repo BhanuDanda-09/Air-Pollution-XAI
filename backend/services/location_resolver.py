@@ -580,7 +580,7 @@ class LocationResolver:
                 "addressdetails": 1,
             }
             headers = {
-                "User-Agent": "AirPollutionXAI-Capstone/2.0 (education; https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
+                "User-Agent": "AirIQIndia/2.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
                 "Accept": "application/json",
             }
             resp = requests.get(url, params=params, headers=headers, timeout=4)
@@ -712,7 +712,7 @@ class LocationResolver:
                 "limit": limit,
             }
             headers = {
-                "User-Agent": "AirPollutionXAI-Capstone/2.0 (education; https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
+                "User-Agent": "AirIQIndia/2.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
                 "Accept": "application/json",
             }
             resp = requests.get(url, params=params, headers=headers, timeout=4)

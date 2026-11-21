@@ -17,7 +17,7 @@ def health_check():
 
     response_data = {
         "status": "healthy" if is_healthy else "degraded",
-        "app_name": "Air Pollution XAI Backend",
+        "app_name": "AirIQ India Backend",
         "version": "1.0.0",
         "models_available": {
             "random_forest": model_status.get("random_forest", False),

@@ -108,7 +108,7 @@ def predict_pm25(rh, wd, sr, bp, at, model, scaler):
 def print_prediction_card(features_dict, predicted_pm25):
     """Format and print a user-friendly prediction report."""
     print("\n" + "=" * 65)
-    print("      AIR POLLUTION XAI — PM2.5 NEURAL ESTIMATION REPORT      ")
+    print("            AIRIQ INDIA — PM2.5 NEURAL ESTIMATION REPORT            ")
     print("=" * 65)
     print("Model Architecture: Multilayer Perceptron (MLP) Deep Learning")
     print("Underlying Engine:  TensorFlow / Keras 3.x")

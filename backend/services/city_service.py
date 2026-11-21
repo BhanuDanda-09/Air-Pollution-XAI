@@ -118,7 +118,7 @@ class CityService:
                     f"Coordinates ({lat}, {lon}) are outside the Indian geographical bounds "
                     f"({INDIA_BOUNDS['min_lat']}°N–{INDIA_BOUNDS['max_lat']}°N, "
                     f"{INDIA_BOUNDS['min_lon']}°E–{INDIA_BOUNDS['max_lon']}°E). "
-                    "Air-Pollution-XAI is calibrated for the Indian subcontinent."
+                    "AirIQ India is calibrated for the Indian subcontinent."
                 ),
             }
 
@@ -230,7 +230,7 @@ class CityService:
                 "addressdetails": 1,
             }
             headers = {
-                "User-Agent": "AirPollutionXAI/2.0 (capstone; https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
+                "User-Agent": "AirIQIndia/2.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
                 "Accept": "application/json",
             }
             resp = requests.get(url, params=params, headers=headers, timeout=5)

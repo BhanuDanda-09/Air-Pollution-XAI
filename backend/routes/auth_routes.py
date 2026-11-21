@@ -104,7 +104,7 @@ def register():
                 "token_type": "Bearer",
                 "expires_in": Config.JWT_EXPIRY_SECONDS,
             },
-            message="Registration successful. Welcome to Air Pollution XAI!",
+            message="Registration successful. Welcome to AirIQ India!",
             status_code=201,
         )
     except Exception as exc:

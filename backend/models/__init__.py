@@ -1,4 +1,4 @@
-"""Model loader package for Air Pollution XAI backend."""
+"""Model loader package for AirIQ India backend."""
 
 from .model_loader import ModelLoader, get_model_loader
 

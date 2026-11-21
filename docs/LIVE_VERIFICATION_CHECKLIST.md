@@ -1,6 +1,6 @@
 # Live Verification & Demonstration Checklist
 
-**Platform**: Air Pollution XAI (Version 2.0.0)  
+**Platform**: AirIQ India (Version 2.0.0)  
 **Live Frontend**: [https://air-pollution-xai.vercel.app](https://air-pollution-xai.vercel.app)  
 **Live Backend API**: [https://air-pollution-xai.onrender.com](https://air-pollution-xai.onrender.com)  
 

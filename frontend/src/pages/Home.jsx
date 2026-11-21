@@ -37,12 +37,12 @@ const FAQ_ITEMS = [
     a: 'Real-time surface meteorology (temperature, relative humidity, boundary layer height, wind vector) is ingested directly from Open-Meteo. Regional reference PM2.5 concentrations are anchored to the European Copernicus Atmosphere Monitoring Service (CAMS) near-real-time atmospheric chemistry model.',
   },
   {
-    q: 'How does VayuPulse cover both monitored and unmonitored areas?',
-    a: 'In high-density monitoring regions (like Delhi-NCR), predictions are trained against historical station telemetry. In other parts of India, VayuPulse combines regional satellite reanalysis with local surface physics, clearly flagging coverage tiers so you know the precision of every estimate.',
+    q: 'How does AirIQ India cover both monitored and unmonitored areas?',
+    a: 'In high-density monitoring regions (like Delhi-NCR), predictions are trained against historical station telemetry. In other parts of India, AirIQ India combines regional satellite reanalysis with local surface physics, clearly flagging coverage tiers so you know the precision of every estimate.',
   },
   {
-    q: 'How does VayuPulse compare with official CPCB monitoring stations?',
-    a: 'Central Pollution Control Board (CPCB) continuous ambient monitoring stations (CAAQMS) report physical sensor readings for discrete fixed locations. VayuPulse complements this by providing continuous spatial coverage from local surface weather, variance checks, and plain-language factor breakdowns of what is affecting the air.',
+    q: 'How does AirIQ India compare with official CPCB monitoring stations?',
+    a: 'Central Pollution Control Board (CPCB) continuous ambient monitoring stations (CAAQMS) report physical sensor readings for discrete fixed locations. AirIQ India complements this by providing continuous spatial coverage from local surface weather, variance checks, and plain-language factor breakdowns of what is affecting the air.',
   },
   {
     q: 'How is the Residential Livability Score computed?',
@@ -171,7 +171,7 @@ export default function Home() {
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-teal-300 border border-white/15 backdrop-blur-xs">
               <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-              <span>VayuPulse • Real-Time Air Intelligence & Health-First Relocation System</span>
+              <span>AirIQ India • Smarter air decisions for every address in India</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
@@ -361,7 +361,7 @@ export default function Home() {
         {disclaimerExpanded && (
           <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-2 animate-in fade-in duration-200">
             <p>
-              VayuPulse synthesizes calibrated machine learning forecasts with real-time surface meteorology and satellite-assimilated atmospheric chemistry models.
+              AirIQ India synthesizes calibrated machine learning forecasts with real-time surface meteorology and satellite-assimilated atmospheric chemistry models.
             </p>
             <p>
               Output categories represent indicative concentration bands and do not constitute official statutory CPCB continuous ambient monitoring station (CAAQMS) measurements. Air quality for villages and rural areas is a gridded model estimate, not a ground measurement.
@@ -375,7 +375,7 @@ export default function Home() {
         <div className="text-center max-w-xl mx-auto space-y-1">
           <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Workflow</span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            How VayuPulse Works
+            How AirIQ India Works
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             From atmospheric physics to actionable personal livability decisions in 3 steps.

@@ -5,7 +5,7 @@ const ThemeContext = createContext(null);
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
     try {
-      return localStorage.getItem('pollution_xai_theme') || 'system';
+      return localStorage.getItem('airiq_theme') || localStorage.getItem('pollution_xai_theme') || 'system';
     } catch {
       return 'system';
     }
@@ -38,7 +38,7 @@ export function ThemeProvider({ children }) {
   const setTheme = useCallback((newTheme) => {
     setThemeState(newTheme);
     try {
-      localStorage.setItem('pollution_xai_theme', newTheme);
+      localStorage.setItem('airiq_theme', newTheme);
     } catch (e) {
       console.warn('Could not save theme preference:', e);
     }

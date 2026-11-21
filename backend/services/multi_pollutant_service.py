@@ -255,7 +255,7 @@ class MultiPollutantService:
                 "timezone": "Asia/Kolkata",
             }
             headers = {
-                "User-Agent": "AirPollutionXAI/2.0 (capstone; https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
+                "User-Agent": "AirIQIndia/2.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
                 "Accept": "application/json",
             }
             if getattr(Config, "OPEN_METEO_API_KEY", None):

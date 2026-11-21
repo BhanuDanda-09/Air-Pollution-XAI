@@ -40,7 +40,7 @@ export default function Footer({ isBackendOnline = true }) {
               </div>
               <div className="flex items-center gap-1.5 whitespace-nowrap">
                 <span className="font-extrabold text-base text-slate-900 dark:text-white tracking-tight">
-                  Vayu<span className="text-emerald-600 dark:text-emerald-400">Pulse</span>
+                  Air<span className="text-cyan-600 dark:text-cyan-400">IQ</span> <span className="text-emerald-600 dark:text-emerald-400">India</span>
                 </span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/80 uppercase tracking-wider">
                   Live
@@ -318,11 +318,9 @@ export default function Footer({ isBackendOnline = true }) {
         <div className="pt-8 border-t border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div className="space-y-1 text-center md:text-left">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-slate-700 dark:text-slate-300 font-semibold">
-              <span>© {new Date().getFullYear()} VayuPulse</span>
+              <span>© {new Date().getFullYear()} AirIQ India</span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
-              <span>Know Your Air. Protect Your Life.</span>
-              <span className="text-slate-300 dark:text-slate-700">•</span>
-              <span>All-India Air Quality & Health Advisor</span>
+              <span>Smarter air decisions for every address in India.</span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-500">
               Air quality estimates are for general information and are not an official AQI or medical advice. If you have a health condition, follow your doctor's guidance.

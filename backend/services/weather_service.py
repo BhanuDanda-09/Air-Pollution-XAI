@@ -115,7 +115,7 @@ class WeatherService:
             "current": "temperature_2m,relative_humidity_2m,wind_direction_10m,surface_pressure,shortwave_radiation",
         }
         headers = {
-            "User-Agent": "AirPollutionXAI/1.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI; research-capstone)",
+            "User-Agent": "AirIQIndia/2.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
             "Accept": "application/json",
         }
         if getattr(Config, "OPEN_METEO_API_KEY", None):

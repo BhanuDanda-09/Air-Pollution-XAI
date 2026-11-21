@@ -3222,8 +3222,8 @@
   "manifestResult": {
     "status": 200,
     "manifest": {
-      "short_name": "AirXAI",
-      "name": "Air Pollution XAI - Livability & Prediction",
+      "short_name": "AirIQ",
+      "name": "AirIQ India — Smarter Air Decisions",
       "icons": [
         {
           "src": "/favicon.svg",
@@ -3231,14 +3231,14 @@
           "sizes": "any"
         },
         {
-          "src": "/pwa-192x192.svg",
-          "type": "image/svg+xml",
+          "src": "/pwa-192x192.png",
+          "type": "image/png",
           "sizes": "192x192",
           "purpose": "any maskable"
         },
         {
-          "src": "/pwa-512x512.svg",
-          "type": "image/svg+xml",
+          "src": "/pwa-512x512.png",
+          "type": "image/png",
           "sizes": "512x512",
           "purpose": "any maskable"
         }
@@ -3248,7 +3248,7 @@
       "theme_color": "#0f172a",
       "display": "standalone",
       "orientation": "portrait",
-      "description": "Real-time location-based air quality assessment, livability scoring, and explainable PM2.5 intelligence."
+      "description": "Smarter air decisions for every address in India. Real-time air quality assessment, livability scoring, and weather-driven insights."
     }
   },
   "offlineResult": {

@@ -28,8 +28,8 @@ export default function FAQPage() {
     },
     {
       category: 'Air Quality & AQI',
-      q: 'How does VayuPulse calculate air quality for villages without monitoring stations?',
-      a: 'Over 95% of rural India does not have a physical ambient monitoring station within 25 km. Rather than naively guessing or drawing straight lines between distant city monitors, VayuPulse uses European Copernicus (CAMS) atmospheric satellite reanalysis assimilated with local surface weather physics. We label these results clearly as "Tier 3: Gridded Regional Estimate" so citizens and authorities always know when data is estimated rather than measured.',
+      q: 'How does AirIQ India calculate air quality for villages without monitoring stations?',
+      a: 'Over 95% of rural India does not have a physical ambient monitoring station within 25 km. Rather than naively guessing or drawing straight lines between distant city monitors, AirIQ India uses European Copernicus (CAMS) atmospheric satellite reanalysis assimilated with local surface weather physics. We label these results clearly as "Tier 3: Gridded Regional Estimate" so citizens and authorities always know when data is estimated rather than measured.',
     },
     {
       category: 'Air Quality & AQI',
@@ -39,7 +39,7 @@ export default function FAQPage() {
     {
       category: 'Health & Sensitive Profiles',
       q: 'How does my health condition change the advice I see?',
-      a: 'Fine particulate matter (PM2.5) penetrates deep into the alveolar sacs of the lungs and passes into the bloodstream. People with asthma or COPD experience bronchospasms at much lower particulate levels than healthy adults. Transplacental transfer poses risks during pregnancy, and developing lung airways make children especially vulnerable. VayuPulse uses WHO 2021 clinical exposure multipliers to trigger stricter health precautions earlier for vulnerable individuals.',
+      a: 'Fine particulate matter (PM2.5) penetrates deep into the alveolar sacs of the lungs and passes into the bloodstream. People with asthma or COPD experience bronchospasms at much lower particulate levels than healthy adults. Transplacental transfer poses risks during pregnancy, and developing lung airways make children especially vulnerable. AirIQ India uses WHO 2021 clinical exposure multipliers to trigger stricter health precautions earlier for vulnerable individuals.',
     },
     {
       category: 'Health & Sensitive Profiles',
@@ -58,12 +58,12 @@ export default function FAQPage() {
     },
     {
       category: 'Data & Privacy',
-      q: 'How is my personal health information protected on VayuPulse?',
+      q: 'How is my personal health information protected on AirIQ India?',
       a: 'We fully comply with India’s Digital Personal Data Protection (DPDP) Act 2023. Health attributes (such as asthma, pregnancy, or heart conditions) are processed exclusively with your explicit consent to generate safety verdicts. We never log or sell health data to third parties. You have the statutory right to export your complete data bundle or permanently delete your account and all associated records at any time from the Privacy page.',
     },
     {
       category: 'Air Quality & AQI',
-      q: 'Can I use VayuPulse to plan moving to another city?',
+      q: 'Can I use AirIQ India to plan moving to another city?',
       a: 'Yes! Our Relocation Advisor compares your current city with up to four candidate destinations. It analyzes chronic exposure, seasonal winter peaks, monsoon clean windows, and gives a clear verdict (Highly Recommended, Conditional, or Not Recommended) tailored to your health profile.',
     },
   ];
@@ -89,7 +89,7 @@ export default function FAQPage() {
           Frequently Asked Questions
         </h1>
         <p className="text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-          Practical answers about air pollution in India, mask safety, indoor purifiers, and how VayuPulse personalizes health guidance.
+          Practical answers about air pollution in India, mask safety, indoor purifiers, and how AirIQ India personalizes health guidance.
         </p>
       </div>
 
