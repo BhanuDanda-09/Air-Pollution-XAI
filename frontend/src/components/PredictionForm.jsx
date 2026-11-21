@@ -71,9 +71,9 @@ export default function PredictionForm({
               disabled={loading}
               className="w-full sm:w-auto max-w-full sm:max-w-xs text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500 disabled:opacity-50 truncate"
             >
-              <option value="xgboost">XGBoost (Top Performer: R²=0.7455)</option>
-              <option value="random_forest">Random Forest (R²=0.7269)</option>
-              <option value="mlp">MLP Neural Net (R²=0.5408)</option>
+              <option value="xgboost">Gradient Boosted Trees (Top Accuracy: R²=0.7455)</option>
+              <option value="random_forest">Decision Forest Ensemble (R²=0.7269)</option>
+              <option value="mlp">Deep Neural Network (R²=0.5408)</option>
             </select>
           </div>
         )}

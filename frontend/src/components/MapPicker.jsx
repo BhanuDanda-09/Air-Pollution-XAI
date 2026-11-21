@@ -67,7 +67,7 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
         attribution: '&copy; OpenStreetMap contributors',
       }).addTo(map);
 
-      // Delhi-NCR Validated Training Region Visual Bounding Box
+      // High-Density Monitoring Region (Delhi-NCR) Bounding Box
       const ncrRect = L.rectangle(DELHI_NCR_BOUNDS, {
         color: '#2563eb',
         weight: 2,
@@ -76,7 +76,7 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
         dashArray: '4, 4',
       }).addTo(map);
 
-      ncrRect.bindTooltip('Validated Training Region (Delhi-NCR)', {
+      ncrRect.bindTooltip('High-Density Monitoring Region (Delhi-NCR)', {
         permanent: false,
         direction: 'top',
       });

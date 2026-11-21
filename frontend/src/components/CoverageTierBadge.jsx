@@ -46,7 +46,7 @@ export default function CoverageTierBadge({ coverage, showDetails = true, classN
       bg: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
       barBg: 'bg-amber-500',
       icon: AlertTriangle,
-      desc: 'CAMS ~11 km Grid Cell (Regional Estimate)',
+      desc: 'Regional ~11 km Satellite Weather Grid',
     },
   };
 

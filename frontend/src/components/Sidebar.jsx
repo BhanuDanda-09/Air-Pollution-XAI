@@ -52,9 +52,9 @@ export default function Sidebar({ isOpen, onClose }) {
         </nav>
 
         {/* Footer info */}
-        <div className="p-4 border-t border-slate-200 text-xs text-slate-500">
-          <p className="font-semibold text-slate-700">Air Pollution XAI</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">B.Tech Capstone Project</p>
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+          <p className="font-semibold text-slate-700 dark:text-slate-200">VayuPulse</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Know Your Air. Protect Your Life.</p>
         </div>
       </div>
     </aside>

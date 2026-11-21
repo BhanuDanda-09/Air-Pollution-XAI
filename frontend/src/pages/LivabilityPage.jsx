@@ -126,7 +126,7 @@ export default function LivabilityPage() {
     setCompareError(null);
     try {
       const res = await livabilityService.compareLivability(locA, locB, healthProfile);
-      setComparisonData(res);
+      setComparisonData(res?.data || res);
     } catch (err) {
       setCompareError(err?.message || 'Failed to compute head-to-head comparison.');
     } finally {
@@ -181,7 +181,7 @@ export default function LivabilityPage() {
               Should I Live In / Go To This Place?
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-3xl leading-relaxed">
-              Synthesize regional Copernicus (CAMS) reference data, local surface meteorological modeling, and 7-day
+              Synthesize regional air quality baselines, surface weather modeling, and 7-day
               forecast trends into plain-language decision guidance.
             </p>
           </div>
@@ -249,7 +249,7 @@ export default function LivabilityPage() {
             to={`/live-assessment?lat=${latitude}&lon=${longitude}`}
             className="inline-flex items-center gap-1 font-bold text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 dark:hover:text-white shrink-0"
           >
-            <span>Need Raw Meteorological Telemetry & SHAP? Go to Live Assessment</span>
+            <span>Need In-Depth Meteorological Diagnostics? Go to Live Assessment</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -418,7 +418,7 @@ export default function LivabilityPage() {
           )}
 
           {/* Comparison Results */}
-          {comparisonData && (
+          {comparisonData && comparisonData.location_a && comparisonData.location_b && (
             <div className="space-y-6 animate-fadeIn">
               {/* Winner Decision Banner */}
               <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-emerald-950/40 border border-emerald-200 dark:border-emerald-800 shadow-sm">
@@ -463,7 +463,7 @@ export default function LivabilityPage() {
                       <strong className="text-slate-800 dark:text-slate-200">{comparisonData.location_a.verdict.label}</strong>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500 dark:text-slate-400">Reference PM2.5 (CAMS)</span>
+                      <span className="text-slate-500 dark:text-slate-400">Regional Air Quality Estimate</span>
                       <strong className="text-slate-800 dark:text-slate-200">
                         {Math.round(comparisonData.location_a.pm25_reference || 0)} µg/m³
                       </strong>
@@ -505,7 +505,7 @@ export default function LivabilityPage() {
                       <strong className="text-slate-800 dark:text-slate-200">{comparisonData.location_b.verdict.label}</strong>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500 dark:text-slate-400">Reference PM2.5 (CAMS)</span>
+                      <span className="text-slate-500 dark:text-slate-400">Regional Air Quality Estimate</span>
                       <strong className="text-slate-800 dark:text-slate-200">
                         {Math.round(comparisonData.location_b.pm25_reference || 0)} µg/m³
                       </strong>

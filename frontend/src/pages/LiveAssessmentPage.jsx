@@ -124,16 +124,16 @@ export default function LiveAssessmentPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 rounded-full">
-                Phase 1, 2 & 3 Live Intelligence
+                Real-Time Diagnostics
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Open-Meteo, CAMS, Persistence & Livability</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Surface Meteorology, Regional Baseline & Health Guidance</span>
             </div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white mt-2 tracking-tight">
               Real-World Air Quality Assessment
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-3xl leading-relaxed">
               Assess live particulate air pollution (PM2.5) for any geographic coordinates using real-time
-              satellite surface meteorology, calibrated XGBoost machine learning, and CAMS reference comparison.
+              surface meteorology, calibrated machine learning, and regional baseline comparison.
             </p>
           </div>
 
@@ -187,7 +187,7 @@ export default function LiveAssessmentPage() {
             <span className="font-extrabold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">
               Scientific Diagnostic
             </span>
-            <span>Deep physical weather telemetry, satellite CAMS reference PM2.5, and SHAP source attributions.</span>
+            <span>Deep physical weather telemetry, regional reference PM2.5, and atmospheric factor attributions.</span>
           </div>
           <Link
             to={`/livability?lat=${latitude}&lon=${longitude}`}

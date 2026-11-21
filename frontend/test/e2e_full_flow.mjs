@@ -640,11 +640,11 @@ staticServer.listen(4175, '127.0.0.1', () => {
       totalTests++;
       await page.goto('http://127.0.0.1:4175/', { waitUntil: 'load' });
       await page.waitForTimeout(500);
-      const hasBrand = await page.$eval('header', el => el.textContent.includes('Pollution') && el.textContent.includes('XAI')).catch(() => false);
-      const hasFooter = await page.$eval('footer', el => el.textContent.includes('Capstone') && el.textContent.includes('Open-Meteo')).catch(() => false);
+      const hasBrand = await page.$eval('header', el => el.textContent.includes('VayuPulse')).catch(() => false);
+      const hasFooter = await page.$eval('footer', el => el.textContent.includes('VayuPulse') && el.textContent.includes('Open-Meteo')).catch(() => false);
       if (hasBrand && hasFooter) {
         passedTests++;
-        console.log('  ✓ Desktop Navbar brand & 4-column Footer present with full attribution.');
+        console.log('  ✓ Desktop Navbar brand (VayuPulse) & 4-column Footer present with full attribution.');
       } else {
         failures.push(`Desktop Navbar or Footer verification failed.`);
       }

@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node ../scripts/verify_brand_cleanliness.mjs",
     "preview": "vite preview",
+    "test:brand": "node ../scripts/verify_brand_cleanliness.mjs",
     "test": "node test/validation.test.js && node test/demo_security.test.js && node test/auth_user.test.js && node test/livability.test.js"
   },
   "dependencies": {

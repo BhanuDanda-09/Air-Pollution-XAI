@@ -24,6 +24,10 @@ const Prediction = lazy(() => import('./pages/Prediction'));
 const ModelComparisonPage = lazy(() => import('./pages/ModelComparisonPage'));
 const Explainability = lazy(() => import('./pages/Explainability'));
 const About = lazy(() => import('./pages/About'));
+const HowItWorksPage = lazy(() => import('./pages/HowItWorksPage'));
+const FAQPage = lazy(() => import('./pages/FAQPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
 const RelocationAdvisorPage = lazy(() => import('./pages/RelocationAdvisorPage'));
 const HotspotsPage = lazy(() => import('./pages/HotspotsPage'));
 const DistrictsPage = lazy(() => import('./pages/DistrictsPage'));
@@ -84,6 +88,10 @@ export default function App() {
                     <Route path="/comparison" element={<ModelComparisonPage />} />
                     <Route path="/explainability" element={<Explainability />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/how-it-works" element={<HowItWorksPage />} />
+                    <Route path="/faq" element={<FAQPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
                     <Route
                       path="/admin"
                       element={

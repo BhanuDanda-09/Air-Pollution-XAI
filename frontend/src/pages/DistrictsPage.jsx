@@ -152,7 +152,7 @@ export default function DistrictsPage() {
         </div>
 
         {/* View Tabs */}
-        <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2">
+        <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2 overflow-x-auto whitespace-nowrap">
           <button
             type="button"
             onClick={() => setActiveTab('districts')}
@@ -376,7 +376,7 @@ export default function DistrictsPage() {
                 Actionable Environmental Insights for State & District Administrations
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
-                Empirical synthesis of SHAP atmospheric feature attributions, boundary layer dynamics, and seasonal emission inventories across India's agro-climatic zones.
+                Empirical synthesis of atmospheric ventilation dynamics, temperature inversions, and seasonal emission patterns across India's agro-climatic zones.
               </p>
             </div>
 
@@ -405,7 +405,7 @@ export default function DistrictsPage() {
                   <span>East & Central: Industrial Inversion Trapping</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  In heavy industrial and mining clusters (Korba, Singrauli, Dhanbad, Asansol), nighttime radiational cooling creates intense ground-level thermal inversions between December and January. SHAP feature attribution indicates surface barometric pressure (BP) and low ambient temperature (AT) contribute up to +42 µg/m³ to particulate surges.
+                  In heavy industrial and mining clusters (Korba, Singrauli, Dhanbad, Asansol), nighttime radiational cooling creates intense ground-level thermal inversions between December and January. Factor analysis indicates surface barometric pressure (BP) and low ambient temperature (AT) contribute up to +42 µg/m³ to particulate surges.
                 </p>
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
                   <span className="font-bold text-slate-800 dark:text-slate-200">Recommended Action:</span>
@@ -439,7 +439,7 @@ export default function DistrictsPage() {
                   <span>Tier 3 Gridded Estimation Disclosure</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Over 180 rural and remote districts in India currently lack physical continuous CAAQMS monitors. Air-Pollution-XAI estimates these areas using CAMS gridded numerical transport models (~11 km resolution) rather than extrapolating urban station readings.
+                  Over 180 rural and remote districts in India currently lack physical continuous CAAQMS monitors. VayuPulse estimates these areas using satellite-assimilated numerical transport models (~11 km resolution) rather than guessing from urban station readings.
                 </p>
                 <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
                   <span className="font-bold text-slate-800 dark:text-slate-200">Methodological Standard:</span>

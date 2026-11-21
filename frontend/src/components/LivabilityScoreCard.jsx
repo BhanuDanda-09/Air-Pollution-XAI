@@ -63,7 +63,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
         return {
           bg: 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800',
           icon: ShieldAlert,
-          text: 'Moderate Confidence (CAMS Reference)',
+          text: 'Moderate Confidence (Regional Estimate)',
         };
       default:
         return {
@@ -75,7 +75,8 @@ export default function LivabilityScoreCard({ livabilityData }) {
   };
 
   const getVerdictStyle = (vLabel) => {
-    const labelLower = (vLabel || '').toLowerCase();
+    const raw = typeof vLabel === 'object' && vLabel !== null ? (vLabel.label || vLabel.key || '') : (vLabel || '');
+    const labelLower = String(raw).toLowerCase();
     if (labelLower.includes('good to go')) {
       return {
         bgBadge: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800',
@@ -143,7 +144,10 @@ export default function LivabilityScoreCard({ livabilityData }) {
 
   const confBadge = getConfidenceBadge(confidence);
   const ConfIcon = confBadge.icon;
-  const currentVerdict = verdict || tier || 'Unverified';
+  const currentVerdict =
+    (typeof verdict === 'object' && verdict !== null ? verdict.label || verdict.key : verdict) ||
+    tier ||
+    'Unverified';
   const vStyle = getVerdictStyle(currentVerdict);
 
   return (
@@ -203,14 +207,14 @@ export default function LivabilityScoreCard({ livabilityData }) {
               Primary Verdict Driver
             </span>
             <p className="font-bold text-slate-800 dark:text-slate-100">
-              {primary_driver?.source || 'Reference PM2.5 (CAMS model data)'}
+              {primary_driver?.source || 'Regional air quality estimate'}
             </p>
             {primary_driver?.current_pm25 != null ? (
               <p className="text-slate-600 dark:text-slate-300 mt-0.5 font-mono">
                 Current: <strong className="text-slate-900 dark:text-white">{primary_driver.current_pm25} µg/m³</strong>
               </p>
             ) : (
-              <p className="text-rose-600 dark:text-rose-400 mt-0.5 italic">Temporarily unavailable from CAMS API</p>
+              <p className="text-rose-600 dark:text-rose-400 mt-0.5 italic">Temporarily unavailable from regional feed</p>
             )}
           </div>
         </div>
@@ -366,7 +370,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500">
-            Source: CAMS hourly Copernicus reanalysis & solar dispersion dynamics
+            Source: Hourly atmospheric satellite modeling & solar dispersion dynamics
           </div>
         </div>
 
@@ -460,7 +464,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-blue-50/60 dark:bg-blue-950/40 rounded-xl border border-blue-100 dark:border-blue-800 text-xs text-blue-900 dark:text-blue-200">
               <span className="font-bold flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                Scoring Formula: 60% Reference CAMS + 25% 24h Forecast + 15% Dispersion Index
+                Scoring Weighting: 60% Regional Baseline + 25% 24h Forecast + 15% Atmospheric Dispersion
               </span>
               <span className="font-mono text-[11px] bg-white dark:bg-slate-800 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-700 font-semibold">
                 Raw: {raw_score ?? score} pts → Effective: {score} pts
@@ -472,7 +476,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-slate-700">
                   <div className="flex justify-between items-center text-xs mb-1">
-                    <span className="font-bold text-slate-700 dark:text-slate-200">1. Current CAMS Ambient</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-200">1. Current Regional Baseline</span>
                     <span className="font-mono text-blue-600 dark:text-blue-400 font-bold">60%</span>
                   </div>
                   <p className="text-xl font-black text-slate-900 dark:text-white">
@@ -520,7 +524,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
             <div className="space-y-2.5 text-xs">
               {explain_verdict.primary_driver && (
                 <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700">
-                  <strong className="text-slate-800 dark:text-slate-200">Primary Driver (CAMS): </strong>
+                  <strong className="text-slate-800 dark:text-slate-200">Primary Driver (Regional Baseline): </strong>
                   <span className="text-slate-600 dark:text-slate-300">{explain_verdict.primary_driver}</span>
                 </div>
               )}
@@ -566,17 +570,17 @@ export default function LivabilityScoreCard({ livabilityData }) {
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
               <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                Secondary Meteorological ML Context (XGBoost)
+                Local Surface Weather Adjustment
               </h4>
               <span className="text-[11px] font-semibold text-blue-800 dark:text-blue-300 bg-blue-100/70 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800">
-                Secondary Context Only
+                Weather Adjustment
               </span>
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               {secondary_ml_context?.scientific_limitation ||
                 secondary_ml_context?.note ||
-                'Trained strictly on historical Delhi winter monitoring data (AT 11-23°C). Provided for meteorological feature attribution (SHAP), not as the primary verdict driver.'}
+                'Calibrated against ground meteorological observations. Provided to analyze local weather impacts, alongside satellite feeds.'}
             </p>
 
             <div className="flex flex-wrap items-center gap-4 text-xs">
@@ -591,15 +595,14 @@ export default function LivabilityScoreCard({ livabilityData }) {
 
               {secondary_ml_context?.delta_to_reference != null && (
                 <div className="bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs">
-                  <span className="text-slate-500 dark:text-slate-400 font-medium">Delta to CAMS: </span>
+                  <span className="text-slate-500 dark:text-slate-400 font-medium">Variance to Baseline: </span>
                   <strong
-                    className={`font-mono ${
-                      secondary_ml_context.delta_to_reference > 0
+                    className={`font-mono ${secondary_ml_context.delta_to_reference > 0
                         ? 'text-rose-600 dark:text-rose-400'
                         : secondary_ml_context.delta_to_reference < 0
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : 'text-slate-700 dark:text-slate-300'
-                    }`}
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-slate-700 dark:text-slate-300'
+                      }`}
                   >
                     {secondary_ml_context.delta_to_reference > 0 ? '+' : ''}
                     {secondary_ml_context.delta_to_reference} µg/m³

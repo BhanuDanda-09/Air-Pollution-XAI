@@ -29,7 +29,7 @@ export default function FeatureImportanceChart({ attributions }) {
     labels,
     datasets: [
       {
-        label: 'SHAP Contribution (µg/m³)',
+        label: 'Impact on PM2.5 (µg/m³)',
         data: values,
         backgroundColor: backgroundColors,
         borderColor: borderColors,
@@ -59,7 +59,7 @@ export default function FeatureImportanceChart({ attributions }) {
       x: {
         title: {
           display: true,
-          text: 'SHAP Value / Impact on PM2.5 (µg/m³)',
+          text: 'Impact on Air Quality Level (µg/m³)',
         },
         grid: { color: '#E2E8F0' },
       },

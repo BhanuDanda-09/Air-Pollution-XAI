@@ -76,7 +76,7 @@ export default function ModelComparison({ comparisonData }) {
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold">
           <Trophy className="w-4 h-4 text-amber-500" />
-          <span>Top Held-out Model: XGBoost</span>
+          <span>Top Held-out Architecture: Gradient Boosted Trees</span>
         </div>
       </div>
 

@@ -24,13 +24,13 @@ export default function SHAPExplanation({ explanationData }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Explainable AI</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Weather Factor Analysis</span>
             <span className="text-slate-300">•</span>
-            <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-              {explainer_type || 'TreeExplainer'}
+            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              Verified Factors
             </span>
           </div>
-          <h3 className="text-xl font-bold text-navy-800 mt-1">SHAP Local Feature Attribution</h3>
+          <h3 className="text-xl font-bold text-navy-800 mt-1">What's Affecting Your Air Quality</h3>
         </div>
         <div className="text-right">
           <span className="text-xs text-slate-500">Explaining Model:</span>
@@ -82,7 +82,7 @@ export default function SHAPExplanation({ explanationData }) {
             <span className="text-2xl font-black text-white">{predicted_value}</span>
             <span className="text-xs text-slate-300">µg/m³</span>
           </div>
-          <p className="text-[11px] text-slate-300 mt-1">Base value + sum of SHAP attributions</p>
+          <p className="text-[11px] text-slate-300 mt-1">Base baseline + combined weather factor impacts</p>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ export default function SHAPExplanation({ explanationData }) {
             <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold">
               <th className="py-2.5 px-3">Feature</th>
               <th className="py-2.5 px-3">Input Value</th>
-              <th className="py-2.5 px-3">SHAP Value</th>
+              <th className="py-2.5 px-3">Impact Value</th>
               <th className="py-2.5 px-3">Direction</th>
               <th className="py-2.5 px-3">Impact Explanation</th>
             </tr>

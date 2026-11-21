@@ -2,52 +2,88 @@ import { useEffect } from 'react';
 
 const BASE_URL = 'https://air-pollution-xai.vercel.app';
 const OG_IMAGE_URL = `${BASE_URL}/og-image.png`;
-const OG_IMAGE_ALT = 'Pollution XAI - Live Air Quality Assessment & Explainable PM2.5 Intelligence';
+const OG_IMAGE_ALT = 'VayuPulse - Live Air Quality & Health Advisor';
 
 const PAGE_META = {
   '/': {
-    title: 'Pollution XAI | Is The Air Safe Where You Are?',
-    description: 'Instant residential air safety diagnostics, live PM2.5 assessments, and explainable ML intelligence for Delhi-NCR.',
+    title: 'VayuPulse | Know Your Air. Protect Your Life.',
+    description: 'Real-time air quality forecasts, personal health advisories, and relocation intelligence across India.',
   },
   '/live-assessment': {
-    title: 'Live Air Quality Assessment | Pollution XAI',
-    description: 'Real-time scientific diagnostic comparing XGBoost meteorological estimations with Copernicus CAMS regional PM2.5 reference data.',
+    title: 'Check My Air | VayuPulse',
+    description: 'Instant local air quality check, 6-pollutant breakdown, and practical health recommendations.',
+  },
+  '/check-air': {
+    title: 'Check My Air | VayuPulse',
+    description: 'Instant local air quality check, 6-pollutant breakdown, and practical health recommendations.',
+  },
+  '/relocation': {
+    title: 'Relocation Advisor | VayuPulse',
+    description: 'Compare air quality between cities and find healthier places to live with asthma-safe guidance.',
+  },
+  '/districts': {
+    title: 'District Intelligence | VayuPulse',
+    description: 'All-India administrative district air quality rankings, seasonal patterns, and environmental guidance.',
+  },
+  '/hotspots': {
+    title: 'National Hotspot Rankings | VayuPulse',
+    description: 'Empirical exposure rankings identifying vulnerable pollution basins and clean sanctuaries across India.',
   },
   '/livability': {
-    title: 'Residential Livability Index & Comparison | Pollution XAI',
-    description: 'Actionable 0–100 residential livability scoring, head-to-head location comparisons, and personalized health profile recommendations.',
+    title: 'Livability Score & Verdict | VayuPulse',
+    description: 'Personalized 0–100 residential suitability scoring based on your family health profile.',
   },
   '/saved-places': {
-    title: 'Saved Places & Custom PM2.5 Alerts | Pollution XAI',
-    description: 'Bookmark Delhi-NCR locations for 1-click diagnostics and automated PM2.5 threshold alerts.',
+    title: 'Saved Places & Custom Alerts | VayuPulse',
+    description: 'Save your home, office, and school locations for custom air quality safety alerts.',
   },
   '/history': {
-    title: 'Personal Exposure & Assessment History | Pollution XAI',
-    description: 'Review past air quality assessments, exposure trends, and export medical consultation reports as CSV.',
+    title: 'Personal Exposure & Assessment History | VayuPulse',
+    description: 'Review your past air quality assessments, exposure trends, and export consultation reports.',
   },
   '/dashboard': {
-    title: 'Model Telemetry & System Dashboard | Pollution XAI',
-    description: 'Live backend health status, held-out test benchmarks for 3 deployed models, and meteorological bounds.',
+    title: 'Environmental Intelligence Dashboard | VayuPulse',
+    description: 'Comprehensive system telemetry, monitoring station status, and atmospheric stability indicators.',
   },
   '/prediction': {
-    title: 'Surface Meteorology PM2.5 Prediction | Pollution XAI',
-    description: 'Input RH, WD, SR, BP, and AT to estimate 24-hr PM2.5 concentration with indicative CPCB health categories.',
+    title: 'Surface Weather Estimator | VayuPulse',
+    description: 'Understand how surface temperature, humidity, and wind physics shape particulate concentrations.',
   },
   '/comparison': {
-    title: 'Multi-Model Performance Benchmarking | Pollution XAI',
-    description: 'Simultaneously evaluate Random Forest, tuned XGBoost, and MLP neural network on identical weather inputs.',
+    title: 'Forecast Accuracy & Model Verification | VayuPulse',
+    description: 'Transparent verification metrics and held-out cross-validation across lead forecast horizons.',
   },
   '/explainability': {
-    title: 'Explainable AI & SHAP Local Attributions | Pollution XAI',
-    description: 'Deconstruct individual PM2.5 predictions with exact Shapley values and meteorological force plots.',
+    title: 'Weather Factors & Air Quality Drivers | VayuPulse',
+    description: 'Explore what atmospheric conditions are driving particulate spikes in your neighborhood.',
+  },
+  '/how-it-works': {
+    title: 'How It Works | VayuPulse',
+    description: 'Learn how satellites, monitoring stations, and atmospheric physics provide neighborhood-level air forecasts.',
+  },
+  '/faq': {
+    title: 'Frequently Asked Questions | VayuPulse',
+    description: 'Answers on AQI, masks, air purifiers, outdoor exercise, and health precautions.',
+  },
+  '/terms': {
+    title: 'Terms of Service | VayuPulse',
+    description: 'Terms of service, platform guidance, and environmental advisory notices.',
+  },
+  '/contact': {
+    title: 'Contact & Feedback | VayuPulse',
+    description: 'Get in touch with our team for questions, suggestions, or reporting station discrepancies.',
+  },
+  '/privacy': {
+    title: 'Privacy Policy & Data Rights | VayuPulse',
+    description: 'DPDP Act 2023 compliance, explicit consent, data export, and permanent account erasure.',
   },
   '/about': {
-    title: 'About the Capstone Project | Pollution XAI',
-    description: 'Problem statement, preprocessing pipeline, model architectures, and scientific limitations of the Delhi air quality study.',
+    title: 'About Our Mission | VayuPulse',
+    description: 'Our mission to empower citizens across India with transparent, health-first air quality intelligence.',
   },
   '/404': {
-    title: '404 Page Not Found | Pollution XAI',
-    description: 'The requested page or diagnostic coordinate was not found.',
+    title: '404 Page Not Found | VayuPulse',
+    description: 'The requested page was not found. Return to VayuPulse home.',
   },
 };
 
@@ -75,10 +111,10 @@ function setOrCreateLink(rel, href) {
 export function usePageMeta(pathname) {
   useEffect(() => {
     // Normalize path (handle trailing slashes or subpaths)
-    const normalizedPath = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+    const normalizedPath = pathname && pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : (pathname || '/');
     const meta = PAGE_META[normalizedPath] || {
-      title: 'Pollution XAI | Explainable Air Quality Intelligence',
-      description: 'Real-time air quality diagnostics and explainable AI for Delhi-NCR.',
+      title: 'VayuPulse | Know Your Air. Protect Your Life.',
+      description: 'Real-time air quality forecasts, personal health advisories, and relocation intelligence across India.',
     };
 
     const currentUrl = `${BASE_URL}${normalizedPath === '/' ? '' : normalizedPath}`;

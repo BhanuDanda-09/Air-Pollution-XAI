@@ -108,15 +108,15 @@ export default function AdminPage() {
             </div>
             <ul className="space-y-2 mt-3 text-xs">
               <li className="flex justify-between items-center p-2 rounded-lg bg-slate-50">
-                <span className="font-semibold text-slate-700">Tuned XGBoost (Primary)</span>
+                <span className="font-semibold text-slate-700">Gradient Boosted Trees (Primary)</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Online</span>
               </li>
               <li className="flex justify-between items-center p-2 rounded-lg bg-slate-50">
-                <span className="font-semibold text-slate-700">Random Forest</span>
+                <span className="font-semibold text-slate-700">Decision Forest Ensemble</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Online</span>
               </li>
               <li className="flex justify-between items-center p-2 rounded-lg bg-slate-50">
-                <span className="font-semibold text-slate-700">Keras 3 MLP</span>
+                <span className="font-semibold text-slate-700">Deep Neural Network</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Online</span>
               </li>
             </ul>
@@ -135,7 +135,7 @@ export default function AdminPage() {
                 </div>
               </div>
               <div className="p-2.5 rounded-lg bg-slate-50">
-                <div className="text-slate-500 font-medium">Air Quality CAMS Cache</div>
+                <div className="text-slate-500 font-medium">Air Quality Regional Cache</div>
                 <div className="text-base font-extrabold text-slate-800 mt-0.5">
                   {metrics.cache_stats?.aq_cache_entries || 0} / {metrics.cache_stats?.aq_cache_max || 256}
                 </div>

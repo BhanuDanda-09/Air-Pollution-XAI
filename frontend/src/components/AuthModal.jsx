@@ -132,12 +132,13 @@ export default function AuthModal() {
 
           {authModalMode === 'register' && (
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label htmlFor="modal-name" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                 Full Name or Alias <span className="text-slate-500 dark:text-slate-400 font-normal">(Optional)</span>
               </label>
               <div className="relative">
                 <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 <input
+                  id="modal-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -149,10 +150,11 @@ export default function AuthModal() {
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
+            <label htmlFor="modal-email" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
+                id="modal-email"
                 type="email"
                 required
                 value={email}
@@ -165,7 +167,7 @@ export default function AuthModal() {
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Password</label>
+              <label htmlFor="modal-password" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Password</label>
               {authModalMode === 'register' && (
                 <span className="text-[11px] text-slate-500 dark:text-slate-400">Min 8 characters</span>
               )}
@@ -173,6 +175,7 @@ export default function AuthModal() {
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
               <input
+                id="modal-password"
                 type={showPassword ? 'text' : 'password'}
                 required
                 value={password}

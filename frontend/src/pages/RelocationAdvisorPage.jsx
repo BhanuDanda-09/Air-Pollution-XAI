@@ -807,13 +807,13 @@ export default function RelocationAdvisorPage() {
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
               <div className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                 <Info className="w-4 h-4 text-blue-600" />
-                <span>Methodological Notes for Capstone Reviewers & Viva Defense</span>
+                <span>Clinical & Scientific Advisory Standards</span>
               </div>
               <p>
-                <strong>Scientific Validity:</strong> Comparative verdicts are derived from multi-criteria ranking combining empirical CAMS reanalysis, machine learning short-term forecast trends (XGBoost $R^2 = 0.715$ at 6h), and epidemiological sensitivity weightings from WHO 2021 air quality guidelines.
+                <strong>Scientific Validity:</strong> Comparative verdicts are derived from multi-criteria ranking combining satellite reanalysis, machine learning short-term forecast trends (held-out $R^2 = 0.715$ at 6h), and epidemiological sensitivity weightings from WHO 2021 air quality guidelines.
               </p>
               <p>
-                <strong>Legal & Medical Disclaimer:</strong> This platform produces environmental decision support, not certified statutory CAAQMS AQI or clinical medical diagnosis.
+                <strong>Legal & Medical Disclaimer:</strong> Air quality estimates are for general information and are not an official AQI or medical advice. If you have a health condition, follow your doctor's guidance.
               </p>
             </div>
           </div>

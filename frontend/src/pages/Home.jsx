@@ -37,16 +37,16 @@ const FAQ_ITEMS = [
     a: 'Real-time surface meteorology (temperature, relative humidity, boundary layer height, wind vector) is ingested directly from Open-Meteo. Regional reference PM2.5 concentrations are anchored to the European Copernicus Atmosphere Monitoring Service (CAMS) near-real-time atmospheric chemistry model.',
   },
   {
-    q: 'Why is the platform calibrated specifically for Delhi-NCR?',
-    a: 'The machine learning models (XGBoost, Random Forest, MLP) were trained on longitudinal meteorological and pollutant data within the Delhi-NCR geographical bounding box (28.2°N–29.0°N, 76.8°E–77.6°E). Predictions within this airshed reflect rigorous empirical calibration.',
+    q: 'How does VayuPulse cover both monitored and unmonitored areas?',
+    a: 'In high-density monitoring regions (like Delhi-NCR), predictions are trained against historical station telemetry. In other parts of India, VayuPulse combines regional satellite reanalysis with local surface physics, clearly flagging coverage tiers so you know the precision of every estimate.',
   },
   {
-    q: 'How does Pollution XAI differ from official CPCB regulatory monitors?',
-    a: 'Central Pollution Control Board (CPCB) continuous ambient monitoring stations (CAAQMS) report physical sensor readings for discrete fixed locations. Pollution XAI complements this by providing continuous spatial estimation from surface weather, model-vs-CAMS variance checks, and exact SHAP source attributions.',
+    q: 'How does VayuPulse compare with official CPCB monitoring stations?',
+    a: 'Central Pollution Control Board (CPCB) continuous ambient monitoring stations (CAAQMS) report physical sensor readings for discrete fixed locations. VayuPulse complements this by providing continuous spatial coverage from local surface weather, variance checks, and plain-language factor breakdowns of what is affecting the air.',
   },
   {
     q: 'How is the Residential Livability Score computed?',
-    a: 'The Livability Score is a normalized 0–100 index evaluated across four sub-factors: (1) Reference CAMS PM2.5 concentration, (2) Surface Meteorological Comfort (temperature & humidity index), (3) Diurnal Atmospheric Stability (inversion & stagnation risk), and (4) Personalized Health Profile sensitivity weighting (Normal, Respiratory/Asthma, Elderly, Child).',
+    a: 'The Livability Score is a normalized 0–100 index evaluated across four sub-factors: (1) Regional air quality estimate, (2) Surface Meteorological Comfort (temperature & humidity index), (3) Diurnal Atmospheric Stability (inversion & stagnation risk), and (4) Personalized Health Profile sensitivity weighting (Normal, Respiratory/Asthma, Elderly, Child).',
   },
 ];
 
@@ -105,7 +105,7 @@ export default function Home() {
     },
     {
       title: 'Live Air Quality Assessment',
-      desc: 'Pinpoint any location with the interactive Leaflet map picker to get live Open-Meteo weather, Copernicus CAMS PM2.5, and model comparison.',
+      desc: 'Pinpoint any location with the interactive Leaflet map picker to get live surface weather, regional air quality baselines, and model forecasts.',
       icon: MapPin,
       color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800',
       link: '/live-assessment',
@@ -120,16 +120,16 @@ export default function Home() {
       action: 'Compare Places',
     },
     {
-      title: 'Explainable AI & Feature Attribution',
-      desc: 'Understand what drives model predictions using exact TreeExplainer SHAP values and empirical meteorological sensitivity maps.',
+      title: 'Air Quality Drivers & Weather Factors',
+      desc: 'Understand what drives local pollution levels using meteorological sensitivity breakdowns and atmospheric ventilation maps.',
       icon: Sparkles,
       color: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 border-purple-200 dark:border-purple-800',
       link: '/explainability',
-      action: 'Explore XAI Engine',
+      action: 'Explore Air Quality Drivers',
     },
     {
       title: 'Saved Places & Safety Alerts',
-      desc: 'Bookmark Home, Work, and Campus with custom PM2.5 threshold alerts notifying you via the Navbar bell whenever air quality deteriorates.',
+      desc: 'Bookmark Home, Work, and School with custom PM2.5 threshold alerts notifying you via the Navbar bell whenever air quality deteriorates.',
       icon: Bookmark,
       color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800',
       link: '/saved-places',
@@ -139,22 +139,22 @@ export default function Home() {
 
   const modelsList = [
     {
-      name: 'XGBoost Regressor (Tuned)',
-      tag: 'Top Performer',
-      metric: 'Test R² = 0.7455',
+      name: 'High-Precision Forecast Engine',
+      tag: 'Primary Model',
+      metric: 'Held-out R² = 0.7455',
       desc: 'Optimized gradient boosted decision tree ensemble with 5-fold cross-validation.',
     },
     {
-      name: 'Random Forest Regressor',
-      tag: 'Bagging Baseline',
-      metric: 'Test R² = 0.7269',
+      name: 'Ensemble Decision Forest',
+      tag: 'Ensemble Baseline',
+      metric: 'Held-out R² = 0.7269',
       desc: '100-tree ensemble with median imputation establishing robust tabular performance.',
     },
     {
-      name: 'Multilayer Perceptron (MLP)',
-      tag: 'Deep Learning',
-      metric: 'Test R² = 0.5408',
-      desc: '3-hidden-layer Keras 3 neural network trained on leak-free standardized features.',
+      name: 'Deep Neural Network',
+      tag: 'Neural Architecture',
+      metric: 'Held-out R² = 0.5408',
+      desc: '3-hidden-layer neural network trained on leak-free standardized features.',
     },
   ];
 
@@ -171,7 +171,7 @@ export default function Home() {
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-teal-300 border border-white/15 backdrop-blur-xs">
               <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-              <span>AI Decision Intelligence • All-India Multi-Pollutant & Relocation System</span>
+              <span>VayuPulse • Real-Time Air Intelligence & Health-First Relocation System</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
@@ -179,7 +179,7 @@ export default function Home() {
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl">
-              All-India multi-pollutant diagnostics (PM2.5, PM10, NO2, SO2, CO, O3), health-personalised relocation advisory (From vs To), and explainable AI insights powered by CAMS reanalysis and machine learning across 45 cities.
+              Personalized air quality guidance for all of India. Track 6 key pollutants, get actionable health recommendations tailored to asthma and respiratory sensitivity, and find cleaner places to live.
             </p>
 
             {/* CTAs: Check My Location (Primary), Relocation Advisor, Try Prediction Model */}
@@ -207,7 +207,7 @@ export default function Home() {
                 className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-bold text-sm bg-white/10 hover:bg-white/15 active:scale-98 text-white border border-white/20 transition-all focus-visible:ring-2 focus-visible:ring-white"
               >
                 <Activity className="w-4 h-4 text-teal-300" />
-                <span>Try the Prediction Model</span>
+                <span>Try the Forecast Engine</span>
               </Link>
             </div>
 
@@ -223,7 +223,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-                <span>SHAP Feature Attribution</span>
+                <span>Explained Weather Factors</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-teal-400 shrink-0" />
@@ -344,7 +344,7 @@ export default function Home() {
           <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
             <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span>
-              <strong>Scientific & Regional Scope:</strong> Model calibrated strictly for the Delhi-NCR airshed (28.2°N–29.0°N, 76.8°E–77.6°E). Reference values are Copernicus CAMS atmospheric chemistry model data.
+              <strong>Consumer Notice:</strong> Air quality estimates are for general information and are not an official AQI or medical advice. If you have a health condition, follow your doctor's guidance.
             </span>
           </div>
           <button
@@ -361,10 +361,10 @@ export default function Home() {
         {disclaimerExpanded && (
           <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-2 animate-in fade-in duration-200">
             <p>
-              This platform synthesizes empirical machine learning models (XGBoost, Random Forest, MLP) with real-time Open-Meteo meteorology and European Copernicus Atmosphere Monitoring Service (CAMS) regional reanalysis.
+              VayuPulse synthesizes calibrated machine learning forecasts with real-time surface meteorology and satellite-assimilated atmospheric chemistry models.
             </p>
             <p>
-              Output categories represent indicative concentration bands derived from meteorological physics and do not constitute an official statutory CPCB 24-hour continuous ambient monitoring station (CAAQMS) certified measurement. For points outside Delhi-NCR, predictions represent unvalidated geographic extrapolations.
+              Output categories represent indicative concentration bands and do not constitute official statutory CPCB continuous ambient monitoring station (CAAQMS) measurements. Air quality for villages and rural areas is a gridded model estimate, not a ground measurement.
             </p>
           </div>
         )}
@@ -375,7 +375,7 @@ export default function Home() {
         <div className="text-center max-w-xl mx-auto space-y-1">
           <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Workflow</span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            How Pollution XAI Works
+            How VayuPulse Works
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             From atmospheric physics to actionable personal livability decisions in 3 steps.
@@ -390,7 +390,7 @@ export default function Home() {
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Live Satellite & Weather Sensing</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Fetches genuine surface meteorology (relative humidity, wind vector, barometric pressure, temperature) and Copernicus CAMS regional aerosol reference models.
+              Fetches genuine surface meteorology (relative humidity, wind vector, barometric pressure, temperature) and regional satellite aerosol reference models.
             </p>
           </div>
 
@@ -399,9 +399,9 @@ export default function Home() {
             <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950/70 text-purple-800 dark:text-purple-300 font-extrabold text-xs flex items-center justify-center">
               2
             </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">AI Attribution & Source Apportionment</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">AI Analysis & Factor Breakdown</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Processes inputs through tuned XGBoost and neural models, calculating exact local SHAP feature impacts and apportioning pollution origin sectors (vehicles, stubble, industry).
+              Processes inputs through tuned machine learning engines, calculating local weather factor impacts and identifying key atmospheric drivers (wind, humidity, boundary layer).
             </p>
           </div>
 
@@ -427,7 +427,7 @@ export default function Home() {
               <span>Diagnostic Output Showcase</span>
             </div>
             <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-1">
-              Sample Assessment: Connaught Place, Central Delhi
+              Live Example: Connaught Place, Central Delhi
             </h3>
           </div>
           <Link
@@ -442,7 +442,7 @@ export default function Home() {
         {/* Diagnostic Sample Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Copernicus CAMS Reference</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Regional Baseline Estimate</span>
             <div className="text-2xl font-black text-purple-600 dark:text-purple-400 font-mono">
               142.0 <span className="text-xs font-normal text-slate-500">µg/m³</span>
             </div>
@@ -452,7 +452,7 @@ export default function Home() {
           </div>
 
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">XGBoost ML Prediction</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Surface Forecast Engine</span>
             <div className="text-2xl font-black text-blue-600 dark:text-blue-400 font-mono">
               134.8 <span className="text-xs font-normal text-slate-500">µg/m³</span>
             </div>
@@ -462,7 +462,7 @@ export default function Home() {
           </div>
 
           <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Top SHAP Drivers</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Key Weather Factors</span>
             <div className="space-y-1 text-xs">
               <div className="flex justify-between">
                 <span className="text-slate-600 dark:text-slate-400">Wind Stagnation</span>
@@ -529,11 +529,11 @@ export default function Home() {
       <section className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Model Zoo</span>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">Trained Machine Learning Architectures</h2>
+            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Predictive Intelligence</span>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">Trained Atmospheric Forecast Architectures</h2>
           </div>
           <Link to="/comparison" className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-            <span>View test comparison</span>
+            <span>View model benchmarks</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

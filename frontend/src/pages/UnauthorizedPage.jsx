@@ -41,10 +41,10 @@ export default function UnauthorizedPage() {
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-left space-y-3">
             <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
               <AlertTriangle className="w-4 h-4 text-amber-600" />
-              <span>Capstone Evaluator Demo Controls</span>
+              <span>Staff & Reviewer Role Switcher</span>
             </div>
             <p className="text-[11px] text-amber-800 leading-relaxed">
-              In demo mode, you can immediately elevate your persona to test protected routes:
+              For authorized previewers, you can switch personas to test role-specific workflows:
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">

@@ -34,7 +34,7 @@ export default function Explainability() {
           Understand Your Prediction
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
-          Inspect how individual meteorological features drive your PM2.5 prediction using Shapley Additive Explanations (SHAP) across Tree and Neural Network models.
+          Inspect how individual weather conditions influence particulate levels using model attribution and factor sensitivity breakdowns.
         </p>
       </div>
 
@@ -42,17 +42,17 @@ export default function Explainability() {
       <div className="bg-slate-50 dark:bg-slate-900/60 rounded-3xl p-5 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 space-y-2">
         <h4 className="font-bold text-navy-900 dark:text-white flex items-center gap-1.5 text-sm">
           <HelpCircle className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          <span>How to Interpret SHAP Feature Attributions</span>
+          <span>How to Interpret Factor Attributions</span>
         </h4>
         <ul className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
           <li className="p-3.5 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
             <strong className="text-slate-800 dark:text-slate-200">1. Base Value:</strong> The model's expected average output under its training background distribution.
           </li>
           <li className="p-3.5 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
-            <strong className="text-rose-600 dark:text-rose-400">2. Positive SHAP (+):</strong> Factors that push the predicted PM2.5 higher relative to the baseline (e.g. low wind speed or thermal inversion).
+            <strong className="text-rose-600 dark:text-rose-400">2. Rising Factors (+):</strong> Factors that push particulate levels higher relative to the average (e.g. calm wind stagnation or thermal inversion).
           </li>
           <li className="p-3.5 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700">
-            <strong className="text-teal-600 dark:text-teal-400">3. Negative SHAP (−):</strong> Factors that push the predicted PM2.5 lower relative to the baseline (e.g. atmospheric ventilation or precipitation wash).
+            <strong className="text-teal-600 dark:text-teal-400">3. Clearing Factors (−):</strong> Factors that push particulate levels lower relative to the average (e.g. high boundary layer ventilation or rain scavenging).
           </li>
         </ul>
       </div>

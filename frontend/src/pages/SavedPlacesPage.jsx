@@ -260,7 +260,7 @@ export default function SavedPlacesPage() {
             Saved Places & Custom Alerts
           </h1>
           <p className="mt-3 text-slate-600 dark:text-slate-400 max-w-lg mx-auto text-sm leading-relaxed">
-            Bookmark your frequent Delhi-NCR spots (Home, Office, University, Gym) to monitor localized air quality, receive automated PM2.5 threshold warnings, and run 1-click livability assessments.
+            Bookmark your frequent spots (Home, Office, School, Gym) to monitor localized air quality, receive automated PM2.5 threshold warnings, and run 1-click livability assessments.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto my-8 text-left">
@@ -388,7 +388,7 @@ export default function SavedPlacesPage() {
               >
                 <option value="Home">Home</option>
                 <option value="Work">Work / Office</option>
-                <option value="Campus">University / School</option>
+                <option value="Campus">School / College</option>
                 <option value="Gym">Gym / Sports</option>
                 <option value="Other">Other</option>
               </select>
@@ -463,7 +463,7 @@ export default function SavedPlacesPage() {
               PM2.5 Pollution Alert Threshold
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Highlights your saved locations in amber/rose whenever live Copernicus CAMS PM2.5 exceeds this limit.
+              Highlights your saved locations in amber/rose whenever live ambient PM2.5 exceeds this limit.
             </p>
           </div>
         </div>
@@ -678,7 +678,7 @@ export default function SavedPlacesPage() {
                 >
                   <option value="Home">Home</option>
                   <option value="Work">Work / Office</option>
-                  <option value="Campus">University / School</option>
+                  <option value="Campus">School / College</option>
                   <option value="Gym">Gym / Sports</option>
                   <option value="Other">Other</option>
                 </select>

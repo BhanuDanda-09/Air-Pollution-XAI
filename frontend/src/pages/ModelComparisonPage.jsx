@@ -31,7 +31,7 @@ export default function ModelComparisonPage() {
           Compare Machine Learning Models
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl">
-          Simultaneously evaluate Random Forest, tuned XGBoost, and Deep Learning (MLP) on identical meteorological conditions alongside held-out generalization benchmarks.
+          Simultaneously evaluate Decision Forest, Gradient Boosted Trees, and Neural Network architectures on identical meteorological conditions alongside held-out generalization benchmarks.
         </p>
       </div>
 

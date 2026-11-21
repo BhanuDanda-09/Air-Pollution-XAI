@@ -28,6 +28,8 @@ import {
   X,
   Sun,
   Moon,
+  Mail,
+  HelpCircle,
 } from 'lucide-react';
 import { hasRoleAccess } from '../services/demoAuth';
 import { useAuth } from '../context/AuthContext';
@@ -201,17 +203,21 @@ export default function Navbar({ isBackendOnline }) {
     { to: '/districts', label: 'District Intelligence', icon: Building2, desc: '320+ district rankings & authority insights' },
     { to: '/hotspots', label: 'Hotspot Rankings', icon: Flame, desc: 'All-India 45-city exposure rankings & tiers' },
     { to: '/livability', label: 'Livability Verdict', icon: Compass, desc: 'Residential suitability & profile scoring' },
-    { to: '/dashboard', label: 'Model Dashboard', icon: BarChart3, desc: 'System telemetry & prediction activity' },
-    { to: '/prediction', label: 'PM2.5 Prediction', icon: Activity, desc: 'Surface meteorology ML estimator' },
-    { to: '/comparison', label: 'Model Benchmarking', icon: GitCompare, desc: 'XGBoost, RF, MLP accuracy metrics' },
-    { to: '/explainability', label: 'XAI & SHAP', icon: Sparkles, desc: 'Local attributions & feature contributions' },
+    { to: '/dashboard', label: 'Environmental Dashboard', icon: BarChart3, desc: 'System telemetry & active monitors' },
+    { to: '/prediction', label: 'Weather Estimator', icon: Activity, desc: 'How temperature & wind shape PM2.5' },
+    { to: '/comparison', label: 'Forecast Accuracy', icon: GitCompare, desc: 'Comparative verification benchmarks' },
+    { to: '/explainability', label: 'Weather Factors', icon: Sparkles, desc: 'What drives particulate surges' },
   ];
 
-  // More dropdown (3 utilities + role portals)
+  // More dropdown (7 items)
   const moreLinks = [
+    { to: '/how-it-works', label: 'How It Works', icon: HelpCircle, desc: 'Satellite, sensor & weather science' },
+    { to: '/faq', label: 'Frequently Asked Questions', icon: HelpCircle, desc: 'Health, masks, purifiers & precautions' },
     { to: '/history', label: 'Exposure History', icon: History, desc: 'Past personal assessment timeline' },
-    { to: '/about', label: 'About & Methodology', icon: Info, desc: 'Research design, data sources & limits' },
-    { to: '/privacy', label: 'Privacy & DPDP', icon: ShieldCheck, desc: 'DPDP Act 2023 consent, export & deletion' },
+    { to: '/contact', label: 'Contact & Feedback', icon: Mail, desc: 'Reach our team with suggestions' },
+    { to: '/privacy', label: 'Privacy & Data Rights', icon: ShieldCheck, desc: 'DPDP Act 2023 consent, export & deletion' },
+    { to: '/terms', label: 'Terms of Service', icon: Shield, desc: 'Advisory notices & acceptable use' },
+    { to: '/about', label: 'About Us', icon: Info, desc: 'Our mission & air standards' },
   ];
 
   const isInsightsActive = [
@@ -224,7 +230,17 @@ export default function Navbar({ isBackendOnline }) {
     '/explainability',
   ].includes(location.pathname);
 
-  const isMoreActive = ['/history', '/about', '/privacy', '/worker', '/admin'].includes(location.pathname);
+  const isMoreActive = [
+    '/how-it-works',
+    '/faq',
+    '/history',
+    '/contact',
+    '/privacy',
+    '/terms',
+    '/about',
+    '/worker',
+    '/admin',
+  ].includes(location.pathname);
 
   const canAccessWorker = hasRoleAccess('worker');
   const canAccessAdmin = hasRoleAccess('admin');
@@ -254,17 +270,17 @@ export default function Navbar({ isBackendOnline }) {
           {/* Brand Logo & Title on One Line */}
           <Link
             to="/"
-            className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg pr-0.5"
+            className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg pr-0.5"
           >
-            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-500 flex items-center justify-center text-white shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform shrink-0">
-              <Wind className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center text-white shadow-sm shadow-emerald-500/20 group-hover:scale-105 transition-transform shrink-0">
+              <Activity className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap shrink-0">
               <span className="font-extrabold text-sm sm:text-base lg:text-lg text-slate-900 dark:text-white tracking-tight whitespace-nowrap">
-                Pollution <span className="text-blue-600 dark:text-blue-400">XAI</span>
+                Vayu<span className="text-emerald-600 dark:text-emerald-400">Pulse</span>
               </span>
-              <span className="text-[9px] sm:text-[10px] font-bold px-1 sm:px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/80 uppercase tracking-wider shrink-0">
-                v2.0
+              <span className="text-[9px] sm:text-[10px] font-bold px-1 sm:px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/80 uppercase tracking-wider shrink-0">
+                Live
               </span>
             </div>
           </Link>
@@ -379,7 +395,7 @@ export default function Navbar({ isBackendOnline }) {
                   role="menu"
                 >
                   <div className="px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
-                    Project Documentation & History
+                    Resources & Guides
                   </div>
                   {moreLinks.map((link) => {
                     const Icon = link.icon;
@@ -811,8 +827,8 @@ export default function Navbar({ isBackendOnline }) {
                 onClick={handleInstallClick}
                 className="w-full min-h-[44px] flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800"
               >
-                <Download className="w-4 h-4 text-blue-600" />
-                <span>Install Pollution XAI Web App</span>
+                <Download className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>Install VayuPulse Web App</span>
               </button>
             </div>
           )}

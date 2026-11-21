@@ -99,7 +99,7 @@ export default function PredictionResult({ result, features, selectedModel }) {
             className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800 transition-colors"
           >
             <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <span>Explain with SHAP</span>
+            <span>Explain Weather Drivers</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

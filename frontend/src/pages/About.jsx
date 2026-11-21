@@ -26,14 +26,14 @@ export default function About() {
     },
     {
       id: 'objectives',
-      title: '2. Project Objectives',
+      title: '2. Platform Objectives',
       icon: CheckCircle2,
       content: (
         <ul className="list-disc list-inside space-y-1.5 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
           <li>Establish a rigorous ML pipeline predicting ambient PM2.5 from 5 surface meteorological features.</li>
-          <li>Systematically evaluate and benchmark Random Forest, tuned XGBoost, and Deep Learning (MLP) on 406 untouched test samples.</li>
-          <li>Implement Explainable AI (SHAP and LIME) to quantify feature importance and local instance attributions.</li>
-          <li>Deploy a production-ready Flask REST backend and responsive React frontend for interactive stakeholder analysis.</li>
+          <li>Systematically evaluate and benchmark ensemble decision trees, gradient boosting, and deep learning architectures on 406 held-out test samples.</li>
+          <li>Implement Explainable AI to quantify meteorological sensitivity and local factor impacts.</li>
+          <li>Deploy a production-ready REST backend and responsive interface for interactive citizen and stakeholder analysis.</li>
         </ul>
       ),
     },
@@ -68,13 +68,13 @@ export default function About() {
         <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
           <div className="space-y-2">
             <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
-              <span className="font-bold text-navy-900 dark:text-white">Random Forest Regressor (Phase 1):</span> Bagging ensemble of 100 decision trees with median imputation. Achieved test R²=0.7269, RMSE=38.05 µg/m³.
+              <span className="font-bold text-navy-900 dark:text-white">Ensemble Decision Forest:</span> Bagging ensemble of 100 decision trees with median imputation. Achieved test R²=0.7269, RMSE=38.05 µg/m³.
             </div>
             <div className="p-3 bg-blue-50/50 dark:bg-blue-950/40 rounded-xl border border-blue-200 dark:border-blue-800">
-              <span className="font-bold text-blue-900 dark:text-blue-200">XGBoost Regressor (Phase 2 - Best Model):</span> 5-fold cross-validated hyperparameter-tuned gradient boosted trees. Achieved test R²=0.7455, RMSE=36.74 µg/m³.
+              <span className="font-bold text-blue-900 dark:text-blue-200">Gradient Boosted Tree Ensemble (Best Model):</span> 5-fold cross-validated hyperparameter-tuned gradient boosted trees. Achieved test R²=0.7455, RMSE=36.74 µg/m³.
             </div>
             <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
-              <span className="font-bold text-navy-900 dark:text-white">Multilayer Perceptron / MLP (Phase 4):</span> Keras 3 sequential 3-layer neural network (128-64-32 units, Dropout, BatchNorm) with leak-free standardization on 1,377 sub-train samples. Achieved test R²=0.5408, RMSE=49.34 µg/m³.
+              <span className="font-bold text-navy-900 dark:text-white">Multilayer Neural Network:</span> Sequential 3-layer neural network (128-64-32 units, Dropout, BatchNorm) with leak-free standardization on 1,377 sub-train samples. Achieved test R²=0.5408, RMSE=49.34 µg/m³.
             </div>
           </div>
         </div>
@@ -118,12 +118,12 @@ export default function About() {
     },
     {
       id: 'viva-guide',
-      title: '7. Viva Voce Defense & Methodology FAQ',
+      title: '7. Methodology & Scientific Verification Standards',
       icon: Code2,
       content: (
         <div className="space-y-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
           <p>
-            Key academic defenses and scientific rationales prepared for capstone project review:
+            Key scientific principles, validation standards, and architectural decisions underpinning the platform:
           </p>
           <div className="space-y-3">
             <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
@@ -224,13 +224,13 @@ export default function About() {
       <div className="pb-4 border-b border-slate-200 dark:border-slate-800">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 mb-2">
           <BookOpen className="w-3.5 h-3.5" />
-          <span>Project Documentation</span>
+          <span>Methodology & Architecture</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-navy-900 dark:text-white tracking-tight">
-          About the Project
+          About VayuPulse
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Explainable AI-Based Air Pollution Prediction and Source Attribution — B.Tech Capstone Project.
+          VayuPulse — Real-Time Explainable Air Quality Intelligence & Relocation Platform for India.
         </p>
       </div>
 

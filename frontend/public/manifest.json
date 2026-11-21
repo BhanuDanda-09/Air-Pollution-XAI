@@ -1,6 +1,6 @@
 {
-  "short_name": "AirXAI",
-  "name": "Air Pollution XAI - Livability & Prediction",
+  "short_name": "VayuPulse",
+  "name": "VayuPulse - Live Air Quality & Health Advisor",
   "icons": [
     {
       "src": "/favicon.svg",
@@ -33,9 +33,9 @@
     }
   ],
   "start_url": "/",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#0B0F19",
+  "theme_color": "#0B0F19",
   "display": "standalone",
   "orientation": "portrait",
-  "description": "Real-time location-based air quality assessment, livability scoring, and explainable PM2.5 intelligence."
+  "description": "Know your air. Protect your life. Real-time air quality forecasts, personal health advisories, and relocation intelligence across India."
 }

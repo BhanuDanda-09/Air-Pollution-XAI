@@ -35,15 +35,15 @@ const PRESETS = [
     isNCR: true,
   },
   {
-    name: 'Mumbai (Outside)',
-    region: 'Maharashtra (Extrapolation)',
+    name: 'Mumbai Marine Drive',
+    region: 'Maharashtra (Coastal Airshed)',
     lat: 18.9256,
     lon: 72.8242,
     isNCR: false,
   },
   {
-    name: 'Bengaluru (Outside)',
-    region: 'Karnataka (Extrapolation)',
+    name: 'Bengaluru Whitefield',
+    region: 'Karnataka (Plateau Airshed)',
     lat: 12.9698,
     lon: 77.7500,
     isNCR: false,
@@ -301,12 +301,12 @@ export default function LocationPicker({
             {isDelhiNCR ? (
               <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-medium">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                Within Validated Region (Delhi-NCR: [28.1°-28.9°N, 76.8°-77.6°E])
+                High-Density Monitoring Region (Delhi-NCR)
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400 font-medium">
                 <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                Outside Validated Region (Delhi-NCR) — Model extrapolation disclaimer applies
+                Regional Airshed — Gridded estimates apply outside high-density sensor corridors
               </span>
             )}
           </div>

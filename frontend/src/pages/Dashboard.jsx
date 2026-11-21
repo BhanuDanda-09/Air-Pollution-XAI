@@ -44,7 +44,7 @@ export default function Dashboard() {
           >
             <Server className="w-4 h-4" />
             <span>
-              {healthData?.status === 'healthy' ? 'Flask API Connected (v1.0)' : 'API Degraded / Offline'}
+              {healthData?.status === 'healthy' ? 'Real-Time Air Service Connected' : 'API Degraded / Offline'}
             </span>
           </div>
         </div>
@@ -69,7 +69,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           title="Top Performing Model"
-          value={xgbModel?.display_name?.split(' ')[0] || 'XGBoost'}
+          value={xgbModel?.display_name?.split(' ')[0] || 'Forecast Engine'}
           unit="(Tuned)"
           subtitle="Selected on held-out test set"
           icon={Trophy}
@@ -84,7 +84,7 @@ export default function Dashboard() {
           subtitle="Generalization score (406 samples)"
           icon={Activity}
           color="teal"
-          badge="XGBoost"
+          badge="Top Score"
         />
 
         <StatCard

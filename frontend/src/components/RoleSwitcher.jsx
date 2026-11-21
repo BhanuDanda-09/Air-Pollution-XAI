@@ -61,17 +61,17 @@ export default function RoleSwitcher() {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${current.color}`}
-        title="Switch Evaluator Demo Persona"
+        title="Switch Preview Role"
       >
         <CurrentIcon className="w-3.5 h-3.5" />
-        <span>Demo: {current.label}</span>
+        <span>Preview: {current.label}</span>
         <ChevronDown className="w-3 h-3 opacity-70" />
       </button>
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white shadow-lg border border-slate-200 py-1.5 z-50 text-xs">
           <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
-            Select Demo Persona
+            Select Preview Role
           </div>
           {Object.entries(roleConfig).map(([key, config]) => {
             const Icon = config.icon;

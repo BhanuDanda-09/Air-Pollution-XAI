@@ -33,23 +33,23 @@ export default function Footer({ isBackendOnline = true }) {
           <div className="space-y-4">
             <Link
               to="/"
-              className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg inline-flex"
+              className="flex items-center gap-2 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg inline-flex"
             >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-500 flex items-center justify-center text-white shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform">
-                <Wind className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center text-white shadow-sm shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                <Activity className="w-4 h-4" />
               </div>
               <div className="flex items-center gap-1.5 whitespace-nowrap">
                 <span className="font-extrabold text-base text-slate-900 dark:text-white tracking-tight">
-                  Pollution <span className="text-blue-600 dark:text-blue-400">XAI</span>
+                  Vayu<span className="text-emerald-600 dark:text-emerald-400">Pulse</span>
                 </span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/80 uppercase tracking-wider">
-                  v2.0.0
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/80 uppercase tracking-wider">
+                  Live
                 </span>
               </div>
             </Link>
 
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              All-India multi-pollutant environmental intelligence, CAMS reanalysis, CPCB ground-truth benchmarking, and health-personalised relocation advisory across 45 Indian cities.
+              All-India multi-pollutant environmental intelligence, satellite atmospheric reanalysis, CPCB ground-truth validation, and health-personalised relocation guidance across Indian cities and rural districts.
             </p>
 
             <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
@@ -141,66 +141,66 @@ export default function Footer({ isBackendOnline = true }) {
                   to="/explainability"
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block"
                 >
-                  SHAP Explainable AI (XAI)
+                  Explainable AI & Weather Drivers
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: Project Links */}
+          {/* Column 3: Resources & Guides */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span>Project & Research</span>
+              <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Resources & Guides</span>
             </div>
             <ul className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link
+                  to="/how-it-works"
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-block"
+                >
+                  How It Works
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/faq"
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-block"
+                >
+                  Frequently Asked Questions
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/about"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block"
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-block"
                 >
-                  About the Capstone Project
+                  About Our Mission
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/about#methodology"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block"
+                  to="/contact"
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-block"
                 >
-                  Methodology & Feature Pipeline
+                  Contact & Support
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/about#limitations"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-block"
+                  to="/terms"
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-block"
                 >
-                  Model Limitations & Bounds
+                  Terms of Service
                 </Link>
               </li>
               <li>
-                <a
-                  href="https://github.com/BhanuDanda-09/Air-Pollution-XAI"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                <Link
+                  to="/privacy"
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors inline-block"
                 >
-                  <Github className="w-3.5 h-3.5" />
-                  <span>GitHub Repository</span>
-                  <ExternalLink className="w-3 h-3 text-slate-400" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://air-pollution-xai.onrender.com/health"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                >
-                  <Activity className="w-3.5 h-3.5" />
-                  <span>Backend REST API Service</span>
-                  <ExternalLink className="w-3 h-3 text-slate-400" />
-                </a>
+                  Privacy Policy (DPDP Act)
+                </Link>
               </li>
             </ul>
           </div>
@@ -314,18 +314,18 @@ export default function Footer({ isBackendOnline = true }) {
           </div>
         </div>
 
-        {/* Bottom Bar: Capstone Metadata, Team Attribution, Status Dot & Back to Top */}
+        {/* Bottom Bar: Copyright, Tagline & API Status */}
         <div className="pt-8 border-t border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div className="space-y-1 text-center md:text-left">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-slate-700 dark:text-slate-300 font-semibold">
-              <span>Final-Year B.Tech Capstone Project (2026)</span>
+              <span>© {new Date().getFullYear()} VayuPulse</span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
-              <span>Computer Science & Engineering</span>
+              <span>Know Your Air. Protect Your Life.</span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
-              <span>Bhanu Danda & Project Team</span>
+              <span>All-India Air Quality & Health Advisor</span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-500">
-              Informational only - not medical advice or an official regulatory AQI measurement.
+              Air quality estimates are for general information and are not an official AQI or medical advice. If you have a health condition, follow your doctor's guidance.
             </p>
           </div>
 

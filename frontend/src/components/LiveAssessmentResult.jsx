@@ -181,7 +181,7 @@ export default function LiveAssessmentResult({ assessmentData }) {
                 Local AI Estimate
               </span>
               <span className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded border border-blue-200 dark:border-blue-800">
-                {model_prediction?.model_name || 'Tuned XGBoost'}
+                Local Forecast
               </span>
             </div>
             <div className="my-3">
@@ -215,7 +215,7 @@ export default function LiveAssessmentResult({ assessmentData }) {
                 Regional Reference
               </span>
               <span className="text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 truncate max-w-[150px]">
-                {reference_air_quality?.reference_label || 'Reference PM2.5 (CAMS model data)'}
+                Regional Baseline
               </span>
             </div>
             <div className="my-3">
@@ -291,20 +291,20 @@ export default function LiveAssessmentResult({ assessmentData }) {
                   )}
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">
-                  Model is {Math.abs(model_vs_reference_comparison.delta).toFixed(1)} µg/m³{' '}
-                  {model_vs_reference_comparison.delta_direction} than CAMS regional data.
+                  Local model is {Math.abs(model_vs_reference_comparison.delta).toFixed(1)} µg/m³{' '}
+                  {model_vs_reference_comparison.delta_direction} than regional baseline.
                 </p>
               </div>
             ) : (
               <div className="my-3 py-2 text-slate-500 dark:text-slate-400 text-xs italic">
-                Comparison unavailable when reference data is offline.
+                Comparison unavailable when regional data is offline.
               </div>
             )}
           </div>
 
           <div className="relative z-10 pt-3 border-t border-slate-100 dark:border-slate-800">
             <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
-              Honest validation: Model is purely surface meteorological; CAMS incorporates satellite AOD.
+              Physical validation: Local model is surface meteorological; regional baseline incorporates satellite aerosol data.
             </p>
           </div>
         </div>
@@ -320,7 +320,7 @@ export default function LiveAssessmentResult({ assessmentData }) {
                 All-India 6 Criteria Pollutants (CPCB Sub-Index Breakdown)
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Real-time CAMS atmospheric telemetry mapped to official Central Pollution Control Board (2014) breakpoints
+                Real-time atmospheric telemetry mapped to official Central Pollution Control Board (2014) breakpoints
               </p>
             </div>
             {multi_pollutant.governing_pollutant && (
@@ -452,7 +452,7 @@ export default function LiveAssessmentResult({ assessmentData }) {
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Gauge className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                Local Meteorological Feature Attributions (SHAP)
+                What's Driving the Air Quality Here (Weather Factors)
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Exact contribution of each surface meteorological variable toward this specific prediction
