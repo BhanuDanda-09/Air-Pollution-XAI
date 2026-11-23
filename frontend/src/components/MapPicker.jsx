@@ -1,8 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { MapPin, Layers, Loader2 } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { MapPin, Layers, Loader2, RotateCcw, AlertTriangle } from 'lucide-react';
 
-const LEAFLET_CSS_URL = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-const LEAFLET_JS_URL = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+const LEAFLET_CDN_PROVIDERS = [
+  {
+    name: 'cdnjs',
+    css: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
+    js: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
+  },
+  {
+    name: 'jsdelivr',
+    css: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css',
+    js: 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
+  },
+  {
+    name: 'unpkg',
+    css: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+    js: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+  },
+];
 
 // Delhi-NCR validated bounds: [28.1, 76.8] to [28.9, 77.6]
 const DELHI_NCR_BOUNDS = [
@@ -14,36 +29,85 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markerRef = useRef(null);
+  const [providerIndex, setProviderIndex] = useState(0);
   const [isLeafletLoaded, setIsLeafletLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [currentProviderName, setCurrentProviderName] = useState(LEAFLET_CDN_PROVIDERS[0].name);
 
-  // Dynamically load Leaflet from CDN on demand to avoid bundling 150KB into main bundle
+  // Load Leaflet dynamically across multiple CDN providers with automatic fallback
   useEffect(() => {
     if (window.L) {
       setIsLeafletLoaded(true);
       return;
     }
 
-    // Inject CSS
-    if (!document.querySelector(`link[href="${LEAFLET_CSS_URL}"]`)) {
+    if (providerIndex >= LEAFLET_CDN_PROVIDERS.length) {
+      setLoadError(true);
+      return;
+    }
+
+    const provider = LEAFLET_CDN_PROVIDERS[providerIndex];
+    setCurrentProviderName(provider.name);
+
+    // 1. Inject CSS if not already present
+    const cssId = `leaflet-css-${provider.name}`;
+    if (!document.getElementById(cssId)) {
       const link = document.createElement('link');
+      link.id = cssId;
       link.rel = 'stylesheet';
-      link.href = LEAFLET_CSS_URL;
+      link.href = provider.css;
       document.head.appendChild(link);
     }
 
-    // Inject JS
-    if (!document.querySelector(`script[src="${LEAFLET_JS_URL}"]`)) {
-      const script = document.createElement('script');
-      script.src = LEAFLET_JS_URL;
+    // 2. Inject JS with timeout failover
+    let timer = null;
+    const scriptId = `leaflet-js-${provider.name}`;
+    let script = document.getElementById(scriptId);
+
+    const handleSuccess = () => {
+      if (timer) clearTimeout(timer);
+      setIsLeafletLoaded(true);
+      setLoadError(false);
+    };
+
+    const handleFailure = () => {
+      if (timer) clearTimeout(timer);
+      if (script && script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      // Try next CDN provider
+      setProviderIndex((prev) => prev + 1);
+    };
+
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.src = provider.js;
       script.async = true;
-      script.onload = () => setIsLeafletLoaded(true);
-      script.onerror = () => setLoadError(true);
+      script.onload = handleSuccess;
+      script.onerror = handleFailure;
       document.body.appendChild(script);
+
+      // 6-second timeout before advancing to next CDN in case of hanging network
+      timer = setTimeout(() => {
+        if (!window.L) {
+          handleFailure();
+        }
+      }, 6000);
     } else {
-      const existingScript = document.querySelector(`script[src="${LEAFLET_JS_URL}"]`);
-      existingScript.addEventListener('load', () => setIsLeafletLoaded(true));
+      script.addEventListener('load', handleSuccess);
+      script.addEventListener('error', handleFailure);
     }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [providerIndex]);
+
+  const handleRetry = useCallback(() => {
+    setLoadError(false);
+    setIsLeafletLoaded(false);
+    setProviderIndex(0);
   }, []);
 
   // Initialize Map once Leaflet is available and DOM container is mounted
@@ -61,8 +125,8 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
         scrollWheelZoom: true,
       });
 
-      // OpenStreetMap Tiles
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // OpenStreetMap Tiles with graceful fallback
+      const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; OpenStreetMap contributors',
       }).addTo(map);
@@ -138,8 +202,22 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
 
   if (loadError) {
     return (
-      <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-center text-xs text-slate-500 dark:text-slate-400">
-        Interactive map tiles could not be loaded. You can still input coordinates or select presets above.
+      <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-amber-200 dark:border-amber-900/50 rounded-xl text-center space-y-2">
+        <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-400 text-xs font-semibold">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>Interactive map tiles could not be loaded</span>
+        </div>
+        <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+          An ad-blocker, privacy extension, or network firewall may be blocking map CDN domains. You can still input coordinates or select presets above.
+        </p>
+        <button
+          type="button"
+          onClick={handleRetry}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          <span>Retry loading map</span>
+        </button>
       </div>
     );
   }
@@ -149,7 +227,7 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
       {!isLeafletLoaded && (
         <div className="h-64 flex flex-col items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs gap-2">
           <Loader2 className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
-          <span>Loading OpenStreetMap tiles...</span>
+          <span>Loading interactive map tiles ({currentProviderName})...</span>
         </div>
       )}
       <div
