@@ -15,6 +15,7 @@ env/
 
 # Local cache
 .matplotlib_cache/
+.pytest_cache/
 
 # Models & Large Artifacts (optional if large, but baseline model can be tracked or ignored)
 # models/*.pkl
