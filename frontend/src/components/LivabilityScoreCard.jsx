@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Compass,
   AlertTriangle,
@@ -21,6 +22,8 @@ import {
   Shield,
   Heart,
   Sparkles,
+  ArrowRight,
+  ExternalLink,
 } from 'lucide-react';
 
 export default function LivabilityScoreCard({ livabilityData }) {
@@ -47,6 +50,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
     best_time_today,
     seven_day_forecast,
     medical_disclaimer,
+    citizen_precautions,
   } = livabilityData;
 
   const isOffline = score === null;
@@ -321,6 +325,96 @@ export default function LivabilityScoreCard({ livabilityData }) {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2B. Health-Personalized Citizen Precautions (Linked to FAQ) */}
+      {citizen_precautions && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <Heart className="w-4 h-4 text-rose-500" />
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                  Health-Personalized Citizen Precautions
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Clinical exposure countermeasures tailored to your physiological and vulnerability profile
+              </p>
+            </div>
+
+            {/* Health profile tags */}
+            {citizen_precautions.health_tags && citizen_precautions.health_tags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {citizen_precautions.health_tags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Precautions list */}
+          {citizen_precautions.precautions && citizen_precautions.precautions.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {citizen_precautions.precautions.map((p, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 space-y-2 flex flex-col justify-between"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        {p.category}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          p.urgency === 'High'
+                            ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200'
+                            : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200'
+                        }`}
+                      >
+                        {p.urgency} Urgency
+                      </span>
+                    </div>
+
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">
+                      {p.title}
+                    </h4>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {p.recommendation}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-500 italic">
+              Standard adult precautions apply. Maintain adequate hydration and avoid idling along congested vehicle corridors.
+            </p>
+          )}
+
+          {/* Link to FAQ */}
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <span className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+              {citizen_precautions.faq_guidance_notice ||
+                'Personalized health precautions are synthesized from WHO 2021 Clinical Guidelines and CPCB Health Advisory Protocols.'}
+            </span>
+
+            <Link
+              to={citizen_precautions.faq_link || '/faq'}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold transition-colors shrink-0 self-start sm:self-auto"
+            >
+              <span>View Health Precautions in FAQ</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       )}

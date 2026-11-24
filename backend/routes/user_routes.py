@@ -436,6 +436,7 @@ def get_user_alerts():
 
     saved_locations = SavedLocation.query.filter_by(user_id=uid).all()
     active_alerts = []
+    forecast_early_warnings = []
 
     for loc in saved_locations:
         try:
@@ -453,6 +454,27 @@ def get_user_alerts():
                     "exceeded_by": round(pm25 - pref.pm25_threshold, 1),
                     "cpcb_band": ref_data.get("cpcb_band", "Unhealthy"),
                 })
+
+            # Check 24-72h CAMS Early Warning for this saved location
+            ew_data = AirQualityService.get_early_warning_forecast(loc.latitude, loc.longitude, horizon_hours=72)
+            banner = ew_data.get("banner", {})
+            if banner.get("has_warning"):
+                forecast_early_warnings.append({
+                    "location_id": loc.id,
+                    "name": loc.name,
+                    "label": loc.label,
+                    "latitude": loc.latitude,
+                    "longitude": loc.longitude,
+                    "has_warning": True,
+                    "severity_level": banner.get("severity_level"),
+                    "trigger_pollutant": banner.get("trigger_pollutant"),
+                    "expected_start_time": banner.get("expected_start_time"),
+                    "formatted_start": banner.get("formatted_start"),
+                    "duration_hours": banner.get("duration_hours"),
+                    "peak_concentration": banner.get("peak_concentration"),
+                    "banner_message": banner.get("message"),
+                    "reference_label": "Reference forecast (CAMS)",
+                })
         except Exception as exc:
             logger.warning("Alert check failed for location %s: %s", loc.id, exc)
 
@@ -460,8 +482,9 @@ def get_user_alerts():
         data={
             "preference": pref.to_dict(),
             "active_alerts": active_alerts,
+            "forecast_early_warnings": forecast_early_warnings,
             "total_saved": len(saved_locations),
-            "alerts_count": len(active_alerts),
+            "alerts_count": len(active_alerts) + len(forecast_early_warnings),
         },
         message="Alerts retrieved.",
     )

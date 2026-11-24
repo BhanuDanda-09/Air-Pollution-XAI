@@ -2,7 +2,7 @@
  * All-India Multi-Pollutant, Geocoding, Climatology, and Relocation API Service.
  */
 
-import api from './api';
+import api from './api.js';
 
 const unwrap = (res) => (res && res.data !== undefined ? res.data : res);
 
@@ -189,6 +189,41 @@ export const airService = {
    */
   async getPlaceAir(placeId) {
     const response = await api.get(`/api/air/${placeId}`);
+    return unwrap(response);
+  },
+
+  /**
+   * Fetch 24-72h CAMS early warning hourly forecast and alert banner.
+   */
+  async getEarlyWarning({ lat, lon, horizon_hours = 72 } = {}) {
+    const params = { horizon_hours };
+    if (lat != null && lon != null) {
+      params.lat = lat;
+      params.lon = lon;
+    }
+    const response = await api.get('/api/air/early-warning', { params });
+    return unwrap(response);
+  },
+
+  /**
+   * On-demand batch check of 24-72h CAMS early warnings across places/saved locations.
+   */
+  async checkEarlyWarnings(places = []) {
+    const response = await api.post('/api/air/early-warning/check', { places });
+    return unwrap(response);
+  },
+
+  /**
+   * Fetch 7-day multi-pollutant history, Pearson correlation matrix, and chemical interpretations.
+   */
+  async getPollutantInteractions({ lat, lon, city, days = 7 } = {}) {
+    const params = { days };
+    if (city) params.city = city;
+    if (lat != null && lon != null) {
+      params.lat = lat;
+      params.lon = lon;
+    }
+    const response = await api.get('/api/air/interactions', { params });
     return unwrap(response);
   },
 };

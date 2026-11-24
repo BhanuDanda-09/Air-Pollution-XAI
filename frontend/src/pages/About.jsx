@@ -216,6 +216,38 @@ export default function About() {
         </div>
       ),
     },
+    {
+      id: 'out-of-scope',
+      title: '9. Explicit Out-of-Scope Boundaries (Scientific Research Disclosures)',
+      icon: ShieldAlert,
+      content: (
+        <div className="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+          <p>
+            In rigorous atmospheric scientific research, explicitly stating methodological and infrastructural boundaries is essential for transparency. The following areas are strictly designated as out of scope:
+          </p>
+          <div className="space-y-2">
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+              <strong className="text-slate-900 dark:text-white block mb-0.5">1. Real-Time Traffic Sensor Telemetry:</strong>
+              <p className="text-xs text-slate-500">
+                Continuous vehicular count feeds from municipal loop detectors or CCTV toll counters are proprietary and not publicly accessible across Indian cities. Traffic density is instead evaluated through verified proxy tracers: commute mode multipliers, transit durations, and atmospheric Nitrogen Dioxide (NO2) and Carbon Monoxide (CO) co-elevation.
+              </p>
+            </div>
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+              <strong className="text-slate-900 dark:text-white block mb-0.5">2. Live Deep Sequence Model Serving (Multi-Layer LSTM / Transformers):</strong>
+              <p className="text-xs text-slate-500">
+                Deep recurrent and attention networks require significant GPU memory and recurrent state caching (&gt;350 MB RAM), exceeding Render's 512 MB free-tier container budget. Deep models were thoroughly benchmarked offline, while production web serving runs compressed, regularized gradient boosted decision trees (2.06 MB bundle, &lt;12 MB RAM footprint).
+              </p>
+            </div>
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+              <strong className="text-slate-900 dark:text-white block mb-0.5">3. Multi-Pollutant Chemical Mass Apportionment Models:</strong>
+              <p className="text-xs text-slate-500">
+                Algorithmic feature attribution (SHAP TreeExplainer and LIME) quantifies mathematical feature influence on model predictions (what drives the model). It does not prove physical chemical emission causality or replace laboratory chemical speciation assays (e.g. EPA PMF filter analysis).
+              </p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
   ];
 
   return (

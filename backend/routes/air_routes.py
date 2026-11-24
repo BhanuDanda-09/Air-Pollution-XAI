@@ -4,6 +4,7 @@ import logging
 from typing import Optional
 from flask import Blueprint, jsonify, request
 
+from backend.services.air_quality_service import AirQualityService
 from backend.services.city_service import CityService
 from backend.services.climatology_service import ClimatologyService
 from backend.services.hotspot_service import HotspotService
@@ -252,6 +253,150 @@ def get_air_history():
     return success_response(data=history_data, message="Hourly air history retrieved.")
 
 
+@air_bp.route("/air/early-warning", methods=["GET"])
+def get_early_warning():
+    """Retrieve 24-72h CAMS hourly forecast and Poor/Very Poor/Severe early warning advisory.
+
+    Query parameters:
+      - lat, lon: coordinates (default: Delhi)
+      - horizon_hours: forecast span (24 to 72 hours, default: 72)
+    """
+    rl_err = _check_rate_limit()
+    if rl_err:
+        return rl_err
+
+    try:
+        lat = float(request.args.get("lat", 28.6139))
+        lon = float(request.args.get("lon", 77.2090))
+        horizon = min(72, max(24, int(request.args.get("horizon_hours", 72))))
+    except ValueError:
+        return error_response(
+            message="Invalid query parameters for early warning forecast.",
+            code="INVALID_PARAMS",
+            status_code=400,
+        )
+
+    if not CityService.is_within_india(lat, lon):
+        cov = CityService.get_coverage_status(lat, lon)
+        return error_response(
+            message=cov["message"],
+            code="OUTSIDE_COVERAGE",
+            status_code=422,
+            details=cov,
+        )
+
+    warning_data = AirQualityService.get_early_warning_forecast(lat, lon, horizon_hours=horizon)
+    return success_response(data=warning_data, message="Early warning forecast retrieved successfully.")
+
+
+@air_bp.route("/air/early-warning/check", methods=["POST"])
+def check_early_warnings():
+    """On-demand batch early warning check across multiple places or saved locations."""
+    rl_err = _check_rate_limit()
+    if rl_err:
+        return rl_err
+
+    payload = request.get_json(silent=True) or {}
+    places = payload.get("places") or payload.get("locations") or []
+    if not isinstance(places, list):
+        return error_response(
+            message="The 'places' field must be a list of location objects.",
+            code="INVALID_PAYLOAD",
+            status_code=400,
+        )
+
+    results = []
+    active_warnings = []
+    for p in places[:20]: # Limit to 20 places per batch
+        try:
+            lat = float(p.get("latitude") or p.get("lat", 0))
+            lon = float(p.get("longitude") or p.get("lon", 0))
+            name = str(p.get("name", "Unknown Location"))
+            p_id = p.get("id") or p.get("place_id")
+
+            ew = AirQualityService.get_early_warning_forecast(lat, lon, horizon_hours=72)
+            banner = ew.get("banner", {})
+
+            entry = {
+                "place_id": p_id,
+                "name": name,
+                "latitude": lat,
+                "longitude": lon,
+                "has_warning": banner.get("has_warning", False),
+                "severity_level": banner.get("severity_level", "Normal"),
+                "trigger_pollutant": banner.get("trigger_pollutant"),
+                "expected_start_time": banner.get("expected_start_time"),
+                "duration_hours": banner.get("duration_hours", 0),
+                "peak_concentration": banner.get("peak_concentration"),
+                "banner_message": banner.get("message"),
+                "reference_label": "Reference forecast (CAMS)",
+            }
+            results.append(entry)
+            if banner.get("has_warning"):
+                active_warnings.append(entry)
+        except Exception as exc:
+            logger.warning("Early warning check failed for place %s: %s", p, exc)
+
+    return success_response(
+        data={
+            "total_checked": len(results),
+            "warnings_count": len(active_warnings),
+            "warnings": active_warnings,
+            "active_warnings": active_warnings,
+            "places": results,
+            "on_demand_timestamp": True,
+        },
+        message=f"Checked {len(results)} locations; found {len(active_warnings)} active early warning alerts.",
+    )
+
+
+@air_bp.route("/air/interactions", methods=["GET"])
+def get_pollutant_interactions():
+    """Fetch 7-day multi-pollutant history, Pearson correlation matrix, and chemical readings.
+
+    Query parameters:
+      - lat, lon: coordinates (default: Delhi)
+      - city: optional city identifier
+      - days: history span (default: 7)
+    """
+    rl_err = _check_rate_limit()
+    if rl_err:
+        return rl_err
+
+    city_id = request.args.get("city")
+    lat_arg = request.args.get("lat")
+    lon_arg = request.args.get("lon")
+
+    lat = float(lat_arg) if lat_arg else None
+    lon = float(lon_arg) if lon_arg else None
+
+    if city_id and (lat is None or lon is None):
+        c = CityService.get_city_by_id(city_id)
+        if c:
+            lat = c["lat"]
+            lon = c["lon"]
+
+    if lat is None or lon is None:
+        lat, lon = 28.6139, 77.2090 # Default to Delhi
+
+    if not CityService.is_within_india(lat, lon):
+        cov = CityService.get_coverage_status(lat, lon)
+        return error_response(
+            message=cov["message"],
+            code="OUTSIDE_COVERAGE",
+            status_code=422,
+            details=cov,
+        )
+
+    try:
+        days = min(7, max(1, int(request.args.get("days", 7))))
+    except ValueError:
+        days = 7
+
+    data = MultiPollutantService.get_pollutant_interactions(lat, lon, days=days)
+    return success_response(data=data, message="Pollutant interactions and correlation matrix computed.")
+
+
 @air_bp.route("/air/climatology", methods=["GET"])
 def get_air_climatology():
     """Retrieve monthly and seasonal air quality norms, best/worst months, and inversion metrics.
@@ -367,6 +512,7 @@ def get_place_air(place_id: str):
 
     current_air = MultiPollutantService.get_current_air(lat, lon)
     forecast = MultiPollutantService.get_forecast(lat, lon, horizon_hours=24)
+    early_warning = AirQualityService.get_early_warning_forecast(lat, lon, horizon_hours=72)
     climatology = ClimatologyService.get_city_climatology(lat=lat, lon=lon)
     coverage = LocationResolver.classify_coverage_tier(lat, lon)
     hierarchy = LocationResolver.reverse_geocode(lat, lon)
@@ -379,6 +525,7 @@ def get_place_air(place_id: str):
             "longitude": lon,
             "current_air": current_air,
             "forecast_24h": forecast,
+            "early_warning": early_warning,
             "climatology": climatology.get("data"),
             "coverage": coverage,
             "hierarchy": hierarchy if hierarchy.get("success") else None,

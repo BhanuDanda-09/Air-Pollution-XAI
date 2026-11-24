@@ -111,12 +111,67 @@ class RiskService:
             tier = "Severe Health Hazard"
             badge_color = "#EF4444"
 
+        # Tailored citizen precautions based on profile conditions
+        precautions = []
+        if has_respiratory:
+            precautions.append({
+                "condition": "Respiratory / Asthma Vulnerability",
+                "action": "Carry prescribed rescue inhalers; strictly limit outdoor activity during peak inversion hours.",
+                "mask": "Certified N95 / FFP2 respirator with tight nasal seal",
+                "faq_link": "/faq",
+            })
+        if has_cardio:
+            precautions.append({
+                "condition": "Cardiovascular Sensitivity",
+                "action": "Avoid abrupt strenuous physical exertion in cold smog to prevent vascular vasoconstriction.",
+                "mask": "Low-resistance certified N95 respirator",
+                "faq_link": "/faq",
+            })
+        if is_pregnant:
+            precautions.append({
+                "condition": "Pregnancy Protection",
+                "action": "Protect fetal lung and neuro-development by remaining in True HEPA filtered rooms during smog surges.",
+                "mask": "Certified N95 respirator during any outdoor transit",
+                "faq_link": "/faq",
+            })
+        if household in ("children", "both") or "child" in conditions:
+            precautions.append({
+                "condition": "Young Children (< 5 yrs)",
+                "action": "Keep children indoors during early morning inversions; developing airways absorb double the particulate dose.",
+                "mask": "Child-fitted N95 / KN95 with nose foam",
+                "faq_link": "/faq",
+            })
+        if household in ("elderly", "both") or "senior" in conditions:
+            precautions.append({
+                "condition": "Senior Citizens (65+ yrs)",
+                "action": "Maintain indoor air purification and stay well-hydrated to compensate for reduced cardiopulmonary clearance.",
+                "mask": "N95 respirator",
+                "faq_link": "/faq",
+            })
+        if outdoor_hours >= 5.0 or commute_mode in ("two_wheeler", "open_auto", "walking", "bicycle"):
+            precautions.append({
+                "condition": "High Outdoor / Open Commute Exposure",
+                "action": "Wear sealed N95 masks on open transit routes and reschedule outdoor running to mid-day solar dispersion windows.",
+                "mask": "N95 sports / active commute respirator",
+                "faq_link": "/faq",
+            })
+        if not precautions:
+            precautions.append({
+                "condition": "General Preventive Guidance",
+                "action": "Follow diurnal CAMS forecast alerts, avoid rush-hour traffic corridors, and keep indoor air clean.",
+                "mask": "N95 recommended above AQI 150",
+                "faq_link": "/faq",
+            })
+
         return {
             "score": final_score,
             "tier": tier,
             "badge_color": badge_color,
             "risk_factors": risk_multipliers,
             "vulnerability_multiplier": round(1.0 + (additive_risk / max(1.0, base_score)), 2),
+            "tailored_precautions": precautions,
+            "faq_link": "/faq",
+            "faq_guidance_notice": "Health precautions strictly follow WHO 2021 air quality guidelines and CPCB advisories. Consult our FAQ for clinical specifics.",
         }
 
     @classmethod

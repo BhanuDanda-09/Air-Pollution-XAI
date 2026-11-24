@@ -18,6 +18,8 @@ import HealthProfileSelector from '../components/HealthProfileSelector';
 import LivabilityScoreCard from '../components/LivabilityScoreCard';
 import LiveAssessmentResult from '../components/LiveAssessmentResult';
 import ColdStartNotice from '../components/ColdStartNotice';
+import EarlyWarningBanner from '../components/EarlyWarningBanner';
+import PollutantInteractionsSection from '../components/PollutantInteractionsSection';
 import locationService from '../services/locationService';
 import userService from '../services/userService';
 import { useAuth } from '../context/AuthContext';
@@ -251,8 +253,16 @@ export default function LiveAssessmentPage() {
         <LivabilityScoreCard livabilityData={assessmentData.livability} />
       )}
 
+      {/* Early Warning Banner (24-72h CAMS Forecast & Episode Warning) */}
+      {assessmentData?.early_warning && (
+        <EarlyWarningBanner earlyWarning={assessmentData.early_warning} />
+      )}
+
       {/* Detailed Assessment Results Component (Meteorology, Model vs Reference, SHAP) */}
       <LiveAssessmentResult assessmentData={assessmentData} />
+
+      {/* 6-Criteria Pollutant Interactions Heatmap & Atmospheric Coupling */}
+      <PollutantInteractionsSection latitude={latitude} longitude={longitude} />
     </div>
   );
 }

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import userService from '../services/userService';
+import airService from '../services/airService';
 import PageSkeleton from '../components/PageSkeleton';
 import ColdStartNotice from '../components/ColdStartNotice';
 import ErrorMessage from '../components/ErrorMessage';
@@ -53,6 +54,9 @@ export default function SavedPlacesPage() {
   // Alert threshold state
   const [threshold, setThreshold] = useState(100);
   const [activeAlerts, setActiveAlerts] = useState([]);
+  const [earlyWarnings, setEarlyWarnings] = useState([]);
+  const [checkingWarnings, setCheckingWarnings] = useState(false);
+  const [emailAlertsConsent, setEmailAlertsConsent] = useState(false);
   const [thresholdSaved, setThresholdSaved] = useState(false);
   const [thresholdLoading, setThresholdLoading] = useState(false);
 
@@ -104,12 +108,48 @@ export default function SavedPlacesPage() {
         if (res.preference?.pm25_threshold) {
           setThreshold(res.preference.pm25_threshold);
         }
+        if (res.preference?.email_alerts !== undefined) {
+          setEmailAlertsConsent(res.preference.email_alerts);
+        }
         if (res.active_alerts) {
           setActiveAlerts(res.active_alerts);
+        }
+        if (res.forecast_early_warnings) {
+          setEarlyWarnings(res.forecast_early_warnings);
         }
       }
     } catch (err) {
       console.warn('Failed to fetch alerts:', err);
+    }
+  };
+
+  const handleCheckEarlyWarnings = async () => {
+    if (!locations || locations.length === 0) return;
+    setCheckingWarnings(true);
+    try {
+      const res = await airService.checkEarlyWarnings(
+        locations.map((l) => ({ name: l.name, lat: l.latitude, lon: l.longitude }))
+      );
+      if (res && res.warnings) {
+        setEarlyWarnings(res.warnings);
+      }
+    } catch (err) {
+      console.warn('Failed on-demand early warning check:', err);
+    } finally {
+      setCheckingWarnings(false);
+    }
+  };
+
+  const handleToggleEmailAlerts = async (e) => {
+    const val = e.target.checked;
+    setEmailAlertsConsent(val);
+    try {
+      await userService.updateAlerts({
+        pm25_threshold: parseFloat(threshold),
+        email_alerts: val,
+      });
+    } catch (err) {
+      console.warn('Failed to save email alert preference:', err);
     }
   };
 
@@ -494,6 +534,71 @@ export default function SavedPlacesPage() {
         </div>
       </form>
 
+      {/* Early Warning System Control & Consent Card */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/70 to-indigo-50/70 dark:from-slate-900 dark:to-slate-900 border border-blue-200 dark:border-blue-900/60 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">
+              Reference forecast (CAMS)
+            </span>
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+              24–72h Early Air Quality Warning
+            </span>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            Checks upcoming European CAMS atmospheric forecast across your saved spots for Poor, Very Poor, or Severe episodes.
+          </p>
+
+          <label className="flex items-center gap-2 pt-1 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={emailAlertsConsent}
+              onChange={handleToggleEmailAlerts}
+              className="w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500"
+            />
+            <span className="text-[11px] text-slate-600 dark:text-slate-300">
+              Enable Email Alerts (Optional / Consent-based under DPDP Act 2023 - free tier on-demand fallback)
+            </span>
+          </label>
+        </div>
+
+        <button
+          type="button"
+          disabled={checkingWarnings || locations.length === 0}
+          onClick={handleCheckEarlyWarnings}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50 shrink-0 cursor-pointer self-start sm:self-auto"
+        >
+          <RotateCw className={`w-3.5 h-3.5 ${checkingWarnings ? 'animate-spin' : ''}`} />
+          <span>{checkingWarnings ? 'Scanning CAMS Forecast...' : 'Check Early Warnings Now'}</span>
+        </button>
+      </div>
+
+      {/* Early Warning Banner if any places triggered warnings */}
+      {earlyWarnings.length > 0 && (
+        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200 text-xs space-y-2 animate-fadeIn">
+          <div className="flex items-center gap-2 font-bold text-sm text-rose-800 dark:text-rose-300">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            <span>
+              Early Warning: {earlyWarnings.length} Saved Location(s) Forecast to Enter Adverse Bands
+            </span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 uppercase font-mono">
+              Reference forecast (CAMS)
+            </span>
+          </div>
+          <ul className="space-y-1 list-disc list-inside text-rose-700 dark:text-rose-300 text-[11px]">
+            {earlyWarnings.map((w, idx) => (
+              <li key={idx}>
+                <strong>{w.place_name || w.location_name || `Location ${idx + 1}`}</strong>: Forecast{' '}
+                <span className="font-bold uppercase">{w.severity_level || w.severity || 'Elevated'}</span> (
+                {w.trigger_pollutant || w.pollutant || 'PM2.5'}) starting{' '}
+                {w.expected_start_time || w.formatted_start || 'upcoming hours'}. Duration: ~
+                {w.duration_hours || 6} hours.
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Filter / Search Bar */}
       {locations.length > 0 && (
         <div className="relative">
@@ -542,6 +647,12 @@ export default function SavedPlacesPage() {
             const Icon = LABEL_ICONS[loc.label] || Bookmark;
             const hasAlert = activeAlerts.some((a) => a.location_id === loc.id);
             const alertInfo = activeAlerts.find((a) => a.location_id === loc.id);
+            const earlyWarn = earlyWarnings.find(
+              (w) =>
+                w.location_id === loc.id ||
+                w.place_name === loc.name ||
+                (w.latitude && Math.abs(w.latitude - loc.latitude) < 0.05 && Math.abs(w.longitude - loc.longitude) < 0.05)
+            );
 
             return (
               <div
@@ -595,6 +706,19 @@ export default function SavedPlacesPage() {
                       <span>
                         PM2.5: {Math.round(alertInfo?.current_pm25 || 0)} µg/m³ (Exceeds {threshold} µg/m³)
                       </span>
+                    </div>
+                  )}
+
+                  {earlyWarn && (
+                    <div className="mt-2.5 p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-[11px] font-semibold flex items-center gap-2">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                      <div>
+                        <span className="font-bold">CAMS Warning:</span>{' '}
+                        <span>
+                          {earlyWarn.severity_level || earlyWarn.severity} ({earlyWarn.trigger_pollutant || earlyWarn.pollutant || 'PM2.5'}) starting{' '}
+                          {earlyWarn.expected_start_time || earlyWarn.formatted_start || 'upcoming hours'}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>

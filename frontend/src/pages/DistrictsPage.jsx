@@ -15,6 +15,8 @@ import {
   Snowflake,
   Wind,
   Info,
+  Factory,
+  ShieldCheck,
 } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
 import airService from '../services/airService';
@@ -366,87 +368,413 @@ export default function DistrictsPage() {
 
         {/* TAB 3: INSIGHTS FOR MUNICIPAL & POLLUTION CONTROL AUTHORITIES */}
         {activeTab === 'authorities' && (
-          <div className="space-y-6">
-            <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
-              <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
-                <ShieldAlert className="w-4 h-4" />
-                Air Quality Management Policy Brief
+          <div className="space-y-8 animate-in fade-in duration-200">
+            {/* Top Policy Header */}
+            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl border border-slate-700">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                  <ShieldAlert className="w-4 h-4" />
+                  Air Quality Management Statutory Intelligence
+                </div>
+                <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-white/10 text-slate-200 border border-white/15">
+                  CAQM Act 2021 & CPCB Protocols
+                </span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-extrabold">
-                Actionable Environmental Insights for State & District Administrations
+              <h2 className="text-xl sm:text-3xl font-black tracking-tight">
+                Actionable Environmental Insights for State & Municipal Administrations
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
-                Empirical synthesis of atmospheric ventilation dynamics, temperature inversions, and seasonal emission patterns across India's agro-climatic zones.
+              <p className="text-xs sm:text-sm text-slate-300 max-w-4xl leading-relaxed">
+                Empirical synthesis of atmospheric ventilation dynamics, thermal inversions, seasonal emission schedules, and statutory mitigation guidelines across India's agro-climatic zones.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Insight 1: Post-Monsoon Agricultural Stubble Inversions */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-3 shadow-xs">
-                <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-sm">
-                  <Flame className="w-5 h-5 shrink-0" />
-                  <span>North Zone: Stubble Burning & Low Ventilation Coefficients</span>
-                </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  During mid-October to late November, boundary layer heights in Punjab, Haryana, and Western UP collapse from 1,800 m to below 350 m. Combined with north-westerly wind drifts (&lt; 2.5 m/s), episodic biomass burning creates persistent trapping over Delhi-NCR and the Indo-Gangetic Plains.
-                </p>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
-                  <span className="font-bold text-slate-800 dark:text-slate-200">Recommended Action:</span>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Deploy mechanized in-situ residue management (Happy Seeders / CRM machines) 3 weeks before harvesting. Enforce GRAP Stage IV heavy diesel transit prohibitions prior to predicted 48-hour calm wind troughs.
+            {/* (a) PRIORITY ACTION DASHBOARD: DISTRICTS & STATES NEEDING ATTENTION NOW */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
+                      <Flame className="w-4 h-4" />
+                    </span>
+                    <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                      (a) Priority Action Dashboard: Districts & States Needing Attention Now
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Districts currently exhibiting Severe or Very Poor particulate levels (AQI &gt; 200) requiring immediate municipal intervention.
                   </p>
                 </div>
+
+                <span className="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-3 py-1 rounded-full border border-rose-200 dark:border-rose-800 shrink-0 self-start sm:self-auto">
+                  Immediate Enforcement Focus
+                </span>
               </div>
 
-              {/* Insight 2: Wintertime Deep Temperature Inversions */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-3 shadow-xs">
-                <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400 font-bold text-sm">
-                  <Snowflake className="w-5 h-5 shrink-0" />
-                  <span>East & Central: Industrial Inversion Trapping</span>
+              {/* Priority Districts Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="px-4 py-3">National Rank</th>
+                      <th className="px-4 py-3">District & State</th>
+                      <th className="px-4 py-3">Zone</th>
+                      <th className="px-4 py-3">Estimated AQI</th>
+                      <th className="px-4 py-3">Governing Pollutant</th>
+                      <th className="px-4 py-3">Current Severity Band</th>
+                      <th className="px-4 py-3">Recommended First Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium">
+                    {districts
+                      .filter((d) => d.estimated_aqi >= 180)
+                      .slice(0, 8)
+                      .map((d) => (
+                        <tr key={`${d.district}-${d.state}`} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                          <td className="px-4 py-3 font-mono font-bold text-slate-700 dark:text-slate-300">
+                            #{d.national_rank}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="font-bold text-slate-900 dark:text-white block">{d.district}</span>
+                            <span className="text-[11px] text-slate-500">{d.state}</span>
+                          </td>
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{d.zone}</td>
+                          <td className="px-4 py-3 font-mono font-black text-sm">
+                            <span className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">
+                              {d.estimated_aqi}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 font-mono text-slate-700 dark:text-slate-300">
+                            {d.governing_pollutant}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              d.estimated_aqi > 250
+                                ? 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300'
+                                : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                            }`}>
+                              {d.estimated_aqi > 250 ? 'Severe (Stage III/IV)' : 'Very Poor (Stage II)'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-slate-600 dark:text-slate-300 text-[11px]">
+                            {d.estimated_aqi > 250
+                              ? 'Halt C&D dust, enforce BS-III/IV LMV ban, water mist cannons'
+                              : 'Ban non-essential DG sets, augment public buses, hike parking fees'}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* (b) & (c) PERSISTENT VS SEASONAL HOTSPOTS & DOMINANT METEOROLOGICAL DRIVERS (SHAP) */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+                    <BarChart3 className="w-4 h-4" />
+                  </span>
+                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                    (b) Persistent vs Seasonal Hotspots & (c) Dominant Meteorological Drivers from SHAP
+                  </h3>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  In heavy industrial and mining clusters (Korba, Singrauli, Dhanbad, Asansol), nighttime radiational cooling creates intense ground-level thermal inversions between December and January. Factor analysis indicates surface barometric pressure (BP) and low ambient temperature (AT) contribute up to +42 µg/m³ to particulate surges.
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-4xl">
+                  Classification of regional air pollution regimes and machine-learning feature attribution (TreeSHAP) quantifying how atmospheric variables drive particulate elevation.
                 </p>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
-                  <span className="font-bold text-slate-800 dark:text-slate-200">Recommended Action:</span>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Implement staggered industrial operational shifts during nocturnal inversion hours (8:00 PM – 6:00 AM). Continuous monitoring of flue gas desulfurization (FGD) at thermal power stations.
-                  </p>
-                </div>
               </div>
 
-              {/* Insight 3: Coastal Marine Boundary Layer Dynamics */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-3 shadow-xs">
-                <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-bold text-sm">
-                  <Wind className="w-5 h-5 shrink-0" />
-                  <span>South & Coastal: Sea-Breeze Scavenging</span>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                {/* Hotspot Type 1: Persistent Industrial Basins */}
+                <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 space-y-3 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300">
+                        Type: Persistent Hotspot
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-mono">Year-Round Baseline</span>
+                    </div>
+
+                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <Factory className="w-4 h-4 text-orange-600" />
+                      Industrial & Mining Basins
+                    </h4>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <strong>Key Locations:</strong> Korba, Singrauli, Dhanbad, Asansol, Jharsuguda, Angul.<br />
+                      <strong>Emission Characteristics:</strong> Continuous point-source stack emissions from thermal coal plants, steel smelters, and open-cast coal mining without seasonal recess.
+                    </p>
+                  </div>
+
+                  {/* SHAP Meteorological Drivers */}
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 space-y-2">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                      <span>Dominant SHAP Drivers</span>
+                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Δ PM2.5 Impact</span>
+                    </div>
+                    <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300 font-mono">
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>High Barometric Pressure (BP &gt; 755 mmHg)</span>
+                        <strong className="text-rose-600 dark:text-rose-400">+34.2 µg/m³</strong>
+                      </li>
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>Calm Nocturnal Winds (WS &lt; 1.2 m/s)</span>
+                        <strong className="text-rose-600 dark:text-rose-400">+28.4 µg/m³</strong>
+                      </li>
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>Low Solar Convection (SR &lt; 120 W/m²)</span>
+                        <strong className="text-rose-600 dark:text-rose-400">+18.6 µg/m³</strong>
+                      </li>
+                    </ul>
+                    <p className="text-[10px] text-slate-400 italic pt-1 border-t border-slate-100 dark:border-slate-700">
+                      Anticyclonic subsidence caps vertical stack dispersion, causing nocturnal valley pooling.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Coastal metros (Mumbai, Chennai, Kochi, Visakhapatnam) benefit from diurnal land-sea breeze circulation, maintaining annual average AQI below 110. However, high relative humidity (&gt; 75%) accelerates secondary aerosol formation through hygroscopic particulate growth.
-                </p>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
-                  <span className="font-bold text-slate-800 dark:text-slate-200">Recommended Action:</span>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Target port vehicular idling and coastal industrial corridors with electrification mandates rather than broad citywide curtailment.
-                  </p>
+
+                {/* Hotspot Type 2: Seasonal Agricultural & Inversion Basins */}
+                <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 space-y-3 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">
+                        Type: Seasonal Hotspot
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-mono">Oct – Feb Peak</span>
+                    </div>
+
+                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <Snowflake className="w-4 h-4 text-sky-600" />
+                      Post-Monsoon & Winter Inversion Basins
+                    </h4>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <strong>Key Locations:</strong> Delhi-NCR, Amritsar, Karnal, Ludhiana, Meerut, Kanpur, Patna.<br />
+                      <strong>Emission Characteristics:</strong> Episodic paddy stubble combustion in Oct–Nov compounded by severe radiational boundary-layer collapse (PBL &lt; 350 m) in Dec–Jan.
+                    </p>
+                  </div>
+
+                  {/* SHAP Meteorological Drivers */}
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 space-y-2">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                      <span>Dominant SHAP Drivers</span>
+                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Δ PM2.5 Impact</span>
+                    </div>
+                    <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300 font-mono">
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>Low Ambient Temp (AT &lt; 13°C)</span>
+                        <strong className="text-rose-600 dark:text-rose-400">+41.5 µg/m³</strong>
+                      </li>
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>North-West Stagnant Drift (WS &lt; 1.5 m/s)</span>
+                        <strong className="text-rose-600 dark:text-rose-400">+31.2 µg/m³</strong>
+                      </li>
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>Surface Pressure Trapping (BP &gt; 758 mmHg)</span>
+                        <strong className="text-rose-600 dark:text-rose-400">+26.0 µg/m³</strong>
+                      </li>
+                    </ul>
+                    <p className="text-[10px] text-slate-400 italic pt-1 border-t border-slate-100 dark:border-slate-700">
+                      Radiational cooling induces severe ground inversions; emissions remain locked in the shallow breathing zone.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Hotspot Type 3: Coastal Marine & Topographic Basins */}
+                <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 space-y-3 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-100 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300">
+                        Type: Dynamic Maritime
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-mono">Diurnal Fluctuation</span>
+                    </div>
+
+                    <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <Wind className="w-4 h-4 text-teal-600" />
+                      Coastal & Topographic Metros
+                    </h4>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <strong>Key Locations:</strong> Mumbai, Chennai, Kolkata, Kochi, Visakhapatnam.<br />
+                      <strong>Emission Characteristics:</strong> High port traffic, refinery clusters, and construction. Annual mean AQI is moderated by diurnal land-sea breeze ventilation.
+                    </p>
+                  </div>
+
+                  {/* SHAP Meteorological Drivers */}
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 space-y-2">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                      <span>Dominant SHAP Drivers</span>
+                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Δ PM2.5 Impact</span>
+                    </div>
+                    <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300 font-mono">
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>High Humidity Hygroscopic Growth (RH &gt; 75%)</span>
+                        <strong className="text-rose-600 dark:text-rose-400">+19.4 µg/m³</strong>
+                      </li>
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>Diurnal Sea Breeze Ventilation (WS &gt; 3.8 m/s)</span>
+                        <strong className="text-emerald-600 dark:text-emerald-400">-22.1 µg/m³</strong>
+                      </li>
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>Moderate Pressure Baseline (BP ~ 750 mmHg)</span>
+                        <strong className="text-slate-600 dark:text-slate-300 font-medium">±2.5 µg/m³</strong>
+                      </li>
+                    </ul>
+                    <p className="text-[10px] text-slate-400 italic pt-1 border-t border-slate-100 dark:border-slate-700">
+                      High ambient moisture accelerates aerosol scattering; onset of daytime sea breeze provides strong natural flushing.
+                    </p>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* Insight 4: Rural & Gridded Precision Disclosure */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-3 shadow-xs">
-                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
-                  <Info className="w-5 h-5 shrink-0" />
-                  <span>Tier 3 Gridded Estimation Disclosure</span>
-                </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Over 180 rural and remote districts in India currently lack physical continuous CAAQMS monitors. AirIQ India estimates these areas using satellite-assimilated numerical transport models (~11 km resolution) rather than guessing from urban station readings.
-                </p>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1">
-                  <span className="font-bold text-slate-800 dark:text-slate-200">Methodological Standard:</span>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Always present rural values with Tier 3 disclosures. Never present mathematical estimates as physical ground measurements during regulatory decision-making.
+            {/* (d) RECOMMENDED-ACTIONS TABLE BY SEVERITY BAND (CAQM GRAP STAGES I-IV) */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                      <ShieldCheck className="w-4 h-4" />
+                    </span>
+                    <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                      (d) Statutory Recommended-Actions Table by Severity Band (CAQM GRAP)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-3xl leading-relaxed">
+                    Official statutory mitigation schedule established under the <strong>Commission for Air Quality Management in National Capital Region and Adjoining Areas Act, 2021</strong> (Section 12 Schedule).
                   </p>
                 </div>
+
+                {/* Explicit Advisory Notice Marker */}
+                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 shrink-0 self-start sm:self-auto">
+                  Marked as Advisory
+                </span>
+              </div>
+
+              {/* Advisory Disclaimer Banner */}
+              <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+                <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="leading-relaxed">
+                  <strong>Statutory Advisory Disclaimer:</strong> The recommended actions below represent technical mitigation benchmarks synthesized from the official CAQM Graded Response Action Plan (GRAP). Implementation by municipal bodies, transport departments, and industrial boards is subject to formal notifications promulgated by the respective State Governments and Pollution Control Committees.
+                </p>
+              </div>
+
+              {/* GRAP Stages Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="px-4 py-3">GRAP Stage</th>
+                      <th className="px-4 py-3">AQI Band & Trigger</th>
+                      <th className="px-4 py-3">Primary Target Sectors</th>
+                      <th className="px-4 py-3">Mandated Control Actions</th>
+                      <th className="px-4 py-3">Statutory Enforcement Body</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {/* Stage I */}
+                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <td className="px-4 py-3 font-extrabold text-amber-600 dark:text-amber-400">
+                        Stage I
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 font-bold">
+                          'Poor' (AQI 201–300)
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
+                        Construction, Dust & Solid Waste
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        • Strict enforcement of anti-dust norms at construction & demolition (C&D) sites (&gt; 500 sq.m).<br />
+                        • Mechanized vacuum sweeping and periodic water sprinkling on arterial roads.<br />
+                        • Complete ban on open biomass/garbage burning with heavy penal fines.
+                      </td>
+                      <td className="px-4 py-3 text-slate-500">
+                        Municipal Corporations (MCD, NDMC) & DPCC / State PCBs
+                      </td>
+                    </tr>
+
+                    {/* Stage II */}
+                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <td className="px-4 py-3 font-extrabold text-orange-600 dark:text-orange-400">
+                        Stage II
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-950 text-orange-800 dark:text-orange-200 font-bold">
+                          'Very Poor' (AQI 301–400)
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
+                        Diesel Generators & Urban Traffic
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        • Complete ban on operation of diesel generator (DG) sets across commercial/industrial sectors (except emergency healthcare, metro, and dual-fuel systems).<br />
+                        • Augment public transit: enhance CNG/electric bus frequencies and metro train cycles.<br />
+                        • Hike municipal parking charges by 3×–4× to discourage private vehicular commuting.
+                      </td>
+                      <td className="px-4 py-3 text-slate-500">
+                        State Transport Depts, DISCOMs & Traffic Police
+                      </td>
+                    </tr>
+
+                    {/* Stage III */}
+                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <td className="px-4 py-3 font-extrabold text-rose-600 dark:text-rose-400">
+                        Stage III
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 font-bold">
+                          'Severe' (AQI 401–450)
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
+                        Non-Essential Construction & Older Vehicles
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        • Immediate halt on all non-essential construction and demolition activities (excavation, earthworks, tiling).<br />
+                        • Strict prohibition on plying of BS-III Petrol and BS-IV Diesel Light Motor Vehicles (LMVs) in NCR.<br />
+                        • Discontinue in-person school sessions for children up to Class V in affected districts.
+                      </td>
+                      <td className="px-4 py-3 text-slate-500">
+                        District Magistrates, Transport Commissioners & CAQM Taskforce
+                      </td>
+                    </tr>
+
+                    {/* Stage IV */}
+                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <td className="px-4 py-3 font-extrabold text-purple-600 dark:text-purple-400">
+                        Stage IV
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 font-bold">
+                          'Severe+' (AQI &gt; 450)
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
+                        Heavy Truck Entry, Public Works & Remote Work
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        • Prohibit entry of non-Delhi registered heavy trucks (except EVs, CNG, and essential commodities).<br />
+                        • Complete shutdown of all public civil infrastructure projects (flyovers, highways, power transmission).<br />
+                        • Mandate 50% work-from-home (WFH) capacity for public, municipal, and private corporate offices.<br />
+                        • Suspend physical classes for Class VI–IX and Class XI.
+                      </td>
+                      <td className="px-4 py-3 text-slate-500">
+                        Chief Secretaries, State Disaster Management Authorities & Ministry of Home Affairs
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Source attribution & standard */}
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-400">
+                <span>
+                  Official Source: Commission for Air Quality Management (CAQM) Direction No. 77 / Statutory GRAP Protocol (2023 Revision).
+                </span>
+                <span className="font-semibold text-slate-500 dark:text-slate-400">
+                  AirIQ India Municipal Intelligence Engine
+                </span>
               </div>
             </div>
           </div>

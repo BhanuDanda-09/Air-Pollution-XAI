@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Compass,
   MapPin,
@@ -18,6 +19,7 @@ import {
   Calendar,
   Wind,
   Info,
+  Heart,
 } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { useAuth } from '../context/AuthContext';
@@ -787,6 +789,38 @@ export default function RelocationAdvisorPage() {
                       ))}
                     </ul>
                   </div>
+
+                  {/* Tailored Health Profile Precautions */}
+                  {cand.personal_risk?.tailored_precautions && cand.personal_risk.tailored_precautions.length > 0 && (
+                    <div className="p-3.5 rounded-2xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 space-y-2 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-rose-900 dark:text-rose-200 flex items-center gap-1.5">
+                          <Heart className="w-3.5 h-3.5 text-rose-500" />
+                          Tailored Precautions for Your Health Profile
+                        </span>
+                        <Link
+                          to="/faq"
+                          className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                        >
+                          <span>FAQ</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+
+                      <ul className="space-y-1.5 text-[11px] text-slate-700 dark:text-slate-300">
+                        {cand.personal_risk.tailored_precautions.map((tp, idx) => (
+                          <li key={idx} className="flex flex-col gap-0.5">
+                            <span className="font-semibold text-rose-800 dark:text-rose-300">
+                              {tp.condition}:
+                            </span>
+                            <span className="text-slate-600 dark:text-slate-400">
+                              {tp.action} ({tp.mask})
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Climatology Preview */}
                   {cand.climatology && (

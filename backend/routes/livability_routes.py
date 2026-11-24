@@ -36,6 +36,7 @@ def _assess_single_coordinates(lat: float, lon: float, health_profile: dict = No
         }
 
     reference_info = AirQualityService.get_reference_air_quality(lat, lon)
+    early_warning = AirQualityService.get_early_warning_forecast(lat, lon)
     livability_eval = LivabilityService.evaluate_livability(
         reference_info=reference_info,
         weather_info=weather_info,
@@ -52,6 +53,7 @@ def _assess_single_coordinates(lat: float, lon: float, health_profile: dict = No
             "validity": weather_info["validity"],
             "validity_warning": weather_info["validity_warning"],
         },
+        "early_warning": early_warning if early_warning.get("success") else None,
         "livability": livability_eval,
         "meteorological_inputs": {
             "features": features,

@@ -269,6 +269,15 @@ class LivabilityService:
                 f"(-{profile_shift['total_shift']} threshold shift)."
             )
 
+        # Generate persona-tailored citizen precautions with direct FAQ linkage
+        citizen_precautions = cls.generate_citizen_precautions(
+            effective_score=effective_score,
+            verdict_label=matched_verdict["label"],
+            health_profile=health_profile,
+            current_pm25=ref_pm25,
+            forecast_pm25=ref_fc_pm25,
+        )
+
         # "Explain this verdict" interactive panel breakdown
         explain_verdict = {
             "verdict_assigned": matched_verdict["label"],
@@ -404,5 +413,149 @@ class LivabilityService:
             },
             "best_time_today": reference_info.get("best_time_today"),
             "seven_day_forecast": reference_info.get("seven_day_forecast"),
+            "citizen_precautions": citizen_precautions,
             "medical_disclaimer": Config.MEDICAL_DISCLAIMER,
+        }
+
+    @classmethod
+    def generate_citizen_precautions(
+        cls,
+        effective_score: float,
+        verdict_label: str = "Moderate",
+        health_profile: Optional[Dict[str, Any]] = None,
+        current_pm25: Optional[float] = None,
+        forecast_pm25: Optional[float] = None,
+        cpcb_category: Optional[str] = None,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        """Generate tailored citizen precautions based on specific health profile and air severity."""
+        profile = health_profile or {}
+        conditions = [str(c).lower() for c in profile.get("conditions", [])]
+        if profile.get("asthma") or profile.get("has_respiratory_condition"):
+            conditions.append("asthma")
+        if profile.get("has_heart_condition"):
+            conditions.append("cardiovascular")
+        if profile.get("is_pregnant"):
+            conditions.append("pregnancy")
+        if profile.get("is_outdoor_worker"):
+            conditions.append("outdoor_worker")
+
+        age_group = str(profile.get("age_group", "adult")).lower()
+        if age_group in ("child", "senior"):
+            conditions.append(age_group)
+
+        # Detect active vulnerabilities
+        active_tags = []
+        if any(c in conditions for c in ("asthma", "copd", "bronchitis", "allergic_rhinitis")):
+            active_tags.append("Respiratory Vulnerability")
+        if any(c in conditions for c in ("cardiovascular", "hypertension", "diabetes")):
+            active_tags.append("Cardiovascular Sensitivity")
+        if "pregnancy" in conditions:
+            active_tags.append("Expectant Mother")
+        if "child" in conditions:
+            active_tags.append("Young Child (< 12 yrs)")
+        if "senior" in conditions:
+            active_tags.append("Senior Citizen (65+ yrs)")
+        if "outdoor_worker" in conditions:
+            active_tags.append("High Outdoor Exposure")
+
+        if not active_tags:
+            active_tags.append("Standard Healthy Adult")
+
+        precautions = []
+
+        # 1. Mask guidance
+        if effective_score < 60:
+            precautions.append({
+                "category": "Respiratory Barrier & Masking",
+                "title": "Certified N95 / FFP2 Respirator Mandate",
+                "recommendation": (
+                    "Cloth masks and simple surgical masks provide near-zero filtration against microscopic PM2.5 particulates. "
+                    "Wear an airtight, certified N95 or FFP2 respirator with an adjustable metal nose clip whenever outdoors."
+                ),
+                "urgency": "High" if effective_score < 40 else "Moderate",
+                "faq_anchor": "protection-masks",
+            })
+        else:
+            precautions.append({
+                "category": "Respiratory Barrier & Masking",
+                "title": "Optional Protection for High-Traffic Corridors",
+                "recommendation": "Air quality is currently acceptable. Masks are optional, but recommended if walking along heavy vehicular transit corridors.",
+                "urgency": "Low",
+                "faq_anchor": "protection-masks",
+            })
+
+        # 2. Indoor environment & HEPA air purifiers
+        if effective_score < 50:
+            precautions.append({
+                "category": "Indoor Clean Air Sanctuary",
+                "title": "Seal Windows & Run True HEPA (H13) Filtration",
+                "recommendation": (
+                    "Close external windows during calm morning and evening inversion hours (6:00 AM – 10:00 AM and 7:00 PM – 11:00 PM). "
+                    "Run a certified True HEPA (H13) air purifier sized appropriately to your room's Clean Air Delivery Rate (CADR)."
+                ),
+                "urgency": "High",
+                "faq_anchor": "protection-masks",
+            })
+
+        # 3. Clinical medication & condition-specific precautions
+        if "Respiratory Vulnerability" in active_tags:
+            precautions.append({
+                "category": "Clinical Condition Care",
+                "title": "Asthma / COPD Action Plan & Inhaler Readiness",
+                "recommendation": (
+                    "Carry prescribed rescue bronchodilators (e.g. Salbutamol) at all times. "
+                    "Track daily Peak Expiratory Flow (PEF). If morning chest tightness or persistent coughing occurs, "
+                    "consult your pulmonologist immediately."
+                ),
+                "urgency": "High" if effective_score < 60 else "Moderate",
+                "faq_anchor": "health-sensitive-profiles",
+            })
+
+        if "Cardiovascular Sensitivity" in active_tags:
+            precautions.append({
+                "category": "Cardiovascular Protection",
+                "title": "Avoid Early Morning Cold & Strenuous Exertion",
+                "recommendation": (
+                    "Inhaling sub-micron particulates causes systemic inflammation, autonomic nervous stimulation, and vasoconstriction. "
+                    "Strictly avoid rapid physical exertion in cold smog, which elevates arterial pressure and myocardial workload."
+                ),
+                "urgency": "High",
+                "faq_anchor": "health-sensitive-profiles",
+            })
+
+        if "Expectant Mother" in active_tags:
+            precautions.append({
+                "category": "Maternal & Fetal Protection",
+                "title": "Strict Particulate Avoidance During Pregnancy",
+                "recommendation": (
+                    "Ultra-fine particulate matter (< 0.1 µm) can translocate across the alveolar-capillary barrier into maternal circulation. "
+                    "Prioritize clean indoor air rooms and avoid road transit during high smog hours."
+                ),
+                "urgency": "High",
+                "faq_anchor": "health-sensitive-profiles",
+            })
+
+        # 4. Activity Timing & Outdoor Exercise
+        if effective_score < 40:
+            precautions.append({
+                "category": "Exercise & Activity Scheduling",
+                "title": "Shift All Cardiovascular Workouts Indoors",
+                "recommendation": (
+                    "Deep aerobic breathing during running or cycling increases particulate intake by 4–8x and bypasses nasal filtration. "
+                    "Shift all workouts indoors to a filtered room until daytime solar radiation disperses the surface inversion layer."
+                ),
+                "urgency": "High",
+                "faq_anchor": "health-sensitive-profiles",
+            })
+
+        return {
+            "health_tags": active_tags,
+            "precautions_count": len(precautions),
+            "precautions": precautions,
+            "faq_link": "/faq",
+            "faq_guidance_notice": (
+                "Personalized health precautions are synthesized from WHO 2021 Clinical Guidelines and CPCB Health Advisory Protocols. "
+                "For detailed mask standards, HEPA CADR sizing, and exercise thresholds, consult our FAQ."
+            ),
         }

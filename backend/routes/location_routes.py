@@ -189,11 +189,13 @@ def assess_location():
     coverage.update(tier_info)
     multi_pol = MultiPollutantService.get_current_air(lat, lon)
     hierarchy = LocationResolver.reverse_geocode(lat, lon)
+    early_warning = AirQualityService.get_early_warning_forecast(lat, lon)
 
     response_data = {
         "coverage": coverage,
         "hierarchy": hierarchy if hierarchy.get("success") else None,
         "multi_pollutant": multi_pol if multi_pol.get("success") else None,
+        "early_warning": early_warning if early_warning.get("success") else None,
         "location": {
             "latitude": lat,
             "longitude": lon,
