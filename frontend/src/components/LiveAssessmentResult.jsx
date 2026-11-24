@@ -206,16 +206,16 @@ export default function LiveAssessmentResult({ assessmentData }) {
           </div>
         </div>
 
-        {/* Card B: Reference PM2.5 (CAMS model data) */}
+        {/* Card B: Regional estimate PM2.5 (CAMS model data) */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col justify-between">
           <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 dark:bg-indigo-950/40 rounded-bl-full -z-0 opacity-60" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Regional Reference
+                Regional estimate (CAMS)
               </span>
               <span className="text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 truncate max-w-[150px]">
-                Regional Baseline
+                Atmospheric Model
               </span>
             </div>
             <div className="my-3">
@@ -233,9 +233,9 @@ export default function LiveAssessmentResult({ assessmentData }) {
                 </>
               ) : (
                 <div className="py-2 text-slate-500 dark:text-slate-400">
-                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Reference Offline</p>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Regional Estimate Offline</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    {reference_air_quality?.error || 'Reference service unavailable for this location.'}
+                    {reference_air_quality?.error || 'Regional estimate service unavailable for this location.'}
                   </p>
                 </div>
               )}
@@ -261,7 +261,7 @@ export default function LiveAssessmentResult({ assessmentData }) {
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Model vs Reference Discrepancy
+                Model vs Regional Estimate Delta
               </span>
               <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
                 Δ Comparison
@@ -304,7 +304,7 @@ export default function LiveAssessmentResult({ assessmentData }) {
 
           <div className="relative z-10 pt-3 border-t border-slate-100 dark:border-slate-800">
             <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
-              Physical validation: Local model is surface meteorological; regional baseline incorporates satellite aerosol data.
+              Physical validation: Local model is surface meteorological; regional baseline incorporates regional atmospheric chemistry estimates.
             </p>
           </div>
         </div>

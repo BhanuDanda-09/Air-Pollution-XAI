@@ -416,6 +416,11 @@ class MultiPollutantService:
     @classmethod
     def get_history(cls, lat: float, lon: float, days: int = 7) -> Dict[str, Any]:
         """Fetch past hourly multi-pollutant trajectory for trend charting."""
+        cache_key = f"hist:{round(lat, 2)}:{round(lon, 2)}:{days}"
+        cached = current_aq_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         coverage = CityService.get_coverage_status(lat, lon)
         if not coverage["in_coverage"]:
             return {
@@ -441,7 +446,7 @@ class MultiPollutantService:
                 co_raw = hourly.get("carbon_monoxide", [])[-168:]
                 # Convert CO from ug/m3 to mg/m3 if present
                 co_mg = [round(c / 1000.0, 2) if c is not None else 0.0 for c in co_raw]
-                return {
+                result = {
                     "success": True,
                     "coordinates": {"lat": lat, "lon": lon},
                     "timestamps": times[-168:],  # Last 7 days = 168 hours
@@ -452,6 +457,8 @@ class MultiPollutantService:
                     "so2": hourly.get("sulphur_dioxide", [])[-168:],
                     "co": co_mg,
                 }
+                current_aq_cache.set(cache_key, result)
+                return result
         except Exception as exc:
             logger.error("Failed to fetch air quality history: %s", exc)
 
@@ -460,6 +467,11 @@ class MultiPollutantService:
     @classmethod
     def get_pollutant_interactions(cls, lat: float, lon: float, days: int = 7) -> Dict[str, Any]:
         """Compute Pearson correlation matrix and chemical/meteorological plain-language readings across all 6 pollutants."""
+        cache_key = f"interactions:{round(lat, 2)}:{round(lon, 2)}:{days}"
+        cached = current_aq_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
         history = cls.get_history(lat, lon, days=days)
 
         pollutant_keys = ["pm25", "pm10", "no2", "so2", "co", "o3"]
@@ -586,7 +598,7 @@ class MultiPollutantService:
             },
         ]
 
-        return {
+        result = {
             "success": True,
             "coordinates": {"lat": lat, "lon": lon},
             "pollutants": display_names,
@@ -597,6 +609,8 @@ class MultiPollutantService:
             "sample_hours": len(series_data.get("pm25", [])) if has_real_data else 168,
             "scientific_note": "Pearson product-moment correlation r calculated over continuous hourly Copernicus CAMS observations.",
         }
+        current_aq_cache.set(cache_key, result)
+        return result
 
     @classmethod
     def _get_offline_fallback(cls, lat: float, lon: float, coverage: Dict[str, Any]) -> Dict[str, Any]:

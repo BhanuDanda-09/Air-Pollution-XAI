@@ -329,7 +329,7 @@ def check_early_warnings():
                 "duration_hours": banner.get("duration_hours", 0),
                 "peak_concentration": banner.get("peak_concentration"),
                 "banner_message": banner.get("message"),
-                "reference_label": "Reference forecast (CAMS)",
+                "reference_label": "Regional estimate (CAMS)",
             }
             results.append(entry)
             if banner.get("has_warning"):

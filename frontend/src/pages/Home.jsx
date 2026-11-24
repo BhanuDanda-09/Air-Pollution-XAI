@@ -34,7 +34,7 @@ const PRESET_PLACES = [
 const FAQ_ITEMS = [
   {
     q: 'Where does the real-time air quality data originate?',
-    a: 'Real-time surface meteorology (temperature, relative humidity, boundary layer height, wind vector) is ingested directly from Open-Meteo. Regional reference PM2.5 concentrations are anchored to the European Copernicus Atmosphere Monitoring Service (CAMS) near-real-time atmospheric chemistry model.',
+    a: 'Real-time surface meteorology (temperature, relative humidity, boundary layer height, wind vector) is ingested directly from Open-Meteo. Regional PM2.5 estimates are anchored to the European Copernicus Atmosphere Monitoring Service (CAMS) near-real-time atmospheric chemistry model (an atmospheric numerical model estimate, not a ground station measurement or direct satellite reading).',
   },
   {
     q: 'How does AirIQ India cover both monitored and unmonitored areas?',
@@ -361,7 +361,7 @@ export default function Home() {
         {disclaimerExpanded && (
           <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 space-y-2 animate-in fade-in duration-200">
             <p>
-              AirIQ India synthesizes calibrated machine learning forecasts with real-time surface meteorology and satellite-assimilated atmospheric chemistry models.
+              AirIQ India synthesizes calibrated machine learning forecasts with real-time surface meteorology and atmospheric chemistry models.
             </p>
             <p>
               Output categories represent indicative concentration bands and do not constitute official statutory CPCB continuous ambient monitoring station (CAAQMS) measurements. Air quality for villages and rural areas is a gridded model estimate, not a ground measurement.
@@ -388,9 +388,9 @@ export default function Home() {
             <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-800 dark:text-blue-300 font-extrabold text-xs flex items-center justify-center">
               1
             </div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Live Satellite & Weather Sensing</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Live Atmospheric & Weather Sensing</h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Fetches genuine surface meteorology (relative humidity, wind vector, barometric pressure, temperature) and regional satellite aerosol reference models.
+              Fetches genuine surface meteorology (relative humidity, wind vector, barometric pressure, temperature) and regional atmospheric chemistry estimates.
             </p>
           </div>
 
@@ -554,7 +554,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. Short Viva & Evaluator FAQ Accordion */}
+      {/* 7. Scientific & Methodology FAQ Accordion */}
       <section className="space-y-6">
         <div className="text-center max-w-xl mx-auto space-y-1">
           <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Frequently Asked Questions</span>

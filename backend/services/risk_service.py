@@ -291,6 +291,8 @@ class RiskService:
             "success": True,
             "origin": {
                 "name": origin_name,
+                "district": origin.get("district"),
+                "state": origin.get("state"),
                 "lat": origin_lat,
                 "lon": origin_lon,
                 "current_aqi": origin_aqi,

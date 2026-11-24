@@ -211,7 +211,7 @@ export default function Navbar({ isBackendOnline }) {
 
   // More dropdown (7 items)
   const moreLinks = [
-    { to: '/how-it-works', label: 'How It Works', icon: HelpCircle, desc: 'Satellite, sensor & weather science' },
+    { to: '/how-it-works', label: 'How It Works', icon: HelpCircle, desc: 'Model, sensor & weather science' },
     { to: '/faq', label: 'Frequently Asked Questions', icon: HelpCircle, desc: 'Health, masks, purifiers & precautions' },
     { to: '/history', label: 'Exposure History', icon: History, desc: 'Past personal assessment timeline' },
     { to: '/contact', label: 'Contact & Feedback', icon: Mail, desc: 'Reach our team with suggestions' },

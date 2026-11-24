@@ -384,7 +384,7 @@ export default function DistrictsPage() {
                 Actionable Environmental Insights for State & Municipal Administrations
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-4xl leading-relaxed">
-                Empirical synthesis of atmospheric ventilation dynamics, thermal inversions, seasonal emission schedules, and statutory mitigation guidelines across India's agro-climatic zones.
+                Evidence-based synthesis of atmospheric ventilation dynamics, thermal inversions, seasonal emission schedules, and statutory mitigation guidelines across India's agro-climatic zones.
               </p>
             </div>
 
@@ -401,13 +401,18 @@ export default function DistrictsPage() {
                     </h3>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Districts currently exhibiting Severe or Very Poor particulate levels (AQI &gt; 200) requiring immediate municipal intervention.
+                    Districts exhibiting elevated particulate levels (expert early-warning threshold AQI &ge; 180, providing an advisory buffer prior to statutory 'Poor' at 200).
                   </p>
                 </div>
 
-                <span className="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-3 py-1 rounded-full border border-rose-200 dark:border-rose-800 shrink-0 self-start sm:self-auto">
-                  Immediate Enforcement Focus
-                </span>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
+                    Expert Classification
+                  </span>
+                  <span className="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-3 py-1 rounded-full border border-rose-200 dark:border-rose-800 shrink-0">
+                    Immediate Enforcement Focus
+                  </span>
+                </div>
               </div>
 
               {/* Priority Districts Table */}
@@ -465,9 +470,13 @@ export default function DistrictsPage() {
                   </tbody>
                 </table>
               </div>
+
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                * Threshold Derivation: The AQI &ge; 180 trigger is an expert classification providing a precautionary buffer (~10% below CPCB's statutory 200 'Poor' trigger) enabling municipal administrations to mobilize mechanized sweepers and anti-smog guns proactively.
+              </p>
             </div>
 
-            {/* (b) & (c) PERSISTENT VS SEASONAL HOTSPOTS & DOMINANT METEOROLOGICAL DRIVERS (SHAP) */}
+            {/* (b) & (c) PERSISTENT VS SEASONAL HOTSPOTS & METEOROLOGICAL DRIVERS */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
               <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
@@ -475,11 +484,24 @@ export default function DistrictsPage() {
                     <BarChart3 className="w-4 h-4" />
                   </span>
                   <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
-                    (b) Persistent vs Seasonal Hotspots & (c) Dominant Meteorological Drivers from SHAP
+                    (b) Persistent vs Seasonal Hotspots & (c) Meteorological Drivers & Model Feature Attribution
                   </h3>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-4xl">
-                  Classification of regional air pollution regimes and machine-learning feature attribution (TreeSHAP) quantifying how atmospheric variables drive particulate elevation.
+                  Classification of regional air pollution regimes (expert classification) and machine-learning feature attribution (TreeSHAP) computed on empirical surface meteorological inputs.
+                </p>
+              </div>
+
+              {/* Methodology Disclosure */}
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 space-y-1">
+                <span className="font-bold text-slate-800 dark:text-slate-200 block">
+                  Methodology & Scientific Integrity Disclosures:
+                </span>
+                <p className="leading-relaxed">
+                  <strong>Hotspot Classification:</strong> Regimes are an expert classification derived from empirical annual distributions: Persistent Hotspots exhibit high baseline loading year-round (P90 &gt; 150 µg/m³, Winter/Monsoon ratio &lt; 1.8), while Seasonal Hotspots show winter amplification (Winter/Monsoon ratio &gt; 2.5×, P90 &gt; 200 µg/m³).
+                </p>
+                <p className="leading-relaxed">
+                  <strong>Feature Attribution Boundary:</strong> Our machine learning model is trained strictly on five surface meteorological features: Relative Humidity (RH), Wind Direction (WD), Solar Radiation (SR), Barometric Pressure (BP), and Air Temperature (AT). Wind speed (WS) is <em>not</em> an input feature in this dataset. Exact SHAP values shown below are computed directly from the trained XGBoost model on a verified Delhi winter scenario; qualitative atmospheric drivers for non-Delhi regions cite official CPCB and NEERI literature.
                 </p>
               </div>
 
@@ -491,7 +513,7 @@ export default function DistrictsPage() {
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300">
                         Type: Persistent Hotspot
                       </span>
-                      <span className="text-[11px] text-slate-400 font-mono">Year-Round Baseline</span>
+                      <span className="text-[11px] text-slate-400 font-mono">Expert Classification</span>
                     </div>
 
                     <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
@@ -505,28 +527,28 @@ export default function DistrictsPage() {
                     </p>
                   </div>
 
-                  {/* SHAP Meteorological Drivers */}
+                  {/* Qualitative Drivers from Literature */}
                   <div className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 space-y-2">
                     <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                      <span>Dominant SHAP Drivers</span>
-                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Δ PM2.5 Impact</span>
+                      <span>Atmospheric Drivers (CPCB Literature)</span>
+                      <span className="text-[10px] font-mono text-slate-500">Qualitative Synthesis</span>
                     </div>
-                    <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300 font-mono">
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>High Barometric Pressure (BP &gt; 755 mmHg)</span>
-                        <strong className="text-rose-600 dark:text-rose-400">+34.2 µg/m³</strong>
+                    <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300">
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">• High Surface Pressure & Stagnation:</span>
+                        <span className="text-slate-500">Anticyclonic subsidence caps vertical stack plume dispersion, causing nocturnal valley pooling.</span>
                       </li>
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>Calm Nocturnal Winds (WS &lt; 1.2 m/s)</span>
-                        <strong className="text-rose-600 dark:text-rose-400">+28.4 µg/m³</strong>
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">• Low Convective Dispersion:</span>
+                        <span className="text-slate-500">Weak daytime thermal updrafts limit convective dilution of industrial emissions.</span>
                       </li>
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>Low Solar Convection (SR &lt; 120 W/m²)</span>
-                        <strong className="text-rose-600 dark:text-rose-400">+18.6 µg/m³</strong>
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">• Low Boundary-Layer Height:</span>
+                        <span className="text-slate-500">Shallow nocturnal planetary boundary layers trap continuous effluents near surface grade.</span>
                       </li>
                     </ul>
                     <p className="text-[10px] text-slate-400 italic pt-1 border-t border-slate-100 dark:border-slate-700">
-                      Anticyclonic subsidence caps vertical stack dispersion, causing nocturnal valley pooling.
+                      * Airshed Note: Industrial basins lie outside Delhi. The Delhi-trained tabular model is not applied here; drivers cite official CPCB industrial guidelines.
                     </p>
                   </div>
                 </div>
@@ -543,37 +565,48 @@ export default function DistrictsPage() {
 
                     <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
                       <Snowflake className="w-4 h-4 text-sky-600" />
-                      Post-Monsoon & Winter Inversion Basins
+                      Delhi-NCR & Winter Inversion Basins
                     </h4>
 
                     <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                       <strong>Key Locations:</strong> Delhi-NCR, Amritsar, Karnal, Ludhiana, Meerut, Kanpur, Patna.<br />
-                      <strong>Emission Characteristics:</strong> Episodic paddy stubble combustion in Oct–Nov compounded by severe radiational boundary-layer collapse (PBL &lt; 350 m) in Dec–Jan.
+                      <strong>Emission Characteristics:</strong> Episodic post-monsoon stubble burning compounded by severe radiational ground inversions (PBL &lt; 150 m) and stagnant surface air.
                     </p>
                   </div>
 
-                  {/* SHAP Meteorological Drivers */}
+                  {/* Exact TreeSHAP from Trained Model */}
                   <div className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 space-y-2">
                     <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                      <span>Dominant SHAP Drivers</span>
-                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Δ PM2.5 Impact</span>
+                      <span>Exact TreeSHAP (Trained XGBoost)</span>
+                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Baseline: 144.5 µg/m³</span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-mono bg-slate-50 dark:bg-slate-900 p-1.5 rounded border border-slate-200 dark:border-slate-700">
+                      Scenario: RH=85%, WD=290°, SR=15 W/m², BP=746 mmHg, AT=12°C
                     </div>
                     <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300 font-mono">
                       <li className="flex justify-between items-center text-[11px]">
-                        <span>Low Ambient Temp (AT &lt; 13°C)</span>
-                        <strong className="text-rose-600 dark:text-rose-400">+41.5 µg/m³</strong>
+                        <span>High Humidity (RH: 85%)</span>
+                        <strong className="text-rose-600 dark:text-rose-400">+39.3 µg/m³</strong>
                       </li>
                       <li className="flex justify-between items-center text-[11px]">
-                        <span>North-West Stagnant Drift (WS &lt; 1.5 m/s)</span>
-                        <strong className="text-rose-600 dark:text-rose-400">+31.2 µg/m³</strong>
+                        <span>Low Temperature (AT: 12°C)</span>
+                        <strong className="text-slate-600 dark:text-slate-300">-2.1 µg/m³</strong>
                       </li>
                       <li className="flex justify-between items-center text-[11px]">
-                        <span>Surface Pressure Trapping (BP &gt; 758 mmHg)</span>
-                        <strong className="text-rose-600 dark:text-rose-400">+26.0 µg/m³</strong>
+                        <span>WNW Transport Wind (WD: 290°)</span>
+                        <strong className="text-slate-600 dark:text-slate-300">-7.9 µg/m³</strong>
+                      </li>
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>High Surface Pressure (BP: 746)</span>
+                        <strong className="text-slate-600 dark:text-slate-300">-15.7 µg/m³</strong>
+                      </li>
+                      <li className="flex justify-between items-center text-[11px]">
+                        <span>Low Solar Irradiance (SR: 15)</span>
+                        <strong className="text-slate-600 dark:text-slate-300">-0.1 µg/m³</strong>
                       </li>
                     </ul>
                     <p className="text-[10px] text-slate-400 italic pt-1 border-t border-slate-100 dark:border-slate-700">
-                      Radiational cooling induces severe ground inversions; emissions remain locked in the shallow breathing zone.
+                      Net Predicted PM2.5: <strong>157.7 µg/m³</strong>. Model features are strictly RH, WD, SR, BP, AT. Boundary-layer collapse is confirmed by meteorological literature (SAFAR/IMD).
                     </p>
                   </div>
                 </div>
@@ -585,7 +618,7 @@ export default function DistrictsPage() {
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-100 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300">
                         Type: Dynamic Maritime
                       </span>
-                      <span className="text-[11px] text-slate-400 font-mono">Diurnal Fluctuation</span>
+                      <span className="text-[11px] text-slate-400 font-mono">Expert Classification</span>
                     </div>
 
                     <h4 className="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
@@ -599,28 +632,28 @@ export default function DistrictsPage() {
                     </p>
                   </div>
 
-                  {/* SHAP Meteorological Drivers */}
+                  {/* Qualitative Coastal Drivers */}
                   <div className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 space-y-2">
                     <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                      <span>Dominant SHAP Drivers</span>
-                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Δ PM2.5 Impact</span>
+                      <span>Atmospheric Drivers (NEERI / CPCB)</span>
+                      <span className="text-[10px] font-mono text-slate-500">Qualitative Domain</span>
                     </div>
-                    <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300 font-mono">
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>High Humidity Hygroscopic Growth (RH &gt; 75%)</span>
-                        <strong className="text-rose-600 dark:text-rose-400">+19.4 µg/m³</strong>
+                    <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300">
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">• Diurnal Sea-Breeze Ventilation:</span>
+                        <span className="text-slate-500">Daytime onshore marine breeze displaces urban pollutants inland, reducing coastal daytime concentration spikes.</span>
                       </li>
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>Diurnal Sea Breeze Ventilation (WS &gt; 3.8 m/s)</span>
-                        <strong className="text-emerald-600 dark:text-emerald-400">-22.1 µg/m³</strong>
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">• Marine Boundary-Layer Moisture:</span>
+                        <span className="text-slate-500">Elevated coastal humidity promotes sea-salt hygroscopic condensation and aerosol scattering.</span>
                       </li>
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>Moderate Pressure Baseline (BP ~ 750 mmHg)</span>
-                        <strong className="text-slate-600 dark:text-slate-300 font-medium">±2.5 µg/m³</strong>
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">• Nocturnal Land Breeze Reversal:</span>
+                        <span className="text-slate-500">Nighttime offshore winds push accumulated continental aerosol out toward coastal waters.</span>
                       </li>
                     </ul>
                     <p className="text-[10px] text-slate-400 italic pt-1 border-t border-slate-100 dark:border-slate-700">
-                      High ambient moisture accelerates aerosol scattering; onset of daytime sea breeze provides strong natural flushing.
+                      * Model Boundary: Marine sea-breeze dynamics are strictly absent from the Delhi-trained model; coastal drivers are qualitative findings from NEERI/CPCB coastal studies.
                     </p>
                   </div>
                 </div>
@@ -636,25 +669,29 @@ export default function DistrictsPage() {
                       <ShieldCheck className="w-4 h-4" />
                     </span>
                     <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
-                      (d) Statutory Recommended-Actions Table by Severity Band (CAQM GRAP)
+                      (d) Statutory Recommended-Actions Table for Delhi-NCR (CAQM GRAP)
                     </h3>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-3xl leading-relaxed">
-                    Official statutory mitigation schedule established under the <strong>Commission for Air Quality Management in National Capital Region and Adjoining Areas Act, 2021</strong> (Section 12 Schedule).
+                    Official statutory mitigation schedule established under the <strong>Commission for Air Quality Management in National Capital Region and Adjoining Areas Act, 2021</strong> (Direction No. 77 / revised protocol, published at <a href="https://caqm.nic.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">https://caqm.nic.in</a>).
                   </p>
                 </div>
 
-                {/* Explicit Advisory Notice Marker */}
-                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800 shrink-0 self-start sm:self-auto">
-                  Marked as Advisory
-                </span>
+                <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                  <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">
+                    Delhi-NCR Airshed Only
+                  </span>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800">
+                    Marked as Advisory
+                  </span>
+                </div>
               </div>
 
               {/* Advisory Disclaimer Banner */}
               <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
                 <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  <strong>Statutory Advisory Disclaimer:</strong> The recommended actions below represent technical mitigation benchmarks synthesized from the official CAQM Graded Response Action Plan (GRAP). Implementation by municipal bodies, transport departments, and industrial boards is subject to formal notifications promulgated by the respective State Governments and Pollution Control Committees.
+                  <strong>Advisory Statement:</strong> The mitigation measures below summarize the statutory Graded Response Action Plan (GRAP) established under CAQM Direction No. 77 (revised protocol, <a href="https://caqm.nic.in" target="_blank" rel="noopener noreferrer" className="underline font-bold">caqm.nic.in</a>) applicable strictly to the National Capital Region (NCR). In all operational and legal contexts, official statutory orders and real-time directives promulgated by CAQM and respective State Governments (Delhi, Haryana, Uttar Pradesh, Rajasthan) prevail.
                 </p>
               </div>
 

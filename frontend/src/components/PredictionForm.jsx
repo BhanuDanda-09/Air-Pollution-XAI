@@ -1,6 +1,6 @@
 import React from 'react';
-import { FEATURE_SPECS } from '../utils/validation';
-import { Sliders, RotateCcw, Play, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { FEATURE_SPECS, TRAINING_RANGES, checkTrainingRanges } from '../utils/validation';
+import { Sliders, RotateCcw, Play, AlertTriangle } from 'lucide-react';
 
 export default function PredictionForm({
   features,
@@ -15,18 +15,20 @@ export default function PredictionForm({
 }) {
   const presets = [
     {
-      label: 'Winter Stagnation (High PM2.5)',
-      data: { RH: 82.0, WD: 115.0, SR: 140.0, BP: 752.0, AT: 11.5 },
+      label: 'Winter Stagnation (In-Range)',
+      data: { RH: 85.0, WD: 290.0, SR: 20.0, BP: 746.0, AT: 12.0 },
     },
     {
-      label: 'Typical Monsoon (Clean Air)',
-      data: { RH: 70.0, WD: 240.0, SR: 480.0, BP: 738.0, AT: 31.0 },
+      label: 'Autumn Afternoon (In-Range)',
+      data: { RH: 50.0, WD: 200.0, SR: 220.0, BP: 736.0, AT: 20.0 },
     },
     {
-      label: 'Standard Delhi Baseline',
-      data: { RH: 55.0, WD: 180.0, SR: 350.0, BP: 745.0, AT: 28.0 },
+      label: 'Delhi Baseline (In-Range)',
+      data: { RH: 60.0, WD: 180.0, SR: 150.0, BP: 738.0, AT: 18.0 },
     },
   ];
+
+  const rangeCheck = checkTrainingRanges(features);
 
   const applyPreset = (presetData) => {
     Object.entries(presetData).forEach(([key, val]) => {
@@ -94,12 +96,27 @@ export default function PredictionForm({
         ))}
       </div>
 
+      {/* Out of Training Range Warning Banner */}
+      {rangeCheck.hasOutOfRange && (
+        <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2.5 animate-fadeIn">
+          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <span className="font-bold">Out-of-Training-Range Warning:</span>
+            <p className="leading-relaxed">
+              One or more parameters exceed the empirical training domain (SR ≤ 334 W/m², AT 11–23°C, BP 726–749 mmHg). The model will infer via algorithmic extrapolation, which carries higher uncertainty than interpolation inside the training bounds.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 5 Input Fields Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {Object.entries(FEATURE_SPECS).map(([key, spec]) => {
           const val = features[key];
           const hasError = !!errors[key];
           const isBP = key === 'BP';
+          const range = TRAINING_RANGES[key];
+          const isOutOfRange = range && val !== undefined && val !== null && val !== '' && (Number(val) < range.min || Number(val) > range.max);
 
           return (
             <div
@@ -107,6 +124,8 @@ export default function PredictionForm({
               className={`p-4 rounded-xl border transition-all ${
                 hasError
                   ? 'bg-rose-50/50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800'
+                  : isOutOfRange
+                  ? 'bg-amber-50/30 dark:bg-amber-950/20 border-amber-300 dark:border-amber-800'
                   : isBP
                   ? 'bg-blue-50/20 dark:bg-blue-950/30 border-blue-200/70 dark:border-blue-800/70 hover:border-blue-300'
                   : 'bg-slate-50/60 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
@@ -139,6 +158,8 @@ export default function PredictionForm({
                   className={`w-full text-base font-semibold px-3 py-2 rounded-lg border bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 disabled:opacity-50 transition-all ${
                     hasError
                       ? 'border-rose-400 focus:ring-rose-400'
+                      : isOutOfRange
+                      ? 'border-amber-400 focus:ring-amber-400'
                       : 'border-slate-300 dark:border-slate-700 focus:ring-blue-500'
                   }`}
                 />
@@ -157,13 +178,19 @@ export default function PredictionForm({
               />
 
               <div className="flex items-center justify-between mt-1 text-[11px] text-slate-400 dark:text-slate-500">
-                <span>Min: {spec.min}</span>
-                <span>Max: {spec.max}</span>
+                <span>Training: {range ? `${range.min}–${range.max} ${range.unit}` : ''}</span>
+                <span>Limits: {spec.min}–{spec.max}</span>
               </div>
 
               {isBP && (
                 <p className="mt-1.5 text-[10px] text-blue-700/80 dark:text-blue-300/80 leading-tight">
                   Strictly <strong>mmHg</strong> (Delhi surface elevation). Do not input hPa.
+                </p>
+              )}
+
+              {isOutOfRange && !hasError && (
+                <p className="mt-1 text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+                  Outside empirical training range [{range.min}–{range.max} {range.unit}]
                 </p>
               )}
 

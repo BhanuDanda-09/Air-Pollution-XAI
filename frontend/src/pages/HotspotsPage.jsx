@@ -267,7 +267,7 @@ export default function HotspotsPage() {
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 space-y-2">
           <div className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
             <Info className="w-4 h-4 text-blue-600" />
-            <span>Traffic Data & Clustering Methodology (For Viva Defense)</span>
+            <span>Traffic Proxy & Clustering Methodology</span>
           </div>
           <p>
             <strong>Traffic Density Limitation:</strong> Real-time vehicular traffic density lacks a free, open-access national API across India. Urban vehicular emission exposure is represented through municipality tier classifications (Metro vs Industrial vs Highland) and diurnal rush-hour harmonic features. Commercial traffic API integration (TomTom / Google) is documented under Future Scope.

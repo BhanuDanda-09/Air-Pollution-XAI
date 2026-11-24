@@ -197,17 +197,17 @@ def test_location_assess_success_delhi(mock_get, client):
     assert data["model_prediction"]["pm25"] > 0
     assert "cpcb_category" in data["model_prediction"]
 
-    # Reference PM2.5 checks - must be named "Reference PM2.5 (CAMS model data)"
+    # Regional estimate PM2.5 checks - must be named "Regional estimate (CAMS)"
     ref_aq = data["reference_air_quality"]
     assert ref_aq["reference_pm25"] == 115.4
-    assert ref_aq["reference_label"] == "Reference PM2.5 (CAMS model data)"
+    assert ref_aq["reference_label"] == "Regional estimate (CAMS)"
     assert ref_aq["status"] == "available"
 
     # Comparison discrepancy
     comp = data["model_vs_reference_comparison"]
     assert comp is not None
     assert comp["reference_pm25"] == 115.4
-    assert comp["reference_label"] == "Reference PM2.5 (CAMS model data)"
+    assert comp["reference_label"] == "Regional estimate (CAMS)"
     assert "delta" in comp
     assert "discrepancy_explanation" in comp
 

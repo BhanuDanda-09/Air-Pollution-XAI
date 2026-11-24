@@ -133,7 +133,7 @@ def test_livability_verdict_good_to_go(mock_get, client):
     livability = data["livability"]
     assert livability["verdict"] == "Good to go"
     assert livability["confidence"] == "high"
-    assert "Reference PM2.5 (CAMS model data)" in livability["primary_driver"]["source"]
+    assert "Regional estimate (CAMS)" in livability["primary_driver"]["source"]
 
     # Check tailored advice
     advice = livability["tailored_advice"]

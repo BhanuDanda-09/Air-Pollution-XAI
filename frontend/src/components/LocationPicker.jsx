@@ -134,7 +134,7 @@ export default function LocationPicker({
             Live Geographic Assessment
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Evaluate real-time PM2.5 and meteorological conditions anywhere via live satellite & surface data
+            Check current weather and estimated PM2.5 for any place in India, using open weather data and atmospheric model estimates.
           </p>
         </div>
 

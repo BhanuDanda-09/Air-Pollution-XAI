@@ -3,6 +3,15 @@ import { MapPin, Navigation, Search, Check, AlertCircle, Loader2, ChevronDown } 
 import airService from '../services/airService';
 import CoverageTierBadge from './CoverageTierBadge';
 
+const formatLocationLabel = (place) => {
+  if (!place) return '';
+  if (place.display_name && !place.display_name.includes('undefined')) return place.display_name;
+  const parts = [place.name, place.district, place.state].filter(
+    (v) => v && typeof v === 'string' && v.trim() !== '' && v !== 'undefined' && v !== 'null'
+  );
+  return Array.from(new Set(parts)).join(', ') || place.name || '';
+};
+
 /**
  * LocationHierarchySelector:
  * Complete Indian administrative hierarchy selector supporting:
@@ -411,9 +420,11 @@ export default function LocationHierarchySelector({
                   >
                     <div>
                       <span className="font-semibold text-slate-900 dark:text-slate-100">{p.name}</span>
-                      <span className="text-slate-500 dark:text-slate-400 ml-1.5 text-[11px]">
-                        ({p.district}, {p.state})
-                      </span>
+                      {(p.district || p.state) && p.district !== 'undefined' && (
+                        <span className="text-slate-500 dark:text-slate-400 ml-1.5 text-[11px]">
+                          ({[p.district, p.state].filter(Boolean).filter((v) => v !== 'undefined').join(', ')})
+                        </span>
+                      )}
                     </div>
                     {p.coverage && (
                       <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
@@ -471,7 +482,7 @@ export default function LocationHierarchySelector({
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                {selectedPlace.display_name || `${selectedPlace.name}, ${selectedPlace.district}, ${selectedPlace.state}`}
+                {formatLocationLabel(selectedPlace)}
               </p>
               <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
                 Coordinates: {selectedPlace.lat?.toFixed(4)}°N, {selectedPlace.lon?.toFixed(4)}°E

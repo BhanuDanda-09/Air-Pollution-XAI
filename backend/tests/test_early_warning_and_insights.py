@@ -12,7 +12,7 @@ def test_get_early_warning_forecast_structure():
     res = AirQualityService.get_early_warning_forecast(28.6139, 77.2090, horizon_hours=72)
     assert res is not None
     assert res.get("success") is True
-    assert res.get("reference_label") == "Reference forecast (CAMS)"
+    assert res.get("reference_label") == "Regional estimate (CAMS)"
     assert "banner" in res
     assert "hourly_series" in res
     assert len(res["hourly_series"]) > 0
@@ -126,7 +126,7 @@ def test_early_warning_api_routes(client):
     ew_json = ew_resp.get_json()
     assert ew_json["success"] is True
     ref_label = ew_json.get("reference_label") or ew_json.get("data", {}).get("reference_label")
-    assert ref_label == "Reference forecast (CAMS)"
+    assert ref_label == "Regional estimate (CAMS)"
 
     # POST /api/air/early-warning/check
     check_resp = client.post(

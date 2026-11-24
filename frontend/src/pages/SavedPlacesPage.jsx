@@ -536,30 +536,27 @@ export default function SavedPlacesPage() {
 
       {/* Early Warning System Control & Consent Card */}
       <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-50/70 to-indigo-50/70 dark:from-slate-900 dark:to-slate-900 border border-blue-200 dark:border-blue-900/60 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">
-              Reference forecast (CAMS)
+              Regional estimate (CAMS)
             </span>
             <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
               24–72h Early Air Quality Warning
             </span>
           </div>
           <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-            Checks upcoming European CAMS atmospheric forecast across your saved spots for Poor, Very Poor, or Severe episodes.
+            Checks upcoming Copernicus Atmosphere Monitoring Service (CAMS) atmospheric forecast across your saved spots for Poor, Very Poor, or Severe episodes.
           </p>
 
-          <label className="flex items-center gap-2 pt-1 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={emailAlertsConsent}
-              onChange={handleToggleEmailAlerts}
-              className="w-3.5 h-3.5 rounded text-blue-600 border-slate-300 focus:ring-blue-500"
-            />
-            <span className="text-[11px] text-slate-600 dark:text-slate-300">
-              Enable Email Alerts (Optional / Consent-based under DPDP Act 2023 - free tier on-demand fallback)
-            </span>
-          </label>
+          <div className="pt-1 text-[11px] text-slate-500 dark:text-slate-400 space-y-0.5 leading-relaxed max-w-2xl">
+            <p>
+              <strong className="text-slate-700 dark:text-slate-300">On-Demand Forecast Check:</strong> Automated background email delivery is not active on this free-tier container. Use the button on the right for instant on-demand scan.
+            </p>
+            <p>
+              <strong className="text-slate-700 dark:text-slate-300">DPDP Act 2023 Consent:</strong> Your saved locations and threshold preferences are stored with your explicit consent. You can withdraw consent, export your full data bundle, or permanently delete your account at any time in Account settings.
+            </p>
+          </div>
         </div>
 
         <button
@@ -582,7 +579,7 @@ export default function SavedPlacesPage() {
               Early Warning: {earlyWarnings.length} Saved Location(s) Forecast to Enter Adverse Bands
             </span>
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 uppercase font-mono">
-              Reference forecast (CAMS)
+              Regional estimate (CAMS)
             </span>
           </div>
           <ul className="space-y-1 list-disc list-inside text-rose-700 dark:text-rose-300 text-[11px]">

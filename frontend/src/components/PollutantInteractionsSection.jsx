@@ -34,7 +34,7 @@ export default function PollutantInteractionsSection({ latitude, longitude }) {
       setLoading(true);
       setError(null);
       try {
-        const res = await airService.getPollutantInteractions(latitude, longitude, 7);
+        const res = await airService.getPollutantInteractions({ lat: latitude, lon: longitude, days: 7 });
         if (isMounted) {
           setData(res);
         }

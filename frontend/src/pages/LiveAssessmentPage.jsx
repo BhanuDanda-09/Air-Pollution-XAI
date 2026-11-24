@@ -134,8 +134,7 @@ export default function LiveAssessmentPage() {
               Real-World Air Quality Assessment
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-3xl leading-relaxed">
-              Assess live particulate air pollution (PM2.5) for any geographic coordinates using real-time
-              surface meteorology, calibrated machine learning, and regional baseline comparison.
+              Check current weather and estimated PM2.5 for any place in India, using open weather data and atmospheric model estimates.
             </p>
           </div>
 
@@ -189,7 +188,7 @@ export default function LiveAssessmentPage() {
             <span className="font-extrabold uppercase tracking-wider text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">
               Scientific Diagnostic
             </span>
-            <span>Deep physical weather telemetry, regional reference PM2.5, and atmospheric factor attributions.</span>
+            <span>Deep physical weather telemetry, regional estimate PM2.5 (CAMS), and atmospheric factor attributions.</span>
           </div>
           <Link
             to={`/livability?lat=${latitude}&lon=${longitude}`}

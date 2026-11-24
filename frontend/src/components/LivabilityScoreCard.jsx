@@ -464,7 +464,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500">
-            Source: Hourly atmospheric satellite modeling & solar dispersion dynamics
+            Source: Hourly atmospheric numerical modeling & solar dispersion dynamics
           </div>
         </div>
 
@@ -674,7 +674,7 @@ export default function LivabilityScoreCard({ livabilityData }) {
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">
               {secondary_ml_context?.scientific_limitation ||
                 secondary_ml_context?.note ||
-                'Calibrated against ground meteorological observations. Provided to analyze local weather impacts, alongside satellite feeds.'}
+                'Calibrated against ground meteorological observations. Provided to analyze local weather impacts, alongside atmospheric model feeds.'}
             </p>
 
             <div className="flex flex-wrap items-center gap-4 text-xs">

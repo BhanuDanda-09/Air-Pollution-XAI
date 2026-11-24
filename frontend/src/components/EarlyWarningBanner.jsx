@@ -21,7 +21,7 @@ export default function EarlyWarningBanner({ earlyWarning }) {
   const {
     banner = {},
     hourly_series = [],
-    reference_label = 'Reference forecast (CAMS)',
+    reference_label = 'Regional estimate (CAMS)',
     horizon_hours = 72,
   } = earlyWarning;
 
@@ -198,7 +198,7 @@ export default function EarlyWarningBanner({ earlyWarning }) {
         </div>
       )}
 
-      {/* 2. 24–72 Hour Reference Forecast (CAMS) Timeline Chart */}
+      {/* 2. 24–72 Hour Regional Estimate (CAMS) Timeline Chart */}
       {showTimeline && displaySeries.length > 0 && (
         <div className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 animate-in fade-in duration-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">

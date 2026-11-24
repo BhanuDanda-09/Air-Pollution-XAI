@@ -215,8 +215,17 @@ export const airService = {
 
   /**
    * Fetch 7-day multi-pollutant history, Pearson correlation matrix, and chemical interpretations.
+   * Supports both ({ lat, lon, city, days }) and (lat, lon, days) call shapes.
    */
-  async getPollutantInteractions({ lat, lon, city, days = 7 } = {}) {
+  async getPollutantInteractions(param1, param2, param3) {
+    let lat, lon, city, days = 7;
+    if (typeof param1 === 'object' && param1 !== null) {
+      ({ lat, lon, city, days = 7 } = param1);
+    } else {
+      lat = param1;
+      lon = param2;
+      if (param3 != null) days = param3;
+    }
     const params = { days };
     if (city) params.city = city;
     if (lat != null && lon != null) {

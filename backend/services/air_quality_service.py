@@ -162,7 +162,7 @@ class AirQualityService:
                     "reference_pm25": ref_pm25_float,
                     "unit": "µg/m³",
                     "reference_source": "Copernicus Atmosphere Monitoring Service (CAMS via Open-Meteo)",
-                    "reference_label": "Reference PM2.5 (CAMS model data)",
+                    "reference_label": "Regional estimate (CAMS)",
                     "european_aqi": current.get("european_aqi"),
                     "us_aqi": current.get("us_aqi"),
                     "timestamp": current.get("time"),
@@ -401,7 +401,7 @@ class AirQualityService:
         result = {
             "success": True,
             "coordinates": {"lat": lat, "lon": lon},
-            "reference_label": "Reference forecast (CAMS)",
+            "reference_label": "Regional estimate (CAMS)",
             "reference_source": "Copernicus Atmosphere Monitoring Service (CAMS via Open-Meteo)",
             "horizon_hours": horizon_hours,
             "banner": banner,

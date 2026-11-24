@@ -28,20 +28,20 @@ import LocationHierarchySelector from '../components/LocationHierarchySelector';
 import CoverageTierBadge from '../components/CoverageTierBadge';
 
 const PRESET_ORIGINS = [
-  { name: 'Delhi', lat: 28.6139, lon: 77.2090 },
-  { name: 'Mumbai', lat: 19.0760, lon: 72.8777 },
-  { name: 'Kolkata', lat: 22.5726, lon: 88.3639 },
-  { name: 'Patna', lat: 25.5941, lon: 85.1376 },
-  { name: 'Kanpur', lat: 26.4499, lon: 80.3319 },
+  { name: 'Delhi', district: 'New Delhi', state: 'Delhi', lat: 28.6139, lon: 77.2090 },
+  { name: 'Mumbai', district: 'Mumbai City', state: 'Maharashtra', lat: 19.0760, lon: 72.8777 },
+  { name: 'Kolkata', district: 'Kolkata', state: 'West Bengal', lat: 22.5726, lon: 88.3639 },
+  { name: 'Patna', district: 'Patna', state: 'Bihar', lat: 25.5941, lon: 85.1376 },
+  { name: 'Kanpur', district: 'Kanpur Nagar', state: 'Uttar Pradesh', lat: 26.4499, lon: 80.3319 },
 ];
 
 const PRESET_DESTINATIONS = [
-  { name: 'Bengaluru', lat: 12.9716, lon: 77.5946 },
-  { name: 'Pune', lat: 18.5204, lon: 73.8567 },
-  { name: 'Kochi', lat: 9.9312, lon: 76.2673 },
-  { name: 'Shillong', lat: 25.5788, lon: 91.8933 },
-  { name: 'Mysuru', lat: 12.2958, lon: 76.6394 },
-  { name: 'Coimbatore', lat: 11.0168, lon: 76.9558 },
+  { name: 'Bengaluru', district: 'Bengaluru Urban', state: 'Karnataka', lat: 12.9716, lon: 77.5946 },
+  { name: 'Pune', district: 'Pune', state: 'Maharashtra', lat: 18.5204, lon: 73.8567 },
+  { name: 'Kochi', district: 'Ernakulam', state: 'Kerala', lat: 9.9312, lon: 76.2673 },
+  { name: 'Shillong', district: 'East Khasi Hills', state: 'Meghalaya', lat: 25.5788, lon: 91.8933 },
+  { name: 'Mysuru', district: 'Mysuru', state: 'Karnataka', lat: 12.2958, lon: 76.6394 },
+  { name: 'Coimbatore', district: 'Coimbatore', state: 'Tamil Nadu', lat: 11.0168, lon: 76.9558 },
 ];
 
 const HEALTH_CONDITIONS = [
@@ -67,10 +67,10 @@ export default function RelocationAdvisorPage() {
   const [error, setError] = useState(null);
 
   // Form State
-  const [origin, setOrigin] = useState({ name: 'Delhi', lat: 28.6139, lon: 77.2090 });
+  const [origin, setOrigin] = useState(PRESET_ORIGINS[0]);
   const [destinations, setDestinations] = useState([
-    { name: 'Bengaluru', lat: 12.9716, lon: 77.5946 },
-    { name: 'Pune', lat: 18.5204, lon: 73.8567 },
+    PRESET_DESTINATIONS[0],
+    PRESET_DESTINATIONS[1],
   ]);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -837,14 +837,14 @@ export default function RelocationAdvisorPage() {
               ))}
             </div>
 
-            {/* Scientific Viva Defense Footer Note */}
+            {/* Scientific Methodology & Standards Note */}
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
               <div className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
                 <Info className="w-4 h-4 text-blue-600" />
                 <span>Clinical & Scientific Advisory Standards</span>
               </div>
               <p>
-                <strong>Scientific Validity:</strong> Comparative verdicts are derived from multi-criteria ranking combining satellite reanalysis, machine learning short-term forecast trends (held-out $R^2 = 0.715$ at 6h), and epidemiological sensitivity weightings from WHO 2021 air quality guidelines.
+                <strong>Scientific Validity:</strong> Comparative verdicts are derived from multi-criteria ranking combining regional CAMS atmospheric reanalysis, machine learning short-term forecast trends (held-out $R^2 = 0.715$ at 6h), and epidemiological sensitivity weightings from WHO 2021 air quality guidelines.
               </p>
               <p>
                 <strong>Legal & Medical Disclaimer:</strong> Air quality estimates are for general information and are not an official AQI or medical advice. If you have a health condition, follow your doctor's guidance.

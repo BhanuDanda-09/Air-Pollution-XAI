@@ -143,7 +143,7 @@ export default function HistoryPage() {
       'Place Name',
       'Latitude',
       'Longitude',
-      'Reference PM2.5 (ug/m3)',
+      'Regional estimate PM2.5 (ug/m3)',
       'Model Estimate PM2.5 (ug/m3)',
       'Livability Score',
       'Verdict',
@@ -216,7 +216,7 @@ export default function HistoryPage() {
                 Exposure Timeline
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Every location query is archived with exact timestamp and reference PM2.5.
+                Every location query is archived with exact timestamp and regional estimate PM2.5.
               </p>
             </div>
             <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700">
@@ -232,7 +232,7 @@ export default function HistoryPage() {
                 Instant Re-Checks
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Compare past pollution readings directly with current live satellite data.
+                Compare past pollution readings directly with current live atmospheric model data.
               </p>
             </div>
           </div>

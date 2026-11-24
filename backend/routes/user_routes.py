@@ -473,7 +473,7 @@ def get_user_alerts():
                     "duration_hours": banner.get("duration_hours"),
                     "peak_concentration": banner.get("peak_concentration"),
                     "banner_message": banner.get("message"),
-                    "reference_label": "Reference forecast (CAMS)",
+                    "reference_label": "Regional estimate (CAMS)",
                 })
         except Exception as exc:
             logger.warning("Alert check failed for location %s: %s", loc.id, exc)

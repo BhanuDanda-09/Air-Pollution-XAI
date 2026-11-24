@@ -29,7 +29,7 @@ export default function FAQPage() {
     {
       category: 'Air Quality & AQI',
       q: 'How does AirIQ India calculate air quality for villages without monitoring stations?',
-      a: 'Over 95% of rural India does not have a physical ambient monitoring station within 25 km. Rather than naively guessing or drawing straight lines between distant city monitors, AirIQ India uses European Copernicus (CAMS) atmospheric satellite reanalysis assimilated with local surface weather physics. We label these results clearly as "Tier 3: Gridded Regional Estimate" so citizens and authorities always know when data is estimated rather than measured.',
+      a: 'Over 95% of rural India does not have a physical ambient monitoring station within 25 km. Rather than naively guessing or drawing straight lines between distant city monitors, AirIQ India uses European Copernicus (CAMS) atmospheric numerical reanalysis assimilated with local surface weather physics. We label these results clearly as "Tier 3: Gridded Regional Estimate" so citizens and authorities always know when data is estimated rather than measured.',
     },
     {
       category: 'Air Quality & AQI',
