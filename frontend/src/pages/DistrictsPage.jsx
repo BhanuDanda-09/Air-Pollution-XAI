@@ -17,6 +17,7 @@ import {
   Info,
   Factory,
   ShieldCheck,
+  ExternalLink,
 } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
 import airService from '../services/airService';
@@ -577,37 +578,70 @@ export default function DistrictsPage() {
                   {/* Exact TreeSHAP from Trained Model */}
                   <div className="p-3.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 space-y-2">
                     <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                      <span>Exact TreeSHAP (Trained XGBoost)</span>
-                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Baseline: 144.5 µg/m³</span>
+                      <span>TreeSHAP Feature Attribution (Trained XGBoost)</span>
+                      <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400">Baseline E[f(x)]: 144.2 µg/m³</span>
                     </div>
                     <div className="text-[10px] text-slate-500 font-mono bg-slate-50 dark:bg-slate-900 p-1.5 rounded border border-slate-200 dark:border-slate-700">
-                      Scenario: RH=85%, WD=290°, SR=15 W/m², BP=746 mmHg, AT=12°C
+                      Representative Scenario: RH=85%, WD=290°, SR=15 W/m², BP=746 mmHg, AT=12°C
                     </div>
-                    <ul className="text-xs space-y-1.5 text-slate-600 dark:text-slate-300 font-mono">
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>High Humidity (RH: 85%)</span>
-                        <strong className="text-rose-600 dark:text-rose-400">+39.3 µg/m³</strong>
+                    <ul className="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <div className="flex justify-between items-center font-mono">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">Relative Humidity (RH: 85%)</span>
+                          <strong className="text-rose-600 dark:text-rose-400">+39.3 µg/m³</strong>
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          Model predicts higher particulate concentration at high relative humidity. Literature note: atmospheric aerosols undergo hygroscopic growth under elevated relative humidity, increasing particle cross-section and liquid-water content (Zieger et al., 2013; Swietlicki et al., 2008).
+                        </span>
                       </li>
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>Low Temperature (AT: 12°C)</span>
-                        <strong className="text-slate-600 dark:text-slate-300">-2.1 µg/m³</strong>
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <div className="flex justify-between items-center font-mono">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">Air Temperature (AT: 12°C)</span>
+                          <strong className="text-slate-600 dark:text-slate-300">-2.1 µg/m³</strong>
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          Model assigns a slight negative adjustment (-2.1 µg/m³) from the base expectation at this temperature.
+                        </span>
                       </li>
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>WNW Transport Wind (WD: 290°)</span>
-                        <strong className="text-slate-600 dark:text-slate-300">-7.9 µg/m³</strong>
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <div className="flex justify-between items-center font-mono">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">Wind Direction (WD: 290°)</span>
+                          <strong className="text-slate-600 dark:text-slate-300">-7.9 µg/m³</strong>
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          Model assigns a negative adjustment (-7.9 µg/m³) for 290° wind direction relative to training distribution.
+                        </span>
                       </li>
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>High Surface Pressure (BP: 746)</span>
-                        <strong className="text-slate-600 dark:text-slate-300">-15.7 µg/m³</strong>
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <div className="flex justify-between items-center font-mono">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">Barometric Pressure (BP: 746 mmHg)</span>
+                          <strong className="text-slate-600 dark:text-slate-300">-15.7 µg/m³</strong>
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          Model assigns a negative adjustment (-15.7 µg/m³) at 746 mmHg relative to dataset mean.
+                        </span>
                       </li>
-                      <li className="flex justify-between items-center text-[11px]">
-                        <span>Low Solar Irradiance (SR: 15)</span>
-                        <strong className="text-slate-600 dark:text-slate-300">-0.1 µg/m³</strong>
+                      <li className="flex flex-col gap-0.5 text-[11px]">
+                        <div className="flex justify-between items-center font-mono">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">Solar Radiation (SR: 15 W/m²)</span>
+                          <strong className="text-slate-600 dark:text-slate-300">-0.1 µg/m³</strong>
+                        </div>
+                        <span className="text-[10px] text-slate-500">
+                          Model assigns a minimal negative adjustment (-0.1 µg/m³) at low irradiance input.
+                        </span>
                       </li>
                     </ul>
-                    <p className="text-[10px] text-slate-400 italic pt-1 border-t border-slate-100 dark:border-slate-700">
-                      Net Predicted PM2.5: <strong>157.7 µg/m³</strong>. Model features are strictly RH, WD, SR, BP, AT. Boundary-layer collapse is confirmed by meteorological literature (SAFAR/IMD).
-                    </p>
+                    <div className="p-2 rounded bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] text-slate-600 dark:text-slate-400 space-y-1">
+                      <p className="font-semibold text-slate-800 dark:text-slate-200">
+                        Sum of SHAP contributions: <strong>+13.5 µg/m³</strong> (unrounded: +13.537). Net predicted PM2.5: <strong>157.7 µg/m³</strong> (unrounded: 157.733).
+                      </p>
+                      <p className="font-mono text-[9px] text-slate-500">
+                        Arithmetic check: 144.2 (base) + 13.5 (sum) = 157.7 µg/m³. Unrounded values satisfy: base + sum == prediction within 0.0001 µg/m³. Numbers displayed rounded to 1 decimal place.
+                      </p>
+                      <p className="italic text-slate-500">
+                        "This is one representative Delhi winter scenario computed from the trained model. It describes how the model responds, not a physical proof."
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -669,11 +703,11 @@ export default function DistrictsPage() {
                       <ShieldCheck className="w-4 h-4" />
                     </span>
                     <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
-                      (d) Statutory Recommended-Actions Table for Delhi-NCR (CAQM GRAP)
+                      (d) Statutory Graded Response Action Plan (GRAP) Thresholds for Delhi-NCR
                     </h3>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-3xl leading-relaxed">
-                    Official statutory mitigation schedule established under the <strong>Commission for Air Quality Management in National Capital Region and Adjoining Areas Act, 2021</strong> (Direction No. 77 / revised protocol, published at <a href="https://caqm.nic.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">https://caqm.nic.in</a>).
+                    Statutory stage AQI trigger thresholds established under the <strong>Commission for Air Quality Management in National Capital Region and Adjoining Areas Act, 2021</strong>. For the officially approved and revised schedule of mandated actions, refer directly to <a href="https://caqm.nic.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 underline">https://caqm.nic.in</a>.
                   </p>
                 </div>
 
@@ -682,7 +716,7 @@ export default function DistrictsPage() {
                     Delhi-NCR Airshed Only
                   </span>
                   <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800">
-                    Marked as Advisory
+                    Advisory Reference
                   </span>
                 </div>
               </div>
@@ -691,7 +725,7 @@ export default function DistrictsPage() {
               <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
                 <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  <strong>Advisory Statement:</strong> The mitigation measures below summarize the statutory Graded Response Action Plan (GRAP) established under CAQM Direction No. 77 (revised protocol, <a href="https://caqm.nic.in" target="_blank" rel="noopener noreferrer" className="underline font-bold">caqm.nic.in</a>) applicable strictly to the National Capital Region (NCR). In all operational and legal contexts, official statutory orders and real-time directives promulgated by CAQM and respective State Governments (Delhi, Haryana, Uttar Pradesh, Rajasthan) prevail.
+                  <strong>Advisory Statement:</strong> The thresholds below summarize the statutory Graded Response Action Plan (GRAP) stage categories applicable strictly to the National Capital Region (NCR). In all operational, municipal, and legal contexts, official statutory orders and real-time operational notifications promulgated by CAQM (<a href="https://caqm.nic.in" target="_blank" rel="noopener noreferrer" className="underline font-bold">caqm.nic.in</a>) and respective State Governments (Delhi, Haryana, Uttar Pradesh, Rajasthan) strictly prevail. This platform does not state or declare which stage is currently in force; consult <a href="https://caqm.nic.in" target="_blank" rel="noopener noreferrer" className="underline font-bold">caqm.nic.in</a> for current stage enforcement and the complete schedule of actions.
                 </p>
               </div>
 
@@ -701,10 +735,9 @@ export default function DistrictsPage() {
                   <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 uppercase font-bold border-b border-slate-200 dark:border-slate-800">
                     <tr>
                       <th className="px-4 py-3">GRAP Stage</th>
-                      <th className="px-4 py-3">AQI Band & Trigger</th>
-                      <th className="px-4 py-3">Primary Target Sectors</th>
-                      <th className="px-4 py-3">Mandated Control Actions</th>
-                      <th className="px-4 py-3">Statutory Enforcement Body</th>
+                      <th className="px-4 py-3">Statutory AQI Trigger Threshold</th>
+                      <th className="px-4 py-3">Stage Description</th>
+                      <th className="px-4 py-3">Mandated Control Schedule</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -714,20 +747,23 @@ export default function DistrictsPage() {
                         Stage I
                       </td>
                       <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 font-bold">
+                        <span className="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 font-bold font-mono">
                           'Poor' (AQI 201–300)
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
-                        Construction, Dust & Solid Waste
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                        Air quality entering 'Poor' band triggering primary dust abatement and municipal control protocols.
                       </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 leading-relaxed">
-                        • Strict enforcement of anti-dust norms at construction & demolition (C&D) sites (&gt; 500 sq.m).<br />
-                        • Mechanized vacuum sweeping and periodic water sprinkling on arterial roads.<br />
-                        • Complete ban on open biomass/garbage burning with heavy penal fines.
-                      </td>
-                      <td className="px-4 py-3 text-slate-500">
-                        Municipal Corporations (MCD, NDMC) & DPCC / State PCBs
+                      <td className="px-4 py-3">
+                        <a
+                          href="https://caqm.nic.in"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1"
+                        >
+                          <span>Official CAQM Schedule</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                       </td>
                     </tr>
 
@@ -737,20 +773,23 @@ export default function DistrictsPage() {
                         Stage II
                       </td>
                       <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-950 text-orange-800 dark:text-orange-200 font-bold">
+                        <span className="px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-950 text-orange-800 dark:text-orange-200 font-bold font-mono">
                           'Very Poor' (AQI 301–400)
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
-                        Diesel Generators & Urban Traffic
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                        Air quality entering 'Very Poor' band triggering targeted stationary emission and traffic controls.
                       </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 leading-relaxed">
-                        • Complete ban on operation of diesel generator (DG) sets across commercial/industrial sectors (except emergency healthcare, metro, and dual-fuel systems).<br />
-                        • Augment public transit: enhance CNG/electric bus frequencies and metro train cycles.<br />
-                        • Hike municipal parking charges by 3×–4× to discourage private vehicular commuting.
-                      </td>
-                      <td className="px-4 py-3 text-slate-500">
-                        State Transport Depts, DISCOMs & Traffic Police
+                      <td className="px-4 py-3">
+                        <a
+                          href="https://caqm.nic.in"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1"
+                        >
+                          <span>Official CAQM Schedule</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                       </td>
                     </tr>
 
@@ -760,20 +799,23 @@ export default function DistrictsPage() {
                         Stage III
                       </td>
                       <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 font-bold">
+                        <span className="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 font-bold font-mono">
                           'Severe' (AQI 401–450)
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
-                        Non-Essential Construction & Older Vehicles
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                        Air quality entering 'Severe' band triggering construction suspensions and older vehicle restrictions.
                       </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 leading-relaxed">
-                        • Immediate halt on all non-essential construction and demolition activities (excavation, earthworks, tiling).<br />
-                        • Strict prohibition on plying of BS-III Petrol and BS-IV Diesel Light Motor Vehicles (LMVs) in NCR.<br />
-                        • Discontinue in-person school sessions for children up to Class V in affected districts.
-                      </td>
-                      <td className="px-4 py-3 text-slate-500">
-                        District Magistrates, Transport Commissioners & CAQM Taskforce
+                      <td className="px-4 py-3">
+                        <a
+                          href="https://caqm.nic.in"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1"
+                        >
+                          <span>Official CAQM Schedule</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                       </td>
                     </tr>
 
@@ -783,21 +825,23 @@ export default function DistrictsPage() {
                         Stage IV
                       </td>
                       <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 font-bold">
+                        <span className="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 font-bold font-mono">
                           'Severe+' (AQI &gt; 450)
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-700 dark:text-slate-300">
-                        Heavy Truck Entry, Public Works & Remote Work
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                        Air quality entering 'Severe+' band triggering emergency civil measures, transit restrictions, and remote work.
                       </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 leading-relaxed">
-                        • Prohibit entry of non-Delhi registered heavy trucks (except EVs, CNG, and essential commodities).<br />
-                        • Complete shutdown of all public civil infrastructure projects (flyovers, highways, power transmission).<br />
-                        • Mandate 50% work-from-home (WFH) capacity for public, municipal, and private corporate offices.<br />
-                        • Suspend physical classes for Class VI–IX and Class XI.
-                      </td>
-                      <td className="px-4 py-3 text-slate-500">
-                        Chief Secretaries, State Disaster Management Authorities & Ministry of Home Affairs
+                      <td className="px-4 py-3">
+                        <a
+                          href="https://caqm.nic.in"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1"
+                        >
+                          <span>Official CAQM Schedule</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
                       </td>
                     </tr>
                   </tbody>
@@ -807,7 +851,7 @@ export default function DistrictsPage() {
               {/* Source attribution & standard */}
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-400">
                 <span>
-                  Official Source: Commission for Air Quality Management (CAQM) Direction No. 77 / Statutory GRAP Protocol (2023 Revision).
+                  Official Source: Commission for Air Quality Management in NCR & Adjoining Areas (<a href="https://caqm.nic.in" target="_blank" rel="noopener noreferrer" className="underline">caqm.nic.in</a>). Airshed Scope: Delhi-NCR only.
                 </span>
                 <span className="font-semibold text-slate-500 dark:text-slate-400">
                   AirIQ India Municipal Intelligence Engine

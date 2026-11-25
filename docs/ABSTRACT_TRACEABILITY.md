@@ -35,7 +35,7 @@ To maintain complete academic and scientific integrity, the following boundaries
 2. **Sequential Deep Learning (LSTM & Transformer Models)**:
    - *Status*: **Not Delivered (Dataset Constraint: Absence of Timestamps)**.
    - *Rationale*: Recurrent (LSTM/GRU) and self-attention (Transformer) architectures strictly require continuous, monotonic datetime timestamps to formulate sequential time-lag embeddings.
-   - *Implementation*: The clean Delhi dataset consists of 2,027 cross-sectional tabular observations lacking datetime timestamps. Training sequence models on shuffled or synthetic time indices would introduce severe methodological data leakage. Consequently, sequence models were **not trained**, and no metric files exist in `results/metrics/`. Production inference is powered by our evaluated XGBoost ($R^2 = 0.7455$) and MLP ($R^2 = 0.5408$).
+   - *Implementation*: The training dataset has no timestamps (2,027 observations). Consequently, sequence models (LSTM, Transformer) were **not trained**, and no metric files exist in `results/metrics/`. Production inference is powered by our evaluated XGBoost ($R^2 = 0.7455$) and MLP ($R^2 = 0.5408$).
 
 3. **Multi-Pollutant In-House Modeling**:
    - *Status*: **Partial (CAMS External Reference Integration)**.

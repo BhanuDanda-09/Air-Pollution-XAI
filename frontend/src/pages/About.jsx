@@ -235,7 +235,7 @@ export default function About() {
             <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
               <strong className="text-slate-900 dark:text-white block mb-0.5">2. Recurrent & Attention Sequence Models (LSTM / Transformers):</strong>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Sequential deep learning models (LSTM, Transformers) strictly require continuous, monotonic datetime timestamps to formulate autoregressive time-lag sequences. The historical Delhi station training dataset consists of 2,027 tabular meteorological records without datetime indices, precluding genuine sequential recurrent training. While pipeline templates exist in <code>src/train_lstm.py</code>, sequence models were not trained; production inference is powered by our evaluated XGBoost (R² = 0.7455) and MLP neural network (R² = 0.5408).
+                Sequential deep learning models (LSTM, Transformers) strictly require continuous, monotonic datetime timestamps to formulate autoregressive time-lag sequences. The historical Delhi station training dataset has no timestamps (2,027 records), precluding genuine sequential recurrent training. While pipeline templates exist in <code>src/train_lstm.py</code>, sequence models were not trained; production inference is powered by our evaluated XGBoost (R² = 0.7455) and MLP neural network (R² = 0.5408).
               </p>
             </div>
             <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
