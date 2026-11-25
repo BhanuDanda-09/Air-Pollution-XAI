@@ -68,10 +68,9 @@ export default function Navbar({ isBackendOnline }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 2. PWA beforeinstallprompt handler
+  // 2. PWA beforeinstallprompt handler (do not call preventDefault to avoid console warning)
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
       setDeferredPrompt(e);
       setIsInstallable(true);
     };

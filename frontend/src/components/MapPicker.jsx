@@ -67,17 +67,24 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
     }).addTo(map);
 
     let errorCount = 0;
-    tileLayer.on('tileerror', () => {
-      errorCount += 1;
-      // If 5 tiles fail to load consecutively, trip failure state
-      if (errorCount >= 5) {
+    let loadedCount = 0;
+
+    // Show error only if no tile loaded after 15 s AND tile errors were reported
+    const timeoutTimer = setTimeout(() => {
+      if (loadedCount === 0 && errorCount > 0) {
         setTilesFailed(true);
       }
+    }, 15000);
+
+    tileLayer.on('tileerror', () => {
+      errorCount += 1;
     });
 
     tileLayer.on('tileload', () => {
-      // Tiles loaded successfully
+      loadedCount += 1;
+      // Hide the overlay immediately on the first successful tile load
       setTilesFailed(false);
+      clearTimeout(timeoutTimer);
     });
 
     // High-Density Monitoring Region (Delhi-NCR) Bounding Box
@@ -134,6 +141,7 @@ export default function MapPicker({ latitude, longitude, onLocationChange }) {
 
     return () => {
       clearTimeout(resizeTimer);
+      clearTimeout(timeoutTimer);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;

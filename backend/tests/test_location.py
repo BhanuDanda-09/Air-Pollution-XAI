@@ -381,3 +381,69 @@ def test_location_assess_rate_limiter_trusted_proxy_header(mock_get, client):
         ip = get_client_ip()
         assert ip == "203.0.113.50"
 
+
+def test_thread_safe_ttl_cache_is_expired():
+    """Verify ThreadSafeTTLCache._is_expired behavior on valid, expired, and malformed entries."""
+    cache = ThreadSafeTTLCache(maxsize=10, ttl=60)
+    now = time.time()
+
+    # Fresh entry
+    fresh_entry = ({"temp": 25.0}, now - 10)
+    assert cache._is_expired(fresh_entry) is False
+
+    # Expired entry (older than 60s TTL)
+    expired_entry = ({"temp": 25.0}, now - 120)
+    assert cache._is_expired(expired_entry) is True
+
+    # Malformed entry (not tuple/list or too short)
+    assert cache._is_expired("not_a_tuple") is True
+    assert cache._is_expired([]) is True
+    assert cache._is_expired(({"temp": 25.0},)) is True
+
+
+@patch("requests.get")
+def test_weather_service_429_fallback_with_cached_entry(mock_get):
+    """Verify WeatherService gracefully returns recent cached weather when Open-Meteo returns 429."""
+    # Seed cache with a recent entry
+    weather_cache.clear()
+    cached_data = {
+        "temperature_c": 22.5,
+        "humidity_pct": 65.0,
+        "wind_speed_kmh": 12.0,
+        "surface_pressure_hpa": 1012.0,
+        "surface_pressure_mmhg": 759.06,
+        "dew_point_c": 15.0,
+        "weather_code": 1,
+        "condition_label": "Mainly clear",
+        "timestamp": "2026-11-25T10:00:00Z",
+    }
+    weather_cache.set("weather:28.6000:77.2000", cached_data)
+
+    # Mock Open-Meteo returning 429
+    mock_resp = MagicMock()
+    mock_resp.status_code = 429
+    mock_get.return_value = mock_resp
+
+    result = WeatherService.get_live_weather(28.6315, 77.2167)
+    assert result["latitude"] == 28.6315
+    assert result["longitude"] == 77.2167
+    assert result["temperature_c"] == 22.5
+    assert "temporarily rate-limiting" in result["validity_warning"]
+    weather_cache.clear()
+
+
+@patch("requests.get")
+def test_weather_service_429_fallback_to_baseline_when_cache_empty(mock_get):
+    """Verify WeatherService gracefully returns baseline weather when Open-Meteo returns 429 and cache is empty."""
+    weather_cache.clear()
+    mock_resp = MagicMock()
+    mock_resp.status_code = 429
+    mock_get.return_value = mock_resp
+
+    result = WeatherService.get_live_weather(28.6315, 77.2167)
+    assert result["latitude"] == 28.6315
+    assert result["longitude"] == 77.2167
+    assert "Regional Baseline" in result["timestamp"]
+    assert "regional baseline" in result["validity_warning"].lower()
+
+

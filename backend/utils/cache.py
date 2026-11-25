@@ -42,6 +42,13 @@ class ThreadSafeTTLCache:
                 self._cache.popitem(last=False)
             self._cache[key] = (value, time.time())
 
+    def _is_expired(self, entry: Any) -> bool:
+        """Check if a cache entry tuple (data, timestamp) is expired."""
+        if not isinstance(entry, (tuple, list)) or len(entry) < 2:
+            return True
+        _, timestamp = entry
+        return (time.time() - timestamp) > self.ttl
+
     def clear(self) -> None:
         """Clear all cached entries."""
         with self._lock:

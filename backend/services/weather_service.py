@@ -1,6 +1,7 @@
 """Live weather retrieval and meteorological feature mapping via Open-Meteo API."""
 
 import logging
+import time
 from typing import Any, Dict, List, Optional, Tuple
 import requests
 
@@ -130,17 +131,22 @@ class WeatherService:
             response = requests.get(url, params=params, headers=headers, timeout=Config.OPEN_METEO_TIMEOUT)
             if response.status_code == 429:
                 logger.warning("Open-Meteo rate limit (429) encountered for (%s, %s). Checking fallback cache or baseline.", lat, lon)
-                with weather_cache._lock:
-                    for k, v in weather_cache._cache.items():
-                        if not weather_cache._is_expired(v):
-                            cached_val = dict(v["value"])
-                            cached_val["latitude"] = lat
-                            cached_val["longitude"] = lon
-                            cached_val["validity_warning"] = (
-                                "External meteorological service is temporarily rate-limiting requests. "
-                                "Serving recent cached meteorological readings."
-                            )
-                            return cached_val
+                try:
+                    with weather_cache._lock:
+                        for k, entry in list(weather_cache._cache.items()):
+                            if not weather_cache._is_expired(entry):
+                                val = entry[0]
+                                if isinstance(val, dict):
+                                    cached_val = dict(val)
+                                    cached_val["latitude"] = lat
+                                    cached_val["longitude"] = lon
+                                    cached_val["validity_warning"] = (
+                                        "External meteorological service is temporarily rate-limiting requests. "
+                                        "Serving recent cached meteorological readings."
+                                    )
+                                    return cached_val
+                except Exception as cache_err:
+                    logger.warning("Error reading fallback cache: %s. Using baseline.", cache_err)
                 return cls._get_baseline_weather(lat, lon)
             response.raise_for_status()
             data = response.json()
