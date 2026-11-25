@@ -10,6 +10,7 @@
     "test:brand": "node ../scripts/verify_brand_cleanliness.mjs",
     "test:unit": "node test/validation.test.js && node test/demo_security.test.js && node test/auth_user.test.js && node test/livability.test.js && node test/early_warning_and_insights.test.js",
     "test:smoke": "node test/e2e_smoke.mjs",
+    "test:map": "node test/map_tiles.test.mjs",
     "test:footer": "node test/test_footer_suite.mjs",
     "test:e2e": "node test/e2e_full_flow.mjs",
     "test": "npm run test:unit && npm run test:brand"
@@ -17,6 +18,7 @@
   "dependencies": {
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.0",
