@@ -65,24 +65,29 @@ class WeatherService:
             "AT": 24.0,
         }
         has_out_of_range, range_warnings = cls.inspect_training_ranges(mapped_features)
+        elevation_baseline = 214.0 if is_ncr else 100.0
         return {
             "latitude": lat,
             "longitude": lon,
-            "timestamp": "Regional Baseline (External API Rate-Limited)",
+            "elevation": elevation_baseline,
+            "timestamp": "Regional Baseline (External API Offline / Rate-Limited)",
             "raw_weather": {
                 "temperature_2m_c": 24.0,
                 "relative_humidity_2m_pct": 55.0,
                 "wind_direction_10m_deg": 180.0,
+                "wind_speed_10m_kmh": 6.0,
+                "precipitation_mm": 0.0,
                 "surface_pressure_hpa": 986.6,
                 "surface_pressure_mmhg": 740.0,
                 "shortwave_radiation_wm2": 150.0,
+                "elevation_m": elevation_baseline,
             },
             "features": mapped_features,
             "is_delhi_ncr": is_ncr,
             "validity": "valid_training_region" if is_ncr else "outside_training_region",
             "validity_warning": warning_msg or (
-                "External meteorological service is temporarily rate-limiting requests. "
-                "Utilizing regional baseline meteorological indicators for Delhi-NCR."
+                "External meteorological service is temporarily unreachable or rate-limiting requests. "
+                "Utilizing regional baseline meteorological indicators."
             ),
             "has_out_of_training_range_inputs": has_out_of_range,
             "input_out_of_training_range_warnings": range_warnings,
@@ -112,7 +117,7 @@ class WeatherService:
         params = {
             "latitude": lat,
             "longitude": lon,
-            "current": "temperature_2m,relative_humidity_2m,wind_direction_10m,surface_pressure,shortwave_radiation",
+            "current": "temperature_2m,relative_humidity_2m,wind_direction_10m,surface_pressure,shortwave_radiation,wind_speed_10m,precipitation",
         }
         headers = {
             "User-Agent": "AirIQIndia/2.0 (https://github.com/BhanuDanda-09/Air-Pollution-XAI)",
@@ -142,7 +147,11 @@ class WeatherService:
         except requests.HTTPError as http_err:
             if http_err.response is not None and http_err.response.status_code == 429:
                 return cls._get_baseline_weather(lat, lon)
-            raise
+            logger.warning("HTTP error fetching live weather for (%s, %s): %s. Serving baseline.", lat, lon, http_err)
+            return cls._get_baseline_weather(lat, lon)
+        except requests.RequestException as req_err:
+            logger.warning("Network/connection error fetching live weather for (%s, %s): %s. Serving baseline.", lat, lon, req_err)
+            return cls._get_baseline_weather(lat, lon)
 
         current = data.get("current")
         if not current:
@@ -153,6 +162,9 @@ class WeatherService:
         wd_deg = float(current.get("wind_direction_10m", 180.0))
         hpa = float(current.get("surface_pressure", 1013.25))
         sr_wm2 = max(0.0, float(current.get("shortwave_radiation", 0.0)))
+        wind_speed_kmh = float(current.get("wind_speed_10m", 5.0))
+        precipitation_mm = float(current.get("precipitation", 0.0))
+        elevation_m = float(data.get("elevation", 0.0)) if data.get("elevation") is not None else None
 
         # Precise unit conversion from hectopascals (hPa) to millimeters of mercury (mmHg)
         bp_mmhg = round(hpa * HPA_TO_MMHG, 2)
@@ -172,14 +184,18 @@ class WeatherService:
         result = {
             "latitude": lat,
             "longitude": lon,
+            "elevation": elevation_m,
             "timestamp": current.get("time"),
             "raw_weather": {
                 "temperature_2m_c": temp_c,
                 "relative_humidity_2m_pct": rh_pct,
                 "wind_direction_10m_deg": wd_deg,
+                "wind_speed_10m_kmh": wind_speed_kmh,
+                "precipitation_mm": precipitation_mm,
                 "surface_pressure_hpa": hpa,
                 "surface_pressure_mmhg": bp_mmhg,
                 "shortwave_radiation_wm2": sr_wm2,
+                "elevation_m": elevation_m,
             },
             "features": mapped_features,
             "is_delhi_ncr": is_ncr,

@@ -391,6 +391,16 @@ export default function LivabilityScoreCard({ livabilityData }) {
                     <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                       {p.recommendation}
                     </p>
+                    {p.trigger && (
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">Trigger:</span> {p.trigger}
+                      </div>
+                    )}
+                    {p.source && (
+                      <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 italic">
+                        Source: {p.source}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

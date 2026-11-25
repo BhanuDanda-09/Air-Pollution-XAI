@@ -20,6 +20,7 @@ import {
   Wind,
   Info,
   Heart,
+  Sun,
 } from 'lucide-react';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { useAuth } from '../context/AuthContext';
@@ -89,6 +90,8 @@ export default function RelocationAdvisorPage() {
 
   // Comparison Report Result
   const [comparisonReport, setComparisonReport] = useState(null);
+  const [expandedPrecautions, setExpandedPrecautions] = useState({});
+  const [expandedHowCalculated, setExpandedHowCalculated] = useState({});
 
   // Search geocode debouncer
   useEffect(() => {
@@ -706,7 +709,7 @@ export default function RelocationAdvisorPage() {
                   key={cand.destination?.name}
                   className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 space-y-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden"
                 >
-                  {/* Verdict Header Badge */}
+                  {/* Suitability Header Badge */}
                   <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Destination Candidate {idx + 1}</span>
@@ -716,15 +719,16 @@ export default function RelocationAdvisorPage() {
                     </div>
 
                     <div
-                      className="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5"
-                      style={{
-                        backgroundColor: `${cand.verdict_color}20`,
-                        color: cand.verdict_color,
-                        border: `1px solid ${cand.verdict_color}40`,
-                      }}
+                      className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border ${
+                        cand.suitability === 'Suitable'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                          : cand.suitability === 'Suitable with precautions'
+                          ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                          : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800'
+                      }`}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>{cand.verdict}</span>
+                      <span>{cand.display_verdict || cand.suitability}</span>
                     </div>
                   </div>
 
@@ -741,11 +745,11 @@ export default function RelocationAdvisorPage() {
                     </div>
 
                     <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50">
-                      <div className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">AQI Reduction</div>
+                      <div className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">Exposure Shift</div>
                       <div className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                        {cand.aqi_reduction_pct > 0 ? `-${cand.aqi_reduction_pct}%` : `+${Math.abs(cand.aqi_reduction_pct)}%`}
+                        {cand.exposure_diff_points > 0 ? `-${cand.exposure_diff_points} pts` : `+${Math.abs(cand.exposure_diff_points)} pts`}
                       </div>
-                      <div className="text-[10px] text-emerald-600/80 font-bold">vs Origin</div>
+                      <div className="text-[10px] text-emerald-600/80 font-bold">vs Origin ({cand.aqi_reduction_pct > 0 ? `-${cand.aqi_reduction_pct}%` : `+${Math.abs(cand.aqi_reduction_pct)}%`} AQI)</div>
                     </div>
 
                     <div className="p-3 rounded-2xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50">
@@ -766,38 +770,95 @@ export default function RelocationAdvisorPage() {
                     </div>
                   )}
 
-                  {/* Plain English Clinical Narrative */}
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-1.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                    <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                      <span>Clinical Relocation Assessment</span>
+                  {/* Personalized Suitability Rationale */}
+                  {cand.numeric_reasons && cand.numeric_reasons.length > 0 && (
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        Personalized Suitability Rationale
+                      </span>
+                      <ul className="space-y-1 text-xs text-slate-700 dark:text-slate-300">
+                        {cand.numeric_reasons.map((r, i) => (
+                          <li key={i} className="flex items-start gap-1.5">
+                            <span className="text-blue-500 font-bold">•</span>
+                            <span>{r}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Health-based Relocation Assessment */}
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-2 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                    <div className="font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Health-based Relocation Assessment</span>
+                      </div>
                     </div>
                     <p>{cand.explanation_narrative}</p>
-                  </div>
 
-                  {/* Actionable Advice Checklist */}
-                  <div className="space-y-2 pt-1">
-                    <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      Actionable Environmental Guidelines
+                    {/* How this is calculated expander */}
+                    <div className="pt-1 border-t border-slate-200/60 dark:border-slate-700/40">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedHowCalculated((prev) => ({
+                            ...prev,
+                            [idx]: !prev[idx],
+                          }))
+                        }
+                        className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-1"
+                      >
+                        <Info className="w-3 h-3 text-blue-500" />
+                        <span>{expandedHowCalculated[idx] ? 'Hide calculation details' : 'How this is calculated'}</span>
+                      </button>
+                      {expandedHowCalculated[idx] && (
+                        <div className="mt-2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300 space-y-1.5">
+                          <p>
+                            Suitability is evaluated using your health profile baseline threshold against the destination's verified annual PM2.5 mean ({cand.best_month_to_move?.annual_mean_pm25} µg/m³) and peak winter inversion factor ({cand.climatology?.winter_inversion_factor}×).
+                          </p>
+                          <p className="italic text-slate-500 dark:text-slate-400 font-medium">
+                            Advisory only, not medical advice. Follow your doctor's asthma/health action plan.
+                          </p>
+                          <Link to="/methodology" className="text-blue-600 dark:text-blue-400 font-bold hover:underline inline-flex items-center gap-1">
+                            <span>Read full scientific methodology</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      )}
                     </div>
-                    <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
-                      {cand.actionable_advice?.map((adv, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                          <span>{adv}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
 
-                  {/* Tailored Health Profile Precautions */}
-                  {cand.personal_risk?.tailored_precautions && cand.personal_risk.tailored_precautions.length > 0 && (
-                    <div className="p-3.5 rounded-2xl bg-rose-50/60 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 space-y-2 text-xs">
+                  {/* Best Time to Go Out Today */}
+                  {cand.best_time_today && (
+                    <div className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 space-y-1.5 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-rose-900 dark:text-rose-200 flex items-center gap-1.5">
-                          <Heart className="w-3.5 h-3.5 text-rose-500" />
-                          Tailored Precautions for Your Health Profile
+                        <span className="font-bold text-blue-900 dark:text-blue-200 flex items-center gap-1.5">
+                          <Sun className="w-3.5 h-3.5 text-amber-500" />
+                          Best Time to Go Out Today
                         </span>
+                        <span className="px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-extrabold text-[11px]">
+                          {cand.best_time_today.window}
+                        </span>
+                      </div>
+                      <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">
+                        {cand.best_time_today.guidance}
+                      </p>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-3 pt-0.5">
+                        <span>Hourly PM2.5: <strong className="text-slate-700 dark:text-slate-200">{cand.best_time_today.pm25} µg/m³</strong></span>
+                        <span>Ozone (O3): <strong className="text-slate-700 dark:text-slate-200">{cand.best_time_today.o3} µg/m³</strong></span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dynamic Place Precautions */}
+                  {cand.place_precautions && cand.place_precautions.length > 0 && (
+                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                          <span>Location & Profile Precautions ({cand.place_precautions.length})</span>
+                        </div>
                         <Link
                           to="/faq"
                           className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
@@ -807,30 +868,133 @@ export default function RelocationAdvisorPage() {
                         </Link>
                       </div>
 
-                      <ul className="space-y-1.5 text-[11px] text-slate-700 dark:text-slate-300">
-                        {cand.personal_risk.tailored_precautions.map((tp, idx) => (
-                          <li key={idx} className="flex flex-col gap-0.5">
-                            <span className="font-semibold text-rose-800 dark:text-rose-300">
-                              {tp.condition}:
-                            </span>
-                            <span className="text-slate-600 dark:text-slate-400">
-                              {tp.action} ({tp.mask})
-                            </span>
-                          </li>
+                      <div className="space-y-2.5">
+                        {(expandedPrecautions[idx]
+                          ? cand.place_precautions
+                          : cand.place_precautions.slice(0, 3)
+                        ).map((item) => (
+                          <div
+                            key={item.id || item.text}
+                            className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 text-xs shadow-2xs"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-bold text-slate-800 dark:text-slate-200">
+                                {item.category}
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                  item.priority === 'High'
+                                    ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border border-rose-300 dark:border-rose-800'
+                                    : item.priority === 'Medium'
+                                    ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-800'
+                                    : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800'
+                                }`}
+                              >
+                                {item.priority} Priority
+                              </span>
+                            </div>
+
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                              {item.text}
+                            </p>
+
+                            <div className="pt-1 flex flex-wrap items-center justify-between gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80">
+                              <span>
+                                <strong className="text-slate-700 dark:text-slate-300">Trigger:</strong> {item.trigger}
+                              </span>
+                              <span className="italic">
+                                Source: {item.source}
+                              </span>
+                            </div>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
+
+                      {cand.place_precautions.length > 3 && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpandedPrecautions((prev) => ({
+                              ...prev,
+                              [idx]: !prev[idx],
+                            }))
+                          }
+                          className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-1 flex items-center gap-1"
+                        >
+                          <span>
+                            {expandedPrecautions[idx]
+                              ? 'Show fewer precautions'
+                              : `Show all ${cand.place_precautions.length} precautions`}
+                          </span>
+                        </button>
+                      )}
                     </div>
                   )}
 
-                  {/* Climatology Preview */}
-                  {cand.climatology && (
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-                      <span>
-                        Cleanest Month: <strong className="text-slate-800 dark:text-slate-200">{cand.climatology?.best_month?.month_name}</strong> ({cand.climatology?.best_month?.mean_pm25} µg/m³)
-                      </span>
-                      <span>
-                        Inversion Factor: <strong className="text-slate-800 dark:text-slate-200">{cand.climatology?.winter_inversion_factor}×</strong>
-                      </span>
+                  {/* Mini 12-Month Month-by-Month Climatology Chart */}
+                  {cand.best_month_to_move?.monthly_pm25 && cand.best_month_to_move.monthly_pm25.length > 0 && (
+                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                          12-Month PM2.5 Climatology & Seasonal Trapping
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                          Inversion Factor: <strong className="text-slate-800 dark:text-slate-200">{cand.climatology?.winter_inversion_factor}×</strong>
+                        </span>
+                      </div>
+
+                      {/* Bar Chart rendering */}
+                      <div className="pt-2 pb-1">
+                        <div className="h-24 flex items-end gap-1.5 sm:gap-2 px-1">
+                          {(() => {
+                            const monthsData = cand.best_month_to_move.monthly_pm25;
+                            const maxPm25 = Math.max(120, ...monthsData.map((m) => m.mean_pm25 || 0));
+                            return monthsData.map((m) => {
+                              const val = m.mean_pm25 || 0;
+                              const heightPct = Math.max(8, Math.round((val / maxPm25) * 100));
+                              const isBest = m.month === cand.best_month_to_move?.month;
+                              const isWorst = m.month_name === cand.best_month_to_move?.worst_month_name;
+                              let barBg = 'bg-blue-400 dark:bg-blue-500';
+                              if (val <= 30) barBg = 'bg-emerald-500';
+                              else if (val <= 60) barBg = 'bg-lime-500';
+                              else if (val <= 90) barBg = 'bg-amber-400';
+                              else if (val <= 120) barBg = 'bg-orange-500';
+                              else barBg = 'bg-rose-500';
+
+                              return (
+                                <div key={m.month} className="flex-1 flex flex-col items-center gap-1 group relative">
+                                  {/* Tooltip on hover */}
+                                  <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[9px] px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap z-10">
+                                    {m.month_name}: {val} µg/m³
+                                  </div>
+                                  <div
+                                    className={`w-full rounded-t-md transition-all ${barBg} ${
+                                      isBest ? 'ring-2 ring-emerald-400' : isWorst ? 'ring-2 ring-rose-500' : ''
+                                    }`}
+                                    style={{ height: `${heightPct}%` }}
+                                  />
+                                  <span className={`text-[10px] font-semibold ${isBest ? 'text-emerald-600 font-bold' : isWorst ? 'text-rose-600 font-bold' : 'text-slate-500 dark:text-slate-400'}`}>
+                                    {m.month_name?.slice(0, 3)}
+                                  </span>
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                        <span>
+                          Cleanest: <strong className="text-emerald-600 dark:text-emerald-400">{cand.best_month_to_move?.month_name}</strong> ({cand.best_month_to_move?.mean_pm25} µg/m³)
+                        </span>
+                        <span>
+                          Peak Pollution: <strong className="text-rose-600 dark:text-rose-400">{cand.best_month_to_move?.worst_month_name}</strong> ({cand.best_month_to_move?.worst_mean_pm25} µg/m³)
+                        </span>
+                        <span>
+                          Annual Mean: <strong className="text-slate-800 dark:text-slate-200">{cand.best_month_to_move?.annual_mean_pm25} µg/m³</strong>
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -839,15 +1003,21 @@ export default function RelocationAdvisorPage() {
 
             {/* Scientific Methodology & Standards Note */}
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
-              <div className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                <Info className="w-4 h-4 text-blue-600" />
-                <span>Clinical & Scientific Advisory Standards</span>
+              <div className="font-bold text-slate-700 dark:text-slate-200 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Info className="w-4 h-4 text-blue-600" />
+                  <span>Scientific Advisory & Health Standards</span>
+                </div>
+                <Link to="/methodology" className="text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-1">
+                  <span>Methodology</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
               <p>
-                <strong>Scientific Validity:</strong> Comparative verdicts are derived from multi-criteria ranking combining regional CAMS atmospheric reanalysis, machine learning short-term forecast trends (held-out $R^2 = 0.715$ at 6h), and epidemiological sensitivity weightings from WHO 2021 air quality guidelines.
+                <strong>Scientific Validity:</strong> Comparative suitability is evaluated using rule-based multi-criteria environmental modeling anchored in Copernicus (CAMS) atmospheric reanalysis, local meteorological dispersion factors, and epidemiological sensitivity weightings from WHO 2021 air quality guidelines.
               </p>
               <p>
-                <strong>Legal & Medical Disclaimer:</strong> Air quality estimates are for general information and are not an official AQI or medical advice. If you have a health condition, follow your doctor's guidance.
+                <strong>Legal & Medical Disclaimer:</strong> Advisory only, not medical advice. Follow your doctor's asthma/health action plan. Air quality estimates are for general environmental information and do not substitute for personalized medical diagnosis or statutory governmental advisories.
               </p>
             </div>
           </div>

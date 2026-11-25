@@ -518,7 +518,69 @@ class LivabilityService:
                 f"(-{profile_shift['total_shift']} threshold shift)."
             )
 
-        # Generate persona-tailored citizen precautions with direct FAQ linkage
+        # Generate place-specific precautions using RiskService.generate_place_precautions
+        from backend.services.risk_service import RiskService
+        lat = weather_info.get("latitude", 28.61)
+        lon = weather_info.get("longitude", 77.23)
+        raw_w = weather_info.get("raw_weather", {})
+        temp_c = raw_w.get("temperature_2m_c", 25.0)
+        humidity = raw_w.get("relative_humidity_2m_pct", 50.0)
+        wind_speed = raw_w.get("wind_speed_10m_kmh", 5.0)
+        elevation = raw_w.get("elevation_m") or weather_info.get("elevation", 0.0) or 0.0
+        dust = reference_info.get("dust", 0.0) or 0.0
+        gov_pol = reference_info.get("governing_pollutant", "PM2.5")
+        o3 = reference_info.get("o3", 30.0)
+
+        clim_data = reference_info.get("climatology")
+        if not clim_data:
+            from backend.services.climatology_service import ClimatologyService
+            clim_res = ClimatologyService.get_city_climatology(lat=lat, lon=lon)
+            clim_data = clim_res.get("data", {})
+
+        monthly_pm25 = clim_data.get("monthly_pm25", [])
+        annual_mean = clim_data.get("annual_mean_pm25") or (
+            round(sum(m.get("mean_pm25", 0.0) for m in monthly_pm25) / max(1, len(monthly_pm25)), 1)
+            if monthly_pm25 else 35.0
+        )
+
+        place_ctx = {
+            "name": reference_info.get("place_name") or f"Coordinates ({round(lat, 2)}, {round(lon, 2)})",
+            "lat": lat,
+            "lon": lon,
+            "elevation": elevation,
+            "current_air": {
+                "pm25": ref_pm25,
+                "o3": o3,
+                "dust": dust,
+                "overall_aqi": reference_info.get("overall_aqi", int(ref_pm25 * 1.2)),
+                "cpcb_category": cpcb_category,
+                "governing_pollutant": gov_pol,
+            },
+            "current_weather": {
+                "temperature": temp_c,
+                "humidity": humidity,
+                "wind_speed": wind_speed,
+                "elevation": elevation,
+            },
+            "climatology": {
+                "annual_mean_pm25": annual_mean,
+                "best_month": clim_data.get("best_month", {"month": 7, "month_name": "July", "mean_pm25": 20.0}),
+                "worst_month": clim_data.get("worst_month", {"month": 1, "month_name": "January", "mean_pm25": 80.0}),
+                "winter_inversion_factor": clim_data.get("winter_inversion_factor", 1.5),
+                "monthly_pm25": monthly_pm25,
+            },
+            "forecast": {
+                "mean_pm25_24h": ref_fc_pm25,
+                "best_time_today": reference_info.get("best_time_today") or {},
+            },
+        }
+
+        place_precautions = RiskService.generate_place_precautions(
+            place_context=place_ctx,
+            profile=health_profile or {},
+        )
+
+        # Generate persona-tailored citizen precautions with direct FAQ linkage & place precautions
         citizen_precautions = cls.generate_citizen_precautions(
             effective_score=effective_score,
             verdict_label=matched_verdict["label"],
@@ -526,6 +588,7 @@ class LivabilityService:
             current_pm25=ref_pm25,
             forecast_pm25=ref_fc_pm25,
             cpcb_category=cpcb_category,
+            place_precautions=place_precautions,
         )
 
         # "Explain this verdict" interactive panel breakdown
@@ -696,6 +759,7 @@ class LivabilityService:
             "best_time_today": reference_info.get("best_time_today"),
             "seven_day_forecast": reference_info.get("seven_day_forecast"),
             "citizen_precautions": citizen_precautions,
+            "place_precautions": place_precautions,
             "medical_disclaimer": Config.MEDICAL_DISCLAIMER,
         }
 
@@ -708,6 +772,7 @@ class LivabilityService:
         current_pm25: Optional[float] = None,
         forecast_pm25: Optional[float] = None,
         cpcb_category: Optional[str] = None,
+        place_precautions: Optional[List[Dict[str, Any]]] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """Generate tailored citizen precautions based on specific health profile and air severity."""
@@ -831,10 +896,27 @@ class LivabilityService:
                 "faq_anchor": "health-sensitive-profiles",
             })
 
+        # 5. Place-Specific Environmental & Meteorological Precautions
+        if place_precautions:
+            for pp in place_precautions:
+                precautions.append({
+                    "id": pp.get("id"),
+                    "category": pp.get("category", "Environmental Factor"),
+                    "title": pp.get("category", "Environmental Factor"),
+                    "recommendation": pp.get("text", ""),
+                    "text": pp.get("text", ""),
+                    "trigger": pp.get("trigger", ""),
+                    "urgency": pp.get("priority", "Medium"),
+                    "priority": pp.get("priority", "Medium"),
+                    "source": pp.get("source", "Environmental Advisory"),
+                    "faq_anchor": "health-sensitive-profiles",
+                })
+
         return {
             "health_tags": active_tags,
             "precautions_count": len(precautions),
             "precautions": precautions,
+            "place_precautions": place_precautions or [],
             "faq_link": "/faq",
             "faq_guidance_notice": (
                 "Personalized health precautions are synthesized from WHO 2021 Clinical Guidelines and CPCB Health Advisory Protocols. "

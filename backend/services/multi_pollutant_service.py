@@ -251,7 +251,7 @@ class MultiPollutantService:
             params = {
                 "latitude": lat,
                 "longitude": lon,
-                "current": "pm2_5,pm10,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide,ozone",
+                "current": "pm2_5,pm10,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide,ozone,dust,uv_index",
                 "timezone": "Asia/Kolkata",
             }
             headers = {
@@ -300,6 +300,9 @@ class MultiPollutantService:
                 "success": True,
                 "coordinates": {"lat": lat, "lon": lon},
                 "timestamp": curr.get("time"),
+                "elevation": data.get("elevation"),
+                "dust": curr.get("dust"),
+                "uv_index": curr.get("uv_index"),
                 "data_source": "Copernicus Atmosphere Monitoring Service (CAMS) via Open-Meteo",
                 "scientific_framing": "Model reanalysis reference; represents ~11km grid atmospheric concentration.",
                 "coverage": coverage,
