@@ -134,12 +134,12 @@ class Config:
                 "label": "Not recommended",
                 "min_baseline_score": 0,
                 "color": "#EF4444",  # Crimson Red
-                "summary": "Severe air pollution crisis. Outdoor exposure carries severe health consequences. Unfavorable for residence without continuous high-grade filtration.",
+                "summary": "Unfavorable air quality. Significant particulate accumulation poses elevated health risks. Outdoor exposure not recommended without protective measures.",
                 "actions": {
-                    "n95_mask": "N95/P100 respirator strictly mandatory for any outdoor transit.",
-                    "indoor_exercise": "Strict indoor confinement. No strenuous physical exertion.",
-                    "windows": "Seal window gaps; do not ventilate with unpurified ambient air.",
-                    "purifier": "High-capacity HEPA purifiers running continuously; monitor indoor PM2.5.",
+                    "n95_mask": "N95/FFP2 respirator advised for outdoor transit.",
+                    "indoor_exercise": "Move strenuous physical exertion indoors.",
+                    "windows": "Keep windows closed; avoid ventilating with unpurified ambient air.",
+                    "purifier": "Operate HEPA purifiers continuously in primary rooms.",
                 },
             },
         ],

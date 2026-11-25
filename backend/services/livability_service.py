@@ -44,6 +44,241 @@ class LivabilityService:
         # CPCB Severe: 0 - 10
         return round(max(0.0, 10.0 - ((pm25 - 250.0) / 250.0) * 10.0), 1)
 
+    @classmethod
+    def get_cpcb_category(cls, pm25: Optional[float]) -> str:
+        """Return CPCB 2014 air quality category for 24-hr PM2.5 concentration (µg/m³).
+
+        Breakpoints:
+        - Good: 0 - 30 µg/m³
+        - Satisfactory: 31 - 60 µg/m³
+        - Moderate: 61 - 90 µg/m³
+        - Poor: 91 - 120 µg/m³
+        - Very Poor: 121 - 250 µg/m³
+        - Severe: > 250 µg/m³
+        """
+        if pm25 is None:
+            return "Unknown"
+        if pm25 <= 30.0:
+            return "Good"
+        elif pm25 <= 60.0:
+            return "Satisfactory"
+        elif pm25 <= 90.0:
+            return "Moderate"
+        elif pm25 <= 120.0:
+            return "Poor"
+        elif pm25 <= 250.0:
+            return "Very Poor"
+        else:
+            return "Severe"
+
+    @classmethod
+    def is_sensitive_profile(cls, health_profile: Optional[Dict[str, Any]]) -> bool:
+        """Determine whether the user has a sensitive/vulnerable health profile."""
+        if not health_profile or not isinstance(health_profile, dict):
+            return False
+        # Check explicit conditions list
+        conditions = [str(c).lower() for c in health_profile.get("conditions", [])]
+        sensitive_keywords = {
+            "asthma", "copd", "bronchitis", "allergic_rhinitis", "respiratory",
+            "cardiovascular", "heart_disease", "hypertension", "diabetes",
+            "pregnancy", "child", "senior", "outdoor_worker",
+        }
+        if any(c in sensitive_keywords for c in conditions):
+            return True
+        # Check boolean condition flags
+        if (
+            health_profile.get("has_respiratory_condition")
+            or health_profile.get("asthma")
+            or health_profile.get("has_heart_condition")
+            or health_profile.get("is_pregnant")
+            or health_profile.get("is_outdoor_worker")
+        ):
+            return True
+        # Check age group
+        age = str(health_profile.get("age_group", "adult")).lower()
+        if age in ("child", "senior"):
+            return True
+        return False
+
+    @classmethod
+    def get_verdict_messaging(
+        cls,
+        cpcb_category: str,
+        is_sensitive: bool,
+        health_profile: Optional[Dict[str, Any]] = None,
+        effective_score: float = 50.0,
+    ) -> Dict[str, Any]:
+        """Align verdict summary and protective advice with CPCB PM2.5 band and health profile.
+
+        Strict constraints:
+        - For 91-120 µg/m³ (Poor), do NOT say 'Severe air pollution crisis';
+        - 'Severe' wording is used strictly only for the Severe band (> 250 µg/m³).
+        - Sensitive groups receive stricter, tailored clinical guidance.
+        """
+        cat_lower = cpcb_category.lower()
+
+        if cat_lower == "good":
+            if is_sensitive:
+                summary = (
+                    "Air quality is in the CPCB Good band. Favorable conditions for sensitive individuals, "
+                    "children, and seniors; outdoor activities and natural home ventilation are safe."
+                )
+                actions = {
+                    "n95_mask": "Mask not required; maintain standard medication readiness if clinically prescribed.",
+                    "indoor_exercise": "Safe for children, seniors, and asthmatics to enjoy outdoor exercise.",
+                    "windows": "Natural fresh-air ventilation encouraged during daytime dispersion hours.",
+                    "purifier": "Air purifiers optional; maintain standard indoor allergen management.",
+                }
+            else:
+                summary = (
+                    "Air quality is in the CPCB Good band. Minimal health risk; outdoor activities, sports, "
+                    "and natural home ventilation are safe for all groups."
+                )
+                actions = {
+                    "n95_mask": "Not required for general population under clean air conditions.",
+                    "indoor_exercise": "Outdoor workouts encouraged; enjoy parks and open spaces.",
+                    "windows": "Open windows freely for natural fresh-air ventilation.",
+                    "purifier": "Air purifiers optional under clean outdoor air conditions.",
+                }
+
+        elif cat_lower == "satisfactory":
+            if is_sensitive:
+                summary = (
+                    "Air quality is in the CPCB Satisfactory band. Minor breathing discomfort may occur for sensitive "
+                    "individuals during prolonged heavy outdoor exertion; take breaks if symptoms appear."
+                )
+                actions = {
+                    "n95_mask": "Sensitive individuals advised to carry an N95 mask in congested traffic corridors.",
+                    "indoor_exercise": "Sensitive groups and children should take periodic breaks during prolonged outdoor play.",
+                    "windows": "Keep windows closed during morning and evening rush hour traffic peaks.",
+                    "purifier": "Running an indoor purifier in bedrooms can benefit sensitive respiratory profiles.",
+                }
+            else:
+                summary = (
+                    "Air quality is in the CPCB Satisfactory band. Ambient particulate levels pose minimal risk "
+                    "for healthy individuals during normal daily routines."
+                )
+                actions = {
+                    "n95_mask": "Mask optional for general population in open areas.",
+                    "indoor_exercise": "Normal outdoor workouts and physical activities permitted.",
+                    "windows": "Windows can remain open; close during peak rush hour traffic.",
+                    "purifier": "Air purifiers optional during normal hours.",
+                }
+
+        elif cat_lower == "moderate":
+            if is_sensitive:
+                summary = (
+                    "Air quality is in the CPCB Moderate band. Breathing discomfort possible for people with asthma, "
+                    "lung, or heart disease. Sensitive groups should reduce prolonged heavy outdoor exertion."
+                )
+                actions = {
+                    "n95_mask": "N95 / FFP2 respirator advised for sensitive individuals and seniors when outdoors.",
+                    "indoor_exercise": "Sensitive individuals, children, and seniors should move heavy aerobic exercise indoors.",
+                    "windows": "Keep windows closed to prevent particulate accumulation indoors.",
+                    "purifier": "Operate indoor HEPA air purifiers in bedrooms and primary living rooms.",
+                }
+            else:
+                summary = (
+                    "Air quality is in the CPCB Moderate band. Healthy individuals can engage in routine outdoor activities; "
+                    "prolonged strenuous workouts may cause slight throat irritation."
+                )
+                actions = {
+                    "n95_mask": "N95 mask recommended in congested or dust-heavy traffic corridors.",
+                    "indoor_exercise": "Healthy adults can exercise outdoors; reduce duration of strenuous cardio.",
+                    "windows": "Limit window opening during morning and evening rush hours.",
+                    "purifier": "Indoor air purifiers recommended in living spaces.",
+                }
+
+        elif cat_lower == "poor":
+            # 91 - 120 µg/m³: NO 'severe' or 'crisis' wording!
+            if is_sensitive:
+                summary = (
+                    "Air quality is in the CPCB Poor band. Heightened risk of breathing discomfort and asthma "
+                    "exacerbation for sensitive groups. Strictly avoid prolonged outdoor exertion and keep quick-relief medication handy."
+                )
+                actions = {
+                    "n95_mask": "Airtight N95 / FFP2 respirator strongly advised for any essential outdoor transit.",
+                    "indoor_exercise": "Avoid outdoor exertion; exercise indoors in a filtered room.",
+                    "windows": "Keep windows firmly closed continuously; seal noticeable draft gaps.",
+                    "purifier": "Operate HEPA air purifiers continuously on medium/high speed in living and sleeping areas.",
+                }
+            else:
+                summary = (
+                    "Air quality is in the CPCB Poor band. Ambient particulate levels cause breathing discomfort "
+                    "on prolonged outdoor exposure. Limit heavy outdoor exertion and close windows."
+                )
+                actions = {
+                    "n95_mask": "N95 / FFP2 respirator recommended for prolonged outdoor commutes.",
+                    "indoor_exercise": "Shift strenuous cardio and athletic workouts indoors.",
+                    "windows": "Keep windows and doors closed to block ambient dust ingress.",
+                    "purifier": "Operate HEPA air purifiers in home and office spaces.",
+                }
+
+        elif cat_lower == "very poor":
+            # 121 - 250 µg/m³: High hazard, NO 'severe' wording!
+            if is_sensitive:
+                summary = (
+                    "Air quality is in the CPCB Very Poor band. Significant respiratory and cardiovascular risk for "
+                    "sensitive individuals, children, and seniors. Strictly avoid outdoor exposure."
+                )
+                actions = {
+                    "n95_mask": "Well-fitted N95 / FFP2 respirator strictly mandatory for any unavoidable outdoor trip.",
+                    "indoor_exercise": "Stay indoors; avoid all physical exertion and maintain a clean-air environment.",
+                    "windows": "Keep windows sealed; do not open for ventilation during high-pollution periods.",
+                    "purifier": "Run high-efficiency HEPA purifiers continuously; monitor indoor PM2.5 levels.",
+                }
+            else:
+                summary = (
+                    "Air quality is in the CPCB Very Poor band. Prolonged outdoor exposure increases risk of respiratory "
+                    "illness for all individuals. Avoid strenuous outdoor activities."
+                )
+                actions = {
+                    "n95_mask": "N95 / FFP2 respirator strongly advised whenever stepping outdoors.",
+                    "indoor_exercise": "Move all athletic training, running, and workouts indoors.",
+                    "windows": "Keep windows closed continuously; avoid ventilating with unpurified outdoor air.",
+                    "purifier": "Run HEPA air purifiers continuously in bedrooms and living rooms.",
+                }
+
+        elif cat_lower == "severe":
+            # > 250 µg/m³: 'Severe' wording is strictly appropriate here!
+            if is_sensitive:
+                summary = (
+                    "Severe air pollution emergency. Critical acute hazards for sensitive individuals, children, "
+                    "seniors, and patients with cardiopulmonary disease. Remain strictly indoors with continuous HEPA filtration."
+                )
+                actions = {
+                    "n95_mask": "Certified N95 / FFP2 respirator mandatory; avoid any outdoor exposure if possible.",
+                    "indoor_exercise": "Remain indoors in a clean-air room; consult physician if experiencing respiratory distress.",
+                    "windows": "Completely seal windows and external vents; prevent ambient air infiltration.",
+                    "purifier": "Continuous high-grade HEPA purification essential; monitor indoor PM2.5 closely.",
+                }
+            else:
+                summary = (
+                    "Severe air pollution event. Ambient PM2.5 exceeds 250 µg/m³, affecting healthy individuals "
+                    "and creating serious health risks. Avoid all outdoor physical activity."
+                )
+                actions = {
+                    "n95_mask": "N95 / FFP2 / P100 respirator strictly mandatory for any outdoor transit.",
+                    "indoor_exercise": "Strict indoor stay; halt all non-essential outdoor physical activity.",
+                    "windows": "Seal window and door draft gaps; do not ventilate with raw ambient air.",
+                    "purifier": "Operate high-capacity HEPA filtration units continuously on maximum speed.",
+                }
+
+        else:
+            # Fallback for offline / unknown reference
+            summary = "Unverified air quality. Reference data unavailable to determine CPCB category."
+            actions = {
+                "n95_mask": "Carry an N95 mask as a precaution in high-traffic corridors.",
+                "indoor_exercise": "Monitor local conditions before outdoor exertion.",
+                "windows": "Keep windows closed if outdoor smog or haze is visible.",
+                "purifier": "Operate indoor air purifiers as needed.",
+            }
+
+        return {
+            "summary": summary,
+            "tailored_advice": actions,
+        }
+
     @staticmethod
     def calculate_met_dispersion_subscore(features: Dict[str, float]) -> float:
         """Estimate atmospheric dispersion / ventilation potential from surface weather."""
@@ -257,9 +492,23 @@ class LivabilityService:
                 "However, the location is outside Delhi-NCR, meaning the secondary ML estimate is an extrapolation."
             )
 
+        # Determine CPCB air quality band and health sensitivity
+        cpcb_category = cls.get_cpcb_category(ref_pm25)
+        is_sensitive = cls.is_sensitive_profile(health_profile) or (profile_shift["total_shift"] > 0)
+
+        # Align verdict summary and protective advice with CPCB band and health profile
+        messaging = cls.get_verdict_messaging(
+            cpcb_category=cpcb_category,
+            is_sensitive=is_sensitive,
+            health_profile=health_profile,
+            effective_score=effective_score,
+        )
+        verdict_summary = messaging["summary"]
+        tailored_actions = messaging["tailored_advice"]
+
         # Plain language reasons
         reasons = [
-            f"Current Reference PM2.5 is {ref_pm25} µg/m³ ({reference_info.get('reference_label', 'CAMS data')}).",
+            f"Current Reference PM2.5 is {ref_pm25} µg/m³ ({reference_info.get('reference_label', 'CAMS data')}, CPCB band: {cpcb_category}).",
             f"24-Hour Forecast indicates a {forecast_info.get('trend', 'stable')} trend (mean: {ref_fc_pm25} µg/m³).",
             f"Atmospheric dispersion index is {met_dispersion_score}/100 based on live solar radiation and relative humidity.",
         ]
@@ -276,6 +525,7 @@ class LivabilityService:
             health_profile=health_profile,
             current_pm25=ref_pm25,
             forecast_pm25=ref_fc_pm25,
+            cpcb_category=cpcb_category,
         )
 
         # "Explain this verdict" interactive panel breakdown
@@ -284,7 +534,7 @@ class LivabilityService:
             "raw_score": composite_score,
             "effective_score": effective_score,
             "primary_driver": (
-                f"Reference CAMS PM2.5 ({ref_pm25} µg/m³) provided {round(weights['reference_current'] * ref_current_score, 1)} "
+                f"Reference CAMS PM2.5 ({ref_pm25} µg/m³, CPCB: {cpcb_category}) provided {round(weights['reference_current'] * ref_current_score, 1)} "
                 f"out of 60 possible points."
             ),
             "forecast_influence": (
@@ -305,52 +555,83 @@ class LivabilityService:
             ),
         }
 
-        # Targeted persona-specific health guidance
+        # Targeted persona-specific health guidance aligned with CPCB category & score
+        if cpcb_category == "Severe":
+            gen_tag = "Hazardous"
+            gen_action = "Avoid all outdoor physical activity; seal window drafts and run indoor air purifiers."
+            gen_details = "Severe particulate pollution penetrates alveolar membranes. Stay indoors with continuous HEPA filtration."
+            sens_tag = "Emergency"
+            sens_action = "Remain indoors in a clean-air room with HEPA filtration; consult physician if symptoms appear."
+            sens_details = "Critical hazard for vulnerable respiratory or cardiovascular profiles. Seek immediate care if distress occurs."
+            out_tag = "Prohibited"
+            out_action = "Halt all non-essential outdoor work and outdoor athletic activities."
+            out_details = "Severe particulate exposure poses immediate acute hazards to pulmonary and vascular function. Halt all outdoor exertion."
+        elif cpcb_category == "Very Poor":
+            gen_tag = "Hazardous" if effective_score < 20 else "Unfavorable"
+            gen_action = "Avoid strenuous outdoor physical activity; move cardio indoors and run air purifiers."
+            gen_details = "Very poor air quality with high particulate accumulation. Restrict outdoor activity and run indoor HEPA filtration."
+            sens_tag = "High Caution"
+            sens_action = "Strictly avoid outdoor recreation; wear an N95 respirator if transit is required."
+            sens_details = "Elevated risk of asthma exacerbation, chest tightness, and cardiovascular strain in very poor air."
+            out_tag = "Not Recommended"
+            out_action = "Relocate athletic training indoors; outdoor workers must wear tight-fitting N95 respirators."
+            out_details = "Heavy ventilation during outdoor exercise significantly increases toxic particulate deposition. Move workouts indoors."
+        elif cpcb_category == "Poor":
+            gen_tag = "Unfavorable"
+            gen_action = "Limit prolonged outdoor exertion; consider indoor gym workouts and keep home windows closed."
+            gen_details = "Elevated particulate accumulation increases respiratory strain on prolonged exposure. Limit outdoor exertion."
+            sens_tag = "High Caution"
+            sens_action = "Avoid prolonged outdoor recreation; carry quick-relief inhalers and wear an N95 respirator."
+            sens_details = "Elevated risk of cough, throat irritation, and asthma exacerbation during poor air quality."
+            out_tag = "Not Recommended"
+            out_action = "Relocate strenuous athletic training indoors; outdoor workers should wear N95 respirators."
+            out_details = "Prolonged heavy ventilation during outdoor workouts increases particulate dosage. Shift athletic training indoors."
+        elif cpcb_category == "Moderate":
+            gen_tag = "Moderate"
+            gen_action = "Normal outdoor activities permitted; avoid heavy traffic corridors during peak rush hours."
+            gen_details = "Particulate levels may cause minor throat or respiratory irritation during prolonged exertion."
+            sens_tag = "Caution"
+            sens_action = "Sensitive individuals should carry quick-relief inhalers and avoid intense outdoor play."
+            sens_details = "Children and asthmatics are more susceptible to bronchospasm. Restrict high-intensity outdoor games."
+            out_tag = "Adjust Timing"
+            out_action = "Schedule strenuous training during mid-day dispersion windows; avoid peak traffic hours."
+            out_details = "Deep inhalation during prolonged strenuous exercise increases particulate exposure. Prefer off-peak hours."
+        elif cpcb_category == "Satisfactory":
+            gen_tag = "Moderate" if effective_score < 75 else "Safe"
+            gen_action = "Normal outdoor routines and natural home ventilation permitted."
+            gen_details = "Particulate levels are acceptable; minor irritation only possible for exceptionally sensitive persons."
+            sens_tag = "Caution" if is_sensitive else "Good"
+            sens_action = "Safe outdoor conditions; sensitive individuals should monitor symptoms during prolonged heavy exercise."
+            sens_details = "Low risk for general public; sensitive groups should take intermittent breaks during intense workouts."
+            out_tag = "Recommended"
+            out_action = "Outdoor training and activities permitted; avoid congested vehicular corridors."
+            out_details = "Outdoor physical training is generally safe; adjust timing away from peak traffic corridors."
+        else:  # Good or Unknown
+            gen_tag = "Safe"
+            gen_action = "Normal outdoor routines and natural home ventilation permitted."
+            gen_details = "Clean ambient particulate levels support safe cardio exercise, daily commutes, and open-window ventilation."
+            sens_tag = "Good"
+            sens_action = "Safe outdoor conditions for children, seniors, and expectant mothers."
+            sens_details = "Minimal risk for asthma, COPD, or cardiovascular patients under current atmospheric dispersion."
+            out_tag = "Recommended"
+            out_action = "Optimal conditions for running, cycling, and prolonged outdoor labor."
+            out_details = "Favorable atmospheric dispersion prevents particulate accumulation during deep aerobic breathing."
+
         persona_guidance = {
             "general": {
-                "tag": "Safe" if effective_score >= 75 else ("Moderate" if effective_score >= 50 else ("Unfavorable" if effective_score >= 30 else "Hazardous")),
-                "action": (
-                    "Normal outdoor routines and natural home ventilation permitted." if effective_score >= 75
-                    else "Normal outdoor activities permitted; avoid heavy traffic corridors during peak rush hours." if effective_score >= 50
-                    else "Limit outdoor exertion; consider indoor gym workouts and keep home windows closed." if effective_score >= 30
-                    else "Avoid all outdoor physical activity; seal window drafts and run indoor air purifiers."
-                ),
-                "details": (
-                    "Clean ambient particulate levels support safe cardio exercise, daily commutes, and open-window ventilation." if effective_score >= 75
-                    else "Fine particulates may cause minor throat irritation during prolonged strenuous workouts." if effective_score >= 50
-                    else "Particulate accumulation elevates respiratory strain. Shift aerobic exercises indoors." if effective_score >= 30
-                    else "Severe particulate pollution penetrates alveolar membranes. Stay indoors with continuous HEPA filtration."
-                ),
+                "tag": gen_tag,
+                "action": gen_action,
+                "details": gen_details,
             },
             "sensitive": {
-                "tag": "Good" if effective_score >= 85 else ("Caution" if effective_score >= 60 else ("High Caution" if effective_score >= 35 else "Emergency")),
-                "action": (
-                    "Safe outdoor conditions for children, seniors, and expectant mothers." if effective_score >= 75
-                    else "Sensitive individuals should carry quick-relief inhalers and avoid intense outdoor play." if effective_score >= 50
-                    else "Strictly avoid outdoor recreation; wear an N95 respirator if transit is required." if effective_score >= 30
-                    else "Remain indoors in a clean-air room with HEPA filtration; consult physician if symptoms appear."
-                ),
-                "details": (
-                    "Minimal risk for asthma, COPD, or cardiovascular patients under current atmospheric dispersion." if effective_score >= 75
-                    else "Children and asthmatics are more susceptible to bronchospasm. Restrict high-intensity outdoor games." if effective_score >= 50
-                    else "Elevated risk of asthma exacerbation, chest tightness, and cardiovascular strain." if effective_score >= 30
-                    else "Critical hazard for vulnerable respiratory or cardiovascular profiles. Seek immediate care if distress occurs."
-                ),
+                "tag": sens_tag,
+                "action": sens_action,
+                "details": sens_details,
             },
             "outdoor": {
-                "tag": "Recommended" if effective_score >= 75 else ("Adjust Timing" if effective_score >= 50 else ("Not Recommended" if effective_score >= 30 else "Prohibited")),
-                "action": (
-                    "Optimal conditions for running, cycling, and prolonged outdoor labor." if effective_score >= 75
-                    else "Schedule strenuous training during mid-day dispersion windows; avoid peak traffic hours." if effective_score >= 50
-                    else "Relocate athletic training indoors; outdoor workers must wear tight-fitting N95 respirators." if effective_score >= 30
-                    else "Halt all non-essential outdoor work and outdoor athletic activities."
-                ),
-                "details": (
-                    "Favorable atmospheric dispersion prevents particulate accumulation during deep aerobic breathing." if effective_score >= 75
-                    else "Deep inhalation during exercise increases particulate dosage. Prefer hours with lowest ambient PM2.5." if effective_score >= 50
-                    else "Heavy ventilation during outdoor exercise significantly increases toxic particulate deposition in lungs." if effective_score >= 30
-                    else "Extreme particulate exposure poses immediate acute hazards to pulmonary and vascular function."
-                ),
+                "tag": out_tag,
+                "action": out_action,
+                "details": out_details,
             },
         }
 
@@ -360,11 +641,12 @@ class LivabilityService:
             "verdict": matched_verdict["label"],
             "tier": matched_verdict["label"],
             "color": matched_verdict["color"],
-            "summary": matched_verdict["summary"],
+            "cpcb_category": cpcb_category,
+            "summary": verdict_summary,
             "confidence": confidence,
             "confidence_reason": confidence_reason,
             "reasons": reasons,
-            "tailored_advice": matched_verdict["actions"],
+            "tailored_advice": tailored_actions,
             "persona_guidance": persona_guidance,
             "explain_verdict": explain_verdict,
             "health_profile_applied": {

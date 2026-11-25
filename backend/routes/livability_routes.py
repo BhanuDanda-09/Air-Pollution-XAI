@@ -190,14 +190,19 @@ def compare_livability():
     pm25_b = eval_b.get("reference_air_quality", {}).get("reference_pm25")
 
     # Winner determination
+    v_a_raw = eval_a["livability"].get("verdict", "")
+    v_a_label = v_a_raw.get("label") if isinstance(v_a_raw, dict) else v_a_raw
+    v_b_raw = eval_b["livability"].get("verdict", "")
+    v_b_label = v_b_raw.get("label") if isinstance(v_b_raw, dict) else v_b_raw
+
     if score_a > score_b:
         winner = "location_a"
         winner_name = name_a
         score_diff = score_a - score_b
         summary = (
             f"🏆 {name_a} offers significantly more favorable air quality right now with a livability score "
-            f"of {score_a}/100 ({eval_a['livability']['verdict']['label']}) vs. {name_b}'s {score_b}/100 "
-            f"({eval_b['livability']['verdict']['label']})."
+            f"of {score_a}/100 ({v_a_label}) vs. {name_b}'s {score_b}/100 "
+            f"({v_b_label})."
         )
     elif score_b > score_a:
         winner = "location_b"
@@ -205,8 +210,8 @@ def compare_livability():
         score_diff = score_b - score_a
         summary = (
             f"🏆 {name_b} offers significantly more favorable air quality right now with a livability score "
-            f"of {score_b}/100 ({eval_b['livability']['verdict']['label']}) vs. {name_a}'s {score_a}/100 "
-            f"({eval_a['livability']['verdict']['label']})."
+            f"of {score_b}/100 ({v_b_label}) vs. {name_a}'s {score_a}/100 "
+            f"({v_a_label})."
         )
     else:
         winner = "tie"

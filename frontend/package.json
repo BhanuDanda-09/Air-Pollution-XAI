@@ -8,7 +8,7 @@
     "build": "vite build && node ../scripts/verify_brand_cleanliness.mjs",
     "preview": "vite preview",
     "test:brand": "node ../scripts/verify_brand_cleanliness.mjs",
-    "test:unit": "node test/validation.test.js && node test/demo_security.test.js && node test/auth_user.test.js && node test/livability.test.js && node test/early_warning_and_insights.test.js",
+    "test:unit": "node test/validation.test.js && node test/demo_security.test.js && node test/auth_user.test.js && node test/livability.test.js && node test/early_warning_and_insights.test.js && node test/verdict_cpcb_bands.test.js",
     "test:smoke": "node test/e2e_smoke.mjs",
     "test:map": "node test/map_tiles.test.mjs",
     "test:footer": "node test/test_footer_suite.mjs",
